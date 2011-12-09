@@ -179,33 +179,61 @@ void pkcs11_logger_log_byte_array(const char *name, CK_BYTE_PTR byte_array, CK_U
 }
 
 
-void pkcs11_logger_log_attribute_template(CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulCount)
+void pkcs11_logger_log_attribute_template_with_indent(CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulCount, int level)
 {
 	int i = 0;
-	
+	char indent[level*3+1];
+	char horizontal_line[] = "--------------------------------------";
+
+
 	if ((NULL == pTemplate) || (ulCount < 1))
 		return;
 	
+	for(i = 0; i < level*3+1; i++)
+	{
+		indent[i] = ' ';
+	}
+	if(i > 1) {
+		indent[i++] = '|';
+	}
+	indent[i] = '\0';
+
 	for (i = 0; i < ulCount; i++)
 	{
-		pkcs11_logger_log("  Attribute %d", i);
-		pkcs11_logger_log("   Attribute: %lu (%s)", pTemplate[i].type, pkcs11_logger_translate_ck_attribute(pTemplate[i].type));
-		pkcs11_logger_log("   pValue: %p", pTemplate[i].pValue);
-		pkcs11_logger_log("   ulValueLen: %lu", pTemplate[i].ulValueLen);
+		pkcs11_logger_log("%s  Attribute %d", indent, i);
+		pkcs11_logger_log("%s   Attribute: %lu (%s)", indent, pTemplate[i].type, pkcs11_logger_translate_ck_attribute(pTemplate[i].type));
+		pkcs11_logger_log("%s   pValue: %p", indent, pTemplate[i].pValue);
+		pkcs11_logger_log("%s   ulValueLen: %lu", indent, pTemplate[i].ulValueLen);
 
 		if (NULL != pTemplate[i].pValue)
 		{
 			char *value = NULL;
-			value = pkcs11_logger_translate_ck_byte_ptr(pTemplate[i].pValue, pTemplate[i].ulValueLen);
-			if (NULL != value)
+			if(0x40000000 & pTemplate[i].type)
 			{
-				pkcs11_logger_log("   *pValue: HEX(%s)", value);
-				CALL_N_CLEAR(free, value);
+				pkcs11_logger_log("%s   *pValue: is nested attribute array", indent);
+				pkcs11_logger_log("%s   %s", indent, horizontal_line);
+				pkcs11_logger_log_attribute_template_with_indent(pTemplate[i].pValue, pTemplate[i].ulValueLen / sizeof(CK_ATTRIBUTE), level + 1);
+				pkcs11_logger_log("%s   %s", indent, horizontal_line);
 			}
 			else
 			{
-				pkcs11_logger_log("   *pValue: *** cannot be displayed ***");
+				value = pkcs11_logger_translate_ck_byte_ptr(pTemplate[i].pValue, pTemplate[i].ulValueLen);
+				if (NULL != value)
+				{
+					pkcs11_logger_log("%s   *pValue: HEX(%s)", indent, value);
+					CALL_N_CLEAR(free, value);
+				}
+				else
+				{
+					pkcs11_logger_log("%s   *pValue: *** cannot be displayed ***", indent);
+				}
 			}
 		}
 	}
+}
+
+
+void pkcs11_logger_log_attribute_template(CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulCount)
+{
+	pkcs11_logger_log_attribute_template_with_indent(pTemplate, ulCount, 0);
 }
