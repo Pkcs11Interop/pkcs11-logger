@@ -1149,8 +1149,8 @@ char* pkcs11_logger_translate_ck_byte_ptr(CK_BYTE_PTR bytes, CK_ULONG length)
 	{
 		int lo = bytes[i] & 0x0F;
 		int hi = bytes[i] >> 4;
-		output[i * 2] = t[hi];
-		output[i * 2 + 1] = t[lo];
+		output[(length - 1 - i) * 2] = t[hi];
+		output[(length - 1 - i) * 2 + 1] = t[lo];
 	}
 
 	return output;
