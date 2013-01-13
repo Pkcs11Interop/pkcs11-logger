@@ -22,7 +22,11 @@ Application calls PKCS#11 function provided by logger, logger calls the same
 function provided by original PKCS#11 library and while logging everything 
 it returns the result to the application.
 
-## Building
+## Precompiled binaries
+
+Precompiled binaries as well as source releases can be downloaded from [sourceforge.net](http://sourceforge.net/projects/pkcs11-logger/).
+
+## Building from source
 
 You will need MinGW with MSYS on Windows and GCC and Make on Linux. On both 
 platforms you will need Git to get latest source with command:
