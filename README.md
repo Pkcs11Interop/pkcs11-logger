@@ -1,4 +1,6 @@
-# PKCS11-LOGGER : PKCS#11 logging proxy module
+PKCS11-LOGGER
+=============
+**PKCS#11 logging proxy module**
 
 ## Overview
 
@@ -35,11 +37,11 @@ platforms you will need Git to get latest source with command:
 
 To build logger on Windows use following command:
 
-	make -f Makefile.Windows && make
+	make -f Makefile.Windows
 
 To build logger on Linux use following command:
 
-	make -f Makefile.Linux && make
+	make -f Makefile.Linux
 
 Depending on your platform there should be a library called "pkcs11-logger.dll" 
 or "pkcs11-logger.so" available in your working directory.
