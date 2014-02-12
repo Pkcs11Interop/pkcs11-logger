@@ -1,0 +1,11 @@
+[Bb]in/
+[Oo]bj/
+*.userprefs
+test-results/
+TestResults/
+*.sdf
+*.suo
+*.user
+Debug/
+Release/
+ipch/
