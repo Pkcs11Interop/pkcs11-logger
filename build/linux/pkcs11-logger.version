@@ -1,0 +1,7 @@
+PKCS11LOGGER {
+  global:
+	C_*;
+  local:
+	*;
+};
+
