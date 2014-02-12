@@ -1,23 +1,23 @@
-/* PKCS11-LOGGER - PKCS#11 logging proxy module
- * Copyright (C) 2011 Jaroslav Imrich <jariq(at)jariq(dot)sk>
+/*
+ *  PKCS11-LOGGER - PKCS#11 logging proxy module
+ *  Copyright (c) 2011-2014 JWC s.r.o. <http://www.jwc.sk>
+ *  Author: Jaroslav Imrich <jimrich@jimrich.sk>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License versuin 3 
- * as published by the Free Software Foundation.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  Licensing for open source projects:
+ *  PKCS11-LOGGER is available under the terms of the GNU Affero General 
+ *  Public License version 3 as published by the Free Software Foundation.
+ *  Please see <http://www.gnu.org/licenses/agpl-3.0.html> for more details.
+ *
+ *  Licensing for other types of projects:
+ *  PKCS11-LOGGER is available under the terms of flexible commercial license.
+ *  Please contact JWC s.r.o. at <info@pkcs11interop.net> for more details.
  */
  
 
 #include "pkcs11-logger.h"
 
 
+// Translates CK_RV to string
 const char* pkcs11_logger_translate_ck_rv(CK_RV rv)
 {
 	const char *rv_name = NULL;
@@ -295,6 +295,7 @@ const char* pkcs11_logger_translate_ck_rv(CK_RV rv)
 }
 
 
+// Translates CK_MECHANISM_TYPE to string
 const char* pkcs11_logger_translate_ck_mechanism_type(CK_MECHANISM_TYPE type)
 {
 	const char *type_name = NULL;
@@ -625,37 +626,37 @@ const char* pkcs11_logger_translate_ck_mechanism_type(CK_MECHANISM_TYPE type)
 		case CKM_CAST3_CBC_PAD:
 			type_name = "CKM_CAST3_CBC_PAD";
 			break;
-		// Duplicate values in PKCS#11 specification :/
+		// Duplicate values in PKCS#11 specification
 		// #define CKM_CAST5_KEY_GEN              0x00000320
 		// #define CKM_CAST128_KEY_GEN            0x00000320
 		case CKM_CAST5_KEY_GEN:
 			type_name = "CKM_CAST5_KEY_GEN or CKM_CAST128_KEY_GEN";
 			break;
-		// Duplicate values in PKCS#11 specification :/
+		// Duplicate values in PKCS#11 specification
 		// #define CKM_CAST5_ECB                  0x00000321
 		// #define CKM_CAST128_ECB                0x00000321
 		case CKM_CAST5_ECB:
 			type_name = "CKM_CAST5_ECB or CKM_CAST128_ECB";
 			break;
-		// Duplicate values in PKCS#11 specification :/
+		// Duplicate values in PKCS#11 specification
 		// #define CKM_CAST5_CBC                  0x00000322
 		// #define CKM_CAST128_CBC                0x00000322
 		case CKM_CAST5_CBC:
 			type_name = "CKM_CAST5_CBC or CKM_CAST128_CBC";
 			break;
-		// Duplicate values in PKCS#11 specification :/
+		// Duplicate values in PKCS#11 specification
 		// #define CKM_CAST5_MAC                  0x00000323
 		// #define CKM_CAST128_MAC                0x00000323
 		case CKM_CAST5_MAC:
 			type_name = "CKM_CAST5_MAC or CKM_CAST128_MAC";
 			break;
-		// Duplicate values in PKCS#11 specification :/
+		// Duplicate values in PKCS#11 specification
 		// #define CKM_CAST5_MAC_GENERAL          0x00000324
 		// #define CKM_CAST128_MAC_GENERAL        0x00000324
 		case CKM_CAST5_MAC_GENERAL:
 			type_name = "CKM_CAST5_MAC_GENERAL or CKM_CAST128_MAC_GENERAL";
 			break;
-		// Duplicate values in PKCS#11 specification :/
+		// Duplicate values in PKCS#11 specification
 		// #define CKM_CAST5_CBC_PAD              0x00000325
 		// #define CKM_CAST128_CBC_PAD            0x00000325
 		case CKM_CAST5_CBC_PAD:
@@ -781,13 +782,13 @@ const char* pkcs11_logger_translate_ck_mechanism_type(CK_MECHANISM_TYPE type)
 		case CKM_PBE_MD5_CAST3_CBC:
 			type_name = "CKM_PBE_MD5_CAST3_CBC";
 			break;
-		// Duplicate values in PKCS#11 specification :/
+		// Duplicate values in PKCS#11 specification
 		// #define CKM_PBE_MD5_CAST5_CBC          0x000003A4
 		// #define CKM_PBE_MD5_CAST128_CBC        0x000003A4
 		case CKM_PBE_MD5_CAST5_CBC:
 			type_name = "CKM_PBE_MD5_CAST5_CBC or CKM_PBE_MD5_CAST128_CBC";
 			break;
-		// Duplicate values in PKCS#11 specification :/
+		// Duplicate values in PKCS#11 specification
 		// #define CKM_PBE_SHA1_CAST5_CBC         0x000003A5
 		// #define CKM_PBE_SHA1_CAST128_CBC       0x000003A5
 		case CKM_PBE_SHA1_CAST5_CBC:
@@ -967,7 +968,7 @@ const char* pkcs11_logger_translate_ck_mechanism_type(CK_MECHANISM_TYPE type)
 		case CKM_BATON_WRAP:
 			type_name = "CKM_BATON_WRAP";
 			break;
-		// Duplicate values in PKCS#11 specification :/
+		// Duplicate values in PKCS#11 specification
 		// #define CKM_ECDSA_KEY_PAIR_GEN         0x00001040
 		// #define CKM_EC_KEY_PAIR_GEN            0x00001040
 		case CKM_ECDSA_KEY_PAIR_GEN:
@@ -1080,6 +1081,7 @@ const char* pkcs11_logger_translate_ck_mechanism_type(CK_MECHANISM_TYPE type)
 }
 
 
+// Translates CK_USER_TYPE to string
 const char* pkcs11_logger_translate_ck_user_type(CK_USER_TYPE type)
 {
 	const char *type_name = NULL;
@@ -1103,6 +1105,7 @@ const char* pkcs11_logger_translate_ck_user_type(CK_USER_TYPE type)
 }
 
 
+// Translates CK_STATE to string
 const char* pkcs11_logger_translate_ck_state(CK_STATE state)
 {
 	const char *state_name = NULL;
@@ -1132,11 +1135,12 @@ const char* pkcs11_logger_translate_ck_state(CK_STATE state)
 }
 
 
+// Translates CK_BYTE_PTR to string
 char* pkcs11_logger_translate_ck_byte_ptr(CK_BYTE_PTR bytes, CK_ULONG length)
 {
-	int i = 0;
+	CK_ULONG i = 0;
 	char *output = NULL;
-    int output_len = (length * 2) + 1;
+    CK_ULONG output_len = (length * 2) + 1;
     char *t = "0123456789ABCDEF";
 	
 	output = (char *) malloc(output_len * sizeof(char));
@@ -1157,6 +1161,7 @@ char* pkcs11_logger_translate_ck_byte_ptr(CK_BYTE_PTR bytes, CK_ULONG length)
 }
 
 
+// Translates CK_ATTRIBUTE_TYPE to string
 const char* pkcs11_logger_translate_ck_attribute(CK_ATTRIBUTE_TYPE type)
 {
 	const char *type_name = NULL;
@@ -1307,7 +1312,7 @@ const char* pkcs11_logger_translate_ck_attribute(CK_ATTRIBUTE_TYPE type)
 		case CKA_PRIME_BITS:
 			type_name = "CKA_PRIME_BITS";
 			break;
-		// Duplicate values in PKCS#11 specification :/
+		// Duplicate values in PKCS#11 specification
 		// #define CKA_SUBPRIME_BITS      0x00000134
 		// #define CKA_SUB_PRIME_BITS     CKA_SUBPRIME_BITS
 		case CKA_SUBPRIME_BITS:
@@ -1337,7 +1342,7 @@ const char* pkcs11_logger_translate_ck_attribute(CK_ATTRIBUTE_TYPE type)
 		case CKA_MODIFIABLE:
 			type_name = "CKA_MODIFIABLE";
 			break;
-		// Duplicate values in PKCS#11 specification :/	
+		// Duplicate values in PKCS#11 specification	
 		// #define CKA_ECDSA_PARAMS       0x00000180
 		// #define CKA_EC_PARAMS          0x00000180
 		case CKA_EC_PARAMS:

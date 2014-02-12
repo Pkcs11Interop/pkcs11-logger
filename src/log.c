@@ -1,95 +1,101 @@
-/* PKCS11-LOGGER - PKCS#11 logging proxy module
- * Copyright (C) 2011 Jaroslav Imrich <jariq(at)jariq(dot)sk>
+/*
+ *  PKCS11-LOGGER - PKCS#11 logging proxy module
+ *  Copyright (c) 2011-2014 JWC s.r.o. <http://www.jwc.sk>
+ *  Author: Jaroslav Imrich <jimrich@jimrich.sk>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License versuin 3 
- * as published by the Free Software Foundation.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  Licensing for open source projects:
+ *  PKCS11-LOGGER is available under the terms of the GNU Affero General 
+ *  Public License version 3 as published by the Free Software Foundation.
+ *  Please see <http://www.gnu.org/licenses/agpl-3.0.html> for more details.
+ *
+ *  Licensing for other types of projects:
+ *  PKCS11-LOGGER is available under the terms of flexible commercial license.
+ *  Please contact JWC s.r.o. at <info@pkcs11interop.net> for more details.
  */
 
 
 #include "pkcs11-logger.h"
 
 
-static void current_time_str(char* buff, int buff_len)
-{
-	memset(buff, 0, buff_len * sizeof(char));
-	
-#ifdef _WIN32
-
-	struct timeval tv;
-
-	if (gettimeofday(&tv, NULL) == 0)
-		strftime(buff, buff_len, "%Y-%m-%d %H:%M:%S", localtime(&tv.tv_sec));
-
-#else
-
-	struct timeval tv;
-	struct tm tm;
-	
-	if (gettimeofday(&tv, NULL) == 0)
-		if (localtime_r(&tv.tv_sec, &tm) != NULL)
-			strftime(buff, buff_len, "%Y-%m-%d %H:%M:%S", &tm);
-
-#endif
-}
+extern CK_BBOOL pkcs11_logger_env_vars_read;
+extern CK_CHAR_PTR pkcs11_logger_log_file_path;
+extern CK_ULONG pkcs11_logger_flags;
 
 
-static int get_thread_id()
-{
-#ifdef _WIN32
-	return GetCurrentThreadId();
-#else
-	return pthread_self();
-#endif
-}
-
-static int get_process_id()
-{
-#ifdef _WIN32
-	return _getpid();
-#else
-	return getpid();
-#endif
-}
-
-
+// Logs message
 void pkcs11_logger_log(const char* message, ...)
 {
 	FILE *fw = NULL;
-	FILE *output = stdout;
 	va_list ap;
-	
+
+	unsigned long disable_log_file = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE) == PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE);
+	unsigned long disable_process_id = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID) == PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID);
+	unsigned long disable_thread_id = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID) == PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID);
+	unsigned long enable_stdout = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_ENABLE_STDOUT) == PKCS11_LOGGER_FLAG_ENABLE_STDOUT);
+	unsigned long enable_stderr = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_ENABLE_STDERR) == PKCS11_LOGGER_FLAG_ENABLE_STDERR);
+
 	// Acquire exclusive access to the file
 	pkcs11_logger_lock_acquire();
 	
-	va_start(ap, message);
-	
-	// Determine log filename
-	char *log_file_name = getenv("PKCS11_LOGGER_LOG_FILE");
-	if (NULL == log_file_name)
-		log_file_name = DEFAULT_PKCS11_LOGGER_LOG_FILE;
-	
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#endif
+
 	// Open log file
-	fw = fopen(log_file_name, "a");
-	if (NULL != fw)
-		output = fw;
-	
-	// Output message to log file or stdout
-	fprintf(output, "%0#10x : ", get_process_id());
-	fprintf(output, "%0#10x : ", get_thread_id());
-	vfprintf(output, message, ap);
-	fprintf(output, "\n");
+	if (!disable_log_file && pkcs11_logger_log_file_path != NULL)
+		fw = fopen((const char *) pkcs11_logger_log_file_path, "a");
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
+
+	// Log to file
+	if ((!disable_log_file) && (NULL != fw))
+	{
+		va_start(ap, message);
+
+		if (!disable_process_id)
+			fprintf(fw, "%0#10x : ", pkcs11_logger_utils_get_process_id());
+		if (!disable_thread_id)
+			fprintf(fw, "%0#10x : ", pkcs11_logger_utils_get_thread_id());
+		vfprintf(fw, message, ap);
+		fprintf(fw, "\n");
+
+		va_end(ap);
+	}
+
+	// Log to stdout
+	if (enable_stdout)
+	{
+		va_start(ap, message);
+
+		if (!disable_process_id)
+			fprintf(stdout, "%0#10x : ", pkcs11_logger_utils_get_process_id());
+		if (!disable_thread_id)
+			fprintf(stdout, "%0#10x : ", pkcs11_logger_utils_get_thread_id());
+		vfprintf(stdout, message, ap);
+		fprintf(stdout, "\n");
+		
+		va_end(ap);
+	}
+
+	// Log to stderr
+	if (enable_stderr || pkcs11_logger_env_vars_read == CK_FALSE)
+	{
+		va_start(ap, message);
+
+		if (!disable_process_id)
+			fprintf(stderr, "%0#10x : ", pkcs11_logger_utils_get_process_id());
+		if (!disable_thread_id)
+			fprintf(stderr, "%0#10x : ", pkcs11_logger_utils_get_thread_id());
+		vfprintf(stderr, message, ap);
+		fprintf(stderr, "\n");
+
+		va_end(ap);
+	}
 	
 	// Cleanup
-	va_end(ap);
 	CALL_N_CLEAR(fclose, fw);
 	
 	// Release exclusive access to the file
@@ -97,14 +103,16 @@ void pkcs11_logger_log(const char* message, ...)
 }
 
 
+// Logs separator line
 void pkcs11_logger_log_separator(void)
 {
 	char str_time[20];
-	current_time_str(str_time, sizeof(str_time));
+	pkcs11_logger_utils_get_current_time_str(str_time, sizeof(str_time));
 	pkcs11_logger_log("****************************** %s ***", str_time);
 }
 
 
+// Logs function call
 void pkcs11_logger_log_function_enter(const char *function)
 {
 	pkcs11_logger_log_separator();
@@ -112,24 +120,28 @@ void pkcs11_logger_log_function_enter(const char *function)
 }
 
 
+// Logs function exit
 void pkcs11_logger_log_function_exit(CK_RV rv)
 {
 	pkcs11_logger_log("Returning %lu (%s)", rv, pkcs11_logger_translate_ck_rv(rv));
 }
 
 
+// Logs input params notice
 void pkcs11_logger_log_input_params(void)
 {
 	pkcs11_logger_log("Input");
 }
 
 
+// Logs output params notice
 void pkcs11_logger_log_output_params(void)
 {
 	pkcs11_logger_log("Output");
 }
-	
 
+
+// Logs flag
 void pkcs11_logger_log_flag(CK_ULONG flags, CK_ULONG flag_value, const char *flag_name)
 {
 	if (flags & flag_value)
@@ -139,7 +151,8 @@ void pkcs11_logger_log_flag(CK_ULONG flags, CK_ULONG flag_value, const char *fla
 }
 
 
-void pkcs11_logger_log_nonzero_string(const char *name, const unsigned char *nonzero_string, CK_ULONG nonzero_string_len)
+// Logs string that is not zero terminated
+void pkcs11_logger_log_nonzero_string(const char *name, const CK_UTF8CHAR_PTR nonzero_string, CK_ULONG nonzero_string_len)
 {
 	if (NULL != nonzero_string)
 	{
@@ -160,6 +173,7 @@ void pkcs11_logger_log_nonzero_string(const char *name, const unsigned char *non
 }
 
 
+// Logs byte array
 void pkcs11_logger_log_byte_array(const char *name, CK_BYTE_PTR byte_array, CK_ULONG byte_array_len)
 {
 	if (NULL != byte_array)
@@ -179,12 +193,15 @@ void pkcs11_logger_log_byte_array(const char *name, CK_BYTE_PTR byte_array, CK_U
 }
 
 
+// Logs array of cryptoki attributes
 void pkcs11_logger_log_attribute_template(CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulCount)
 {
-	int i = 0;
+	CK_ULONG i = 0;
 	
 	if ((NULL == pTemplate) || (ulCount < 1))
 		return;
+	
+	pkcs11_logger_log("  *** Begin attribute template ***");
 	
 	for (i = 0; i < ulCount; i++)
 	{
@@ -196,6 +213,16 @@ void pkcs11_logger_log_attribute_template(CK_ATTRIBUTE_PTR pTemplate, CK_ULONG u
 		if (NULL != pTemplate[i].pValue)
 		{
 			char *value = NULL;
+
+			if ((pTemplate[i].type & CKF_ARRAY_ATTRIBUTE) == CKF_ARRAY_ATTRIBUTE)
+			{
+				if (0 == (pTemplate[i].ulValueLen % sizeof(CK_ATTRIBUTE)))
+				{
+					pkcs11_logger_log_attribute_template(pTemplate[i].pValue, pTemplate[i].ulValueLen / sizeof(CK_ATTRIBUTE));
+					continue;
+				}
+			}
+
 			value = pkcs11_logger_translate_ck_byte_ptr(pTemplate[i].pValue, pTemplate[i].ulValueLen);
 			if (NULL != value)
 			{
@@ -208,4 +235,6 @@ void pkcs11_logger_log_attribute_template(CK_ATTRIBUTE_PTR pTemplate, CK_ULONG u
 			}
 		}
 	}
+
+	pkcs11_logger_log("  *** End attribute template ***");
 }

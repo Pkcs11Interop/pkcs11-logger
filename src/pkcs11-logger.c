@@ -1,30 +1,42 @@
-/* PKCS11-LOGGER - PKCS#11 logging proxy module
- * Copyright (C) 2011 Jaroslav Imrich <jariq(at)jariq(dot)sk>
+/*
+ *  PKCS11-LOGGER - PKCS#11 logging proxy module
+ *  Copyright (c) 2011-2014 JWC s.r.o. <http://www.jwc.sk>
+ *  Author: Jaroslav Imrich <jimrich@jimrich.sk>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License versuin 3 
- * as published by the Free Software Foundation.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  Licensing for open source projects:
+ *  PKCS11-LOGGER is available under the terms of the GNU Affero General 
+ *  Public License version 3 as published by the Free Software Foundation.
+ *  Please see <http://www.gnu.org/licenses/agpl-3.0.html> for more details.
+ *
+ *  Licensing for other types of projects:
+ *  PKCS11-LOGGER is available under the terms of flexible commercial license.
+ *  Please contact JWC s.r.o. at <info@pkcs11interop.net> for more details.
  */
- 
- 
+
+
 #include "pkcs11-logger.h"
 
 
-DLHANDLE g_orig_lib = NULL;
+// Handle to original PKCS#11 library
+DLHANDLE pkcs11_logger_orig_lib = NULL;
 
+// Pointers to all functions in original PKCS#11 library
+CK_FUNCTION_LIST_PTR pkcs11_logger_orig_lib_functions = NULL;
 
-static CK_FUNCTION_LIST_PTR g_orig_lib_functions = NULL;
+// Flag indicating whether environment variables has been successfuly read
+CK_BBOOL pkcs11_logger_env_vars_read = CK_FALSE;
 
+// Value of PKCS11_LOGGER_LIBRARY_PATH environment variable
+CK_CHAR_PTR pkcs11_logger_library_path = NULL;
 
-static CK_FUNCTION_LIST pkcs11_logger_functions = 
+// Value of PKCS11_LOGGER_LOG_FILE_PATH environment variable
+CK_CHAR_PTR pkcs11_logger_log_file_path = NULL;
+
+// Value of PKCS11_LOGGER_FLAGS environment variable
+CK_ULONG pkcs11_logger_flags = 0;
+
+// Pointers to all functions in PKCS11-LOGGER library
+CK_FUNCTION_LIST pkcs11_logger_functions = 
 {
 	{2, 20},
 	&C_Initialize,
@@ -98,63 +110,11 @@ static CK_FUNCTION_LIST pkcs11_logger_functions =
 };
 
 
-#define INIT_ORIG_LIB_OR_FAIL() if (safely_init_orig_lib() != PKCS11_LOGGER_RV_SUCCESS) return CKR_GENERAL_ERROR;
-
-
-int safely_init_orig_lib(void)
-{
-	if (g_orig_lib != NULL)
-		return PKCS11_LOGGER_RV_SUCCESS;
-
-	// Determine original library name
-	char *orig_lib = getenv("PKCS11_LOGGER_ORIG_LIB");
-	if (orig_lib == NULL)
-		orig_lib = DEFAULT_PKCS11_LOGGER_ORIG_LIB;
-	
-	g_orig_lib = DLOPEN(orig_lib);
-	if (g_orig_lib == NULL)
-	{
-		pkcs11_logger_log_separator();
-		pkcs11_logger_log("%s %s - Unable to load %s", PKCS11_LOGGER_NAME, PKCS11_LOGGER_VERSION, orig_lib);
-		return PKCS11_LOGGER_RV_ERROR;
-	}
-
-	CK_C_GetFunctionList pGetFunctionList = (CK_C_GetFunctionList) DLSYM(g_orig_lib, "C_GetFunctionList");
-	if (pGetFunctionList == NULL)
-	{
-		pkcs11_logger_log_separator();
-		pkcs11_logger_log("%s %s - Unable to find C_GetFunctionList() in %s", PKCS11_LOGGER_NAME, PKCS11_LOGGER_VERSION, orig_lib);
-		CALL_N_CLEAR(DLCLOSE, g_orig_lib);
-		return PKCS11_LOGGER_RV_ERROR;
-	}
-
-	CK_RV rv = pGetFunctionList(&g_orig_lib_functions);
-	if (rv != CKR_OK)
-	{
-		pkcs11_logger_log_separator();
-		pkcs11_logger_log("%s %s - Unable to call C_GetFunctionList() from %s", PKCS11_LOGGER_NAME, PKCS11_LOGGER_VERSION, orig_lib);
-		CALL_N_CLEAR(DLCLOSE, g_orig_lib);
-		return PKCS11_LOGGER_RV_ERROR;
-	}
-
-	// Lets present version of orig library as ours - that's what proxies do :)
-	pkcs11_logger_functions.version.major = g_orig_lib_functions->version.major;
-	pkcs11_logger_functions.version.minor = g_orig_lib_functions->version.minor;
-	
-	// Create lock for synchronization of log file access
-	if (PKCS11_LOGGER_RV_SUCCESS != pkcs11_logger_lock_create())
-		return PKCS11_LOGGER_RV_ERROR;
-	
-	pkcs11_logger_log_separator();
-	pkcs11_logger_log("%s %s - Successfuly loaded %s", PKCS11_LOGGER_NAME, PKCS11_LOGGER_VERSION, orig_lib);
-	
-	return PKCS11_LOGGER_RV_SUCCESS;
-}
-
-
 CK_DEFINE_FUNCTION(CK_RV, C_Initialize)(CK_VOID_PTR pInitArgs)
 {
-	INIT_ORIG_LIB_OR_FAIL();
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 
@@ -172,7 +132,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Initialize)(CK_VOID_PTR pInitArgs)
 		pkcs11_logger_log("  pReserved: %p", args->pReserved);
 	}
 	
-	CK_RV rv = g_orig_lib_functions->C_Initialize(pInitArgs);
+	rv = pkcs11_logger_orig_lib_functions->C_Initialize(pInitArgs);
 
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -181,12 +141,15 @@ CK_DEFINE_FUNCTION(CK_RV, C_Initialize)(CK_VOID_PTR pInitArgs)
 
 CK_DEFINE_FUNCTION(CK_RV, C_Finalize)(CK_VOID_PTR pReserved)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" pReserved: %p", pReserved);
 	
-	CK_RV rv = g_orig_lib_functions->C_Finalize(pReserved);
+	rv = pkcs11_logger_orig_lib_functions->C_Finalize(pReserved);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -195,12 +158,15 @@ CK_DEFINE_FUNCTION(CK_RV, C_Finalize)(CK_VOID_PTR pReserved)
 
 CK_DEFINE_FUNCTION(CK_RV, C_GetInfo)(CK_INFO_PTR pInfo)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" pInfo: %p", pInfo);
 	
-	CK_RV rv = g_orig_lib_functions->C_GetInfo(pInfo);
+	rv = pkcs11_logger_orig_lib_functions->C_GetInfo(pInfo);
 	
 	if (CKR_OK == rv)
 	{
@@ -228,7 +194,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetInfo)(CK_INFO_PTR pInfo)
 
 CK_DEFINE_FUNCTION(CK_RV, C_GetFunctionList)(CK_FUNCTION_LIST_PTR_PTR ppFunctionList)
 {
-	INIT_ORIG_LIB_OR_FAIL();
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -240,7 +208,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetFunctionList)(CK_FUNCTION_LIST_PTR_PTR ppFunction
 	
 	pkcs11_logger_log(" Note: Returning function list of %s", PKCS11_LOGGER_NAME);
 	
-	CK_RV rv = CKR_OK;
+	rv = CKR_OK;
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
 }
@@ -248,10 +216,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetFunctionList)(CK_FUNCTION_LIST_PTR_PTR ppFunction
 
 CK_DEFINE_FUNCTION(CK_RV, C_GetSlotList)(CK_BBOOL tokenPresent, CK_SLOT_ID_PTR pSlotList, CK_ULONG_PTR pulCount)
 {
+	CK_RV rv = CKR_OK;
+	CK_ULONG i = 0;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
-	
-	int i = 0;
 	
 	pkcs11_logger_log(" tokenPresent: %d", tokenPresent);
 	pkcs11_logger_log(" pSlotList: %p", pSlotList);
@@ -259,14 +229,14 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetSlotList)(CK_BBOOL tokenPresent, CK_SLOT_ID_PTR p
 	if (NULL != pulCount)
 		pkcs11_logger_log(" *pulCount: %lu", *pulCount);
 
-	CK_RV rv = g_orig_lib_functions->C_GetSlotList(tokenPresent, pSlotList, pulCount);
+	rv = pkcs11_logger_orig_lib_functions->C_GetSlotList(tokenPresent, pSlotList, pulCount);
 
 	if (CKR_OK == rv)
 	{
 		pkcs11_logger_log_output_params();
 
 		pkcs11_logger_log(" pSlotList: %p", pSlotList);
-		if (NULL != pSlotList)
+		if ((NULL != pSlotList) && (NULL != pulCount))
 		{
 			for (i = 0; i < *pulCount; i++)
 			{
@@ -286,13 +256,16 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetSlotList)(CK_BBOOL tokenPresent, CK_SLOT_ID_PTR p
 
 CK_DEFINE_FUNCTION(CK_RV, C_GetSlotInfo)(CK_SLOT_ID slotID, CK_SLOT_INFO_PTR pInfo)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" slotID: %lu", slotID);
 	pkcs11_logger_log(" pInfo: %p", pInfo);
 	
-	CK_RV rv = g_orig_lib_functions->C_GetSlotInfo(slotID, pInfo);
+	rv = pkcs11_logger_orig_lib_functions->C_GetSlotInfo(slotID, pInfo);
 	
 	if (CKR_OK == rv)
 	{
@@ -323,13 +296,16 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetSlotInfo)(CK_SLOT_ID slotID, CK_SLOT_INFO_PTR pIn
 
 CK_DEFINE_FUNCTION(CK_RV, C_GetTokenInfo)(CK_SLOT_ID slotID, CK_TOKEN_INFO_PTR pInfo)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" slotID: %lu", slotID);
 	pkcs11_logger_log(" pInfo: %p", pInfo);
 	
-	CK_RV rv = g_orig_lib_functions->C_GetTokenInfo(slotID, pInfo);
+	rv = pkcs11_logger_orig_lib_functions->C_GetTokenInfo(slotID, pInfo);
 	
 	if (CKR_OK == rv)
 	{
@@ -388,25 +364,27 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetTokenInfo)(CK_SLOT_ID slotID, CK_TOKEN_INFO_PTR p
 
 CK_DEFINE_FUNCTION(CK_RV, C_GetMechanismList)(CK_SLOT_ID slotID, CK_MECHANISM_TYPE_PTR pMechanismList, CK_ULONG_PTR pulCount)
 {
+	CK_RV rv = CKR_OK;
+	CK_ULONG i = 0;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 
-	int i = 0;
-	
 	pkcs11_logger_log(" slotID: %lu", slotID);
 	pkcs11_logger_log(" pMechanismList: %p", pMechanismList);
 	pkcs11_logger_log(" pulCount: %p", pulCount);
 	if (NULL != pulCount)
 		pkcs11_logger_log(" *pulCount: %lu", *pulCount);
 	
-	CK_RV rv = g_orig_lib_functions->C_GetMechanismList(slotID, pMechanismList, pulCount);
+	rv = pkcs11_logger_orig_lib_functions->C_GetMechanismList(slotID, pMechanismList, pulCount);
 
 	if (CKR_OK == rv)
 	{
 		pkcs11_logger_log_output_params();
 
 		pkcs11_logger_log(" pMechanismList: %p", pMechanismList);			
-		if (NULL != pMechanismList)
+		if ((NULL != pMechanismList) && (NULL != pulCount))
 		{
 			for (i = 0; i < *pulCount; i++)
 			{
@@ -426,6 +404,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetMechanismList)(CK_SLOT_ID slotID, CK_MECHANISM_TY
 
 CK_DEFINE_FUNCTION(CK_RV, C_GetMechanismInfo)(CK_SLOT_ID slotID, CK_MECHANISM_TYPE type, CK_MECHANISM_INFO_PTR pInfo)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -433,7 +414,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetMechanismInfo)(CK_SLOT_ID slotID, CK_MECHANISM_TY
 	pkcs11_logger_log(" type: %lu (%s)", type, pkcs11_logger_translate_ck_mechanism_type(type));
 	pkcs11_logger_log(" pInfo: %p", pInfo);
 	
-	CK_RV rv = g_orig_lib_functions->C_GetMechanismInfo(slotID, type, pInfo);
+	rv = pkcs11_logger_orig_lib_functions->C_GetMechanismInfo(slotID, type, pInfo);
 	
 	if (CKR_OK == rv)
 	{
@@ -475,18 +456,24 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetMechanismInfo)(CK_SLOT_ID slotID, CK_MECHANISM_TY
 
 CK_DEFINE_FUNCTION(CK_RV, C_InitToken)(CK_SLOT_ID slotID, CK_UTF8CHAR_PTR pPin, CK_ULONG ulPinLen, CK_UTF8CHAR_PTR pLabel)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" slotID: %lu", slotID);
 	pkcs11_logger_log(" pPin: %p", pPin);
-	pkcs11_logger_log_nonzero_string(" *pPin", pPin, ulPinLen);
+	if ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_ENABLE_PIN) == PKCS11_LOGGER_FLAG_ENABLE_PIN)
+		pkcs11_logger_log_nonzero_string(" *pPin", pPin, ulPinLen);
+	else
+		pkcs11_logger_log(" *pPin: *** Intentionally hidden ***");
 	pkcs11_logger_log(" ulPinLen: %lu", ulPinLen);
 	pkcs11_logger_log(" pLabel: %p", pLabel);
 	if (NULL != pLabel)
-		pkcs11_logger_log(" *pLabel: %s", pLabel);
+		pkcs11_logger_log(" *pLabel: %.32s", pLabel);
 	
-	CK_RV rv = g_orig_lib_functions->C_InitToken(slotID, pPin, ulPinLen, pLabel);
+	rv = pkcs11_logger_orig_lib_functions->C_InitToken(slotID, pPin, ulPinLen, pLabel);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -495,15 +482,21 @@ CK_DEFINE_FUNCTION(CK_RV, C_InitToken)(CK_SLOT_ID slotID, CK_UTF8CHAR_PTR pPin, 
 
 CK_DEFINE_FUNCTION(CK_RV, C_InitPIN)(CK_SESSION_HANDLE hSession, CK_UTF8CHAR_PTR pPin, CK_ULONG ulPinLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" hSession: %lu", hSession);
 	pkcs11_logger_log(" pPin: %p", pPin);
-	pkcs11_logger_log_nonzero_string(" *pPin", pPin, ulPinLen);
+	if ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_ENABLE_PIN) == PKCS11_LOGGER_FLAG_ENABLE_PIN)
+		pkcs11_logger_log_nonzero_string(" *pPin", pPin, ulPinLen);
+	else
+		pkcs11_logger_log(" *pPin: *** Intentionally hidden ***");
 	pkcs11_logger_log(" ulPinLen: %lu", ulPinLen);
 
-	CK_RV rv = g_orig_lib_functions->C_InitPIN(hSession, pPin, ulPinLen);
+	rv = pkcs11_logger_orig_lib_functions->C_InitPIN(hSession, pPin, ulPinLen);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -512,18 +505,27 @@ CK_DEFINE_FUNCTION(CK_RV, C_InitPIN)(CK_SESSION_HANDLE hSession, CK_UTF8CHAR_PTR
 
 CK_DEFINE_FUNCTION(CK_RV, C_SetPIN)(CK_SESSION_HANDLE hSession, CK_UTF8CHAR_PTR pOldPin, CK_ULONG ulOldLen, CK_UTF8CHAR_PTR pNewPin, CK_ULONG ulNewLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" hSession: %lu", hSession);
 	pkcs11_logger_log(" pOldPin: %p", pOldPin);
-	pkcs11_logger_log_nonzero_string(" *pOldPin", pOldPin, ulOldLen);
+	if ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_ENABLE_PIN) == PKCS11_LOGGER_FLAG_ENABLE_PIN)
+		pkcs11_logger_log_nonzero_string(" *pOldPin", pOldPin, ulOldLen);
+	else
+		pkcs11_logger_log(" *pOldPin: *** Intentionally hidden ***");
 	pkcs11_logger_log(" ulOldLen: %lu", ulOldLen);
 	pkcs11_logger_log(" pNewPin: %p", pNewPin);
-	pkcs11_logger_log_nonzero_string(" *pNewPin", pNewPin, ulNewLen);
+	if ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_ENABLE_PIN) == PKCS11_LOGGER_FLAG_ENABLE_PIN)
+		pkcs11_logger_log_nonzero_string(" *pNewPin", pNewPin, ulNewLen);
+	else
+		pkcs11_logger_log(" *pNewPin: *** Intentionally hidden ***");
 	pkcs11_logger_log(" ulNewLen: %lu", ulNewLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_SetPIN(hSession, pOldPin, ulOldLen, pNewPin, ulNewLen);
+	rv = pkcs11_logger_orig_lib_functions->C_SetPIN(hSession, pOldPin, ulOldLen, pNewPin, ulNewLen);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -532,6 +534,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SetPIN)(CK_SESSION_HANDLE hSession, CK_UTF8CHAR_PTR 
 
 CK_DEFINE_FUNCTION(CK_RV, C_OpenSession)(CK_SLOT_ID slotID, CK_FLAGS flags, CK_VOID_PTR pApplication, CK_NOTIFY Notify, CK_SESSION_HANDLE_PTR phSession)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();	
 	
@@ -545,7 +550,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_OpenSession)(CK_SLOT_ID slotID, CK_FLAGS flags, CK_V
 	if (NULL != phSession)
 		pkcs11_logger_log(" *phSession: %lu", phSession);
 	
-	CK_RV rv = g_orig_lib_functions->C_OpenSession(slotID, flags, pApplication, Notify, phSession);
+	rv = pkcs11_logger_orig_lib_functions->C_OpenSession(slotID, flags, pApplication, Notify, phSession);
 	
 	if (CKR_OK == rv)
 	{
@@ -563,12 +568,15 @@ CK_DEFINE_FUNCTION(CK_RV, C_OpenSession)(CK_SLOT_ID slotID, CK_FLAGS flags, CK_V
 
 CK_DEFINE_FUNCTION(CK_RV, C_CloseSession)(CK_SESSION_HANDLE hSession)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();	
 	
 	pkcs11_logger_log(" hSession: %lu", hSession);
 	
-	CK_RV rv = g_orig_lib_functions->C_CloseSession(hSession);
+	rv = pkcs11_logger_orig_lib_functions->C_CloseSession(hSession);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -577,12 +585,15 @@ CK_DEFINE_FUNCTION(CK_RV, C_CloseSession)(CK_SESSION_HANDLE hSession)
 
 CK_DEFINE_FUNCTION(CK_RV, C_CloseAllSessions)(CK_SLOT_ID slotID)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();	
 	
 	pkcs11_logger_log(" slotID: %lu", slotID);
 	
-	CK_RV rv = g_orig_lib_functions->C_CloseAllSessions(slotID);
+	rv = pkcs11_logger_orig_lib_functions->C_CloseAllSessions(slotID);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -591,13 +602,16 @@ CK_DEFINE_FUNCTION(CK_RV, C_CloseAllSessions)(CK_SLOT_ID slotID)
 
 CK_DEFINE_FUNCTION(CK_RV, C_GetSessionInfo)(CK_SESSION_HANDLE hSession, CK_SESSION_INFO_PTR pInfo)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();	
 	
 	pkcs11_logger_log(" hSession: %lu", hSession);
 	pkcs11_logger_log(" pInfo: %p", pInfo);
 	
-	CK_RV rv = g_orig_lib_functions->C_GetSessionInfo(hSession, pInfo);
+	rv = pkcs11_logger_orig_lib_functions->C_GetSessionInfo(hSession, pInfo);
 	
 	if (CKR_OK == rv)
 	{
@@ -622,6 +636,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetSessionInfo)(CK_SESSION_HANDLE hSession, CK_SESSI
 
 CK_DEFINE_FUNCTION(CK_RV, C_GetOperationState)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pOperationState, CK_ULONG_PTR pulOperationStateLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();	
 	
@@ -631,7 +648,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetOperationState)(CK_SESSION_HANDLE hSession, CK_BY
 	if (NULL != pulOperationStateLen)
 		pkcs11_logger_log(" *pulOperationStateLen: %lu", *pulOperationStateLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_GetOperationState(hSession, pOperationState, pulOperationStateLen);
+	rv = pkcs11_logger_orig_lib_functions->C_GetOperationState(hSession, pOperationState, pulOperationStateLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -652,6 +669,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetOperationState)(CK_SESSION_HANDLE hSession, CK_BY
 
 CK_DEFINE_FUNCTION(CK_RV, C_SetOperationState)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pOperationState, CK_ULONG ulOperationStateLen, CK_OBJECT_HANDLE hEncryptionKey, CK_OBJECT_HANDLE hAuthenticationKey)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();	
 	
@@ -662,7 +682,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SetOperationState)(CK_SESSION_HANDLE hSession, CK_BY
 	pkcs11_logger_log(" hEncryptionKey: %lu", hEncryptionKey);
 	pkcs11_logger_log(" hAuthenticationKey: %lu", hAuthenticationKey);
 	
-	CK_RV rv = g_orig_lib_functions->C_SetOperationState(hSession, pOperationState, ulOperationStateLen, hEncryptionKey, hAuthenticationKey);
+	rv = pkcs11_logger_orig_lib_functions->C_SetOperationState(hSession, pOperationState, ulOperationStateLen, hEncryptionKey, hAuthenticationKey);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -671,16 +691,22 @@ CK_DEFINE_FUNCTION(CK_RV, C_SetOperationState)(CK_SESSION_HANDLE hSession, CK_BY
 
 CK_DEFINE_FUNCTION(CK_RV, C_Login)(CK_SESSION_HANDLE hSession, CK_USER_TYPE userType, CK_UTF8CHAR_PTR pPin, CK_ULONG ulPinLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" hSession: %lu", hSession);
 	pkcs11_logger_log(" userType: %lu (%s)", userType, pkcs11_logger_translate_ck_user_type(userType));
 	pkcs11_logger_log(" pPin: %p", pPin);
-	pkcs11_logger_log_nonzero_string(" *pPin", pPin, ulPinLen);
+	if ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_ENABLE_PIN) == PKCS11_LOGGER_FLAG_ENABLE_PIN)
+		pkcs11_logger_log_nonzero_string(" *pPin", pPin, ulPinLen);
+	else
+		pkcs11_logger_log(" *pPin: *** Intentionally hidden ***");
 	pkcs11_logger_log(" ulPinLen: %lu", ulPinLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_Login(hSession, userType, pPin, ulPinLen);
+	rv = pkcs11_logger_orig_lib_functions->C_Login(hSession, userType, pPin, ulPinLen);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -689,12 +715,15 @@ CK_DEFINE_FUNCTION(CK_RV, C_Login)(CK_SESSION_HANDLE hSession, CK_USER_TYPE user
 
 CK_DEFINE_FUNCTION(CK_RV, C_Logout)(CK_SESSION_HANDLE hSession)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" hSession: %lu", hSession);
 	
-	CK_RV rv = g_orig_lib_functions->C_Logout(hSession);
+	rv = pkcs11_logger_orig_lib_functions->C_Logout(hSession);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -703,6 +732,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Logout)(CK_SESSION_HANDLE hSession)
 
 CK_DEFINE_FUNCTION(CK_RV, C_CreateObject)(CK_SESSION_HANDLE hSession, CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulCount, CK_OBJECT_HANDLE_PTR phObject)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -714,7 +746,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_CreateObject)(CK_SESSION_HANDLE hSession, CK_ATTRIBU
 	if (NULL != phObject)
 		pkcs11_logger_log(" *phObject: %lu", *phObject);
 	
-	CK_RV rv = g_orig_lib_functions->C_CreateObject(hSession, pTemplate, ulCount, phObject);
+	rv = pkcs11_logger_orig_lib_functions->C_CreateObject(hSession, pTemplate, ulCount, phObject);
 	
 	if (CKR_OK == rv)
 	{
@@ -732,6 +764,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_CreateObject)(CK_SESSION_HANDLE hSession, CK_ATTRIBU
 
 CK_DEFINE_FUNCTION(CK_RV, C_CopyObject)(CK_SESSION_HANDLE hSession, CK_OBJECT_HANDLE hObject, CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulCount, CK_OBJECT_HANDLE_PTR phNewObject)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -744,7 +779,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_CopyObject)(CK_SESSION_HANDLE hSession, CK_OBJECT_HA
 	if (NULL != phNewObject)
 		pkcs11_logger_log(" *phNewObject: %lu", *phNewObject);
 	
-	CK_RV rv = g_orig_lib_functions->C_CopyObject(hSession, hObject, pTemplate, ulCount, phNewObject);
+	rv = pkcs11_logger_orig_lib_functions->C_CopyObject(hSession, hObject, pTemplate, ulCount, phNewObject);
 	
 	if (CKR_OK == rv)
 	{
@@ -762,13 +797,16 @@ CK_DEFINE_FUNCTION(CK_RV, C_CopyObject)(CK_SESSION_HANDLE hSession, CK_OBJECT_HA
 
 CK_DEFINE_FUNCTION(CK_RV, C_DestroyObject)(CK_SESSION_HANDLE hSession, CK_OBJECT_HANDLE hObject)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" hSession: %lu", hSession);
 	pkcs11_logger_log(" hObject: %lu", hObject);
 	
-	CK_RV rv = g_orig_lib_functions->C_DestroyObject(hSession, hObject);
+	rv = pkcs11_logger_orig_lib_functions->C_DestroyObject(hSession, hObject);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -777,6 +815,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DestroyObject)(CK_SESSION_HANDLE hSession, CK_OBJECT
 
 CK_DEFINE_FUNCTION(CK_RV, C_GetObjectSize)(CK_SESSION_HANDLE hSession, CK_OBJECT_HANDLE hObject, CK_ULONG_PTR pulSize)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -786,7 +827,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetObjectSize)(CK_SESSION_HANDLE hSession, CK_OBJECT
 	if (NULL != pulSize)
 		pkcs11_logger_log(" *pulSize: %lu", *pulSize);
 	
-	CK_RV rv = g_orig_lib_functions->C_GetObjectSize(hSession, hObject, pulSize);
+	rv = pkcs11_logger_orig_lib_functions->C_GetObjectSize(hSession, hObject, pulSize);
 	
 	if (CKR_OK == rv)
 	{
@@ -804,6 +845,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetObjectSize)(CK_SESSION_HANDLE hSession, CK_OBJECT
 
 CK_DEFINE_FUNCTION(CK_RV, C_GetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OBJECT_HANDLE hObject, CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulCount)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -813,7 +857,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
 	pkcs11_logger_log(" ulCount: %lu", ulCount);
 	pkcs11_logger_log_attribute_template(pTemplate, ulCount);
 	
-	CK_RV rv = g_orig_lib_functions->C_GetAttributeValue(hSession, hObject, pTemplate, ulCount);
+	rv = pkcs11_logger_orig_lib_functions->C_GetAttributeValue(hSession, hObject, pTemplate, ulCount);
 	
 	if ((CKR_OK == rv) || (CKR_ATTRIBUTE_SENSITIVE == rv) || (CKR_ATTRIBUTE_TYPE_INVALID == rv) || (CKR_BUFFER_TOO_SMALL == rv))
 	{
@@ -831,6 +875,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
 
 CK_DEFINE_FUNCTION(CK_RV, C_SetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OBJECT_HANDLE hObject, CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulCount)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -840,7 +887,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
 	pkcs11_logger_log(" ulCount: %lu", ulCount);
 	pkcs11_logger_log_attribute_template(pTemplate, ulCount);	
 	
-	CK_RV rv = g_orig_lib_functions->C_SetAttributeValue(hSession, hObject, pTemplate, ulCount);
+	rv = pkcs11_logger_orig_lib_functions->C_SetAttributeValue(hSession, hObject, pTemplate, ulCount);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -849,6 +896,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
 
 CK_DEFINE_FUNCTION(CK_RV, C_FindObjectsInit)(CK_SESSION_HANDLE hSession, CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulCount)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -857,7 +907,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjectsInit)(CK_SESSION_HANDLE hSession, CK_ATTR
 	pkcs11_logger_log(" ulCount: %lu", ulCount);
 	pkcs11_logger_log_attribute_template(pTemplate, ulCount);		
 	
-	CK_RV rv = g_orig_lib_functions->C_FindObjectsInit(hSession, pTemplate, ulCount);
+	rv = pkcs11_logger_orig_lib_functions->C_FindObjectsInit(hSession, pTemplate, ulCount);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -866,10 +916,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjectsInit)(CK_SESSION_HANDLE hSession, CK_ATTR
 
 CK_DEFINE_FUNCTION(CK_RV, C_FindObjects)(CK_SESSION_HANDLE hSession, CK_OBJECT_HANDLE_PTR phObject, CK_ULONG ulMaxObjectCount, CK_ULONG_PTR pulObjectCount)
 {
+	CK_RV rv = CKR_OK;
+	CK_ULONG i = 0;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
-	
-	int i = 0;
 	
 	pkcs11_logger_log(" hSession: %lu", hSession);
 	pkcs11_logger_log(" phObject: %p", phObject);
@@ -886,7 +938,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjects)(CK_SESSION_HANDLE hSession, CK_OBJECT_H
 		}
 	}
 	
-	CK_RV rv = g_orig_lib_functions->C_FindObjects(hSession, phObject, ulMaxObjectCount, pulObjectCount);
+	rv = pkcs11_logger_orig_lib_functions->C_FindObjects(hSession, phObject, ulMaxObjectCount, pulObjectCount);
 	
 	if (CKR_OK == rv)
 	{
@@ -914,12 +966,15 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjects)(CK_SESSION_HANDLE hSession, CK_OBJECT_H
 
 CK_DEFINE_FUNCTION(CK_RV, C_FindObjectsFinal)(CK_SESSION_HANDLE hSession)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" hSession: %lu", hSession);
 	
-	CK_RV rv = g_orig_lib_functions->C_FindObjectsFinal(hSession);
+	rv = pkcs11_logger_orig_lib_functions->C_FindObjectsFinal(hSession);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -928,6 +983,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjectsFinal)(CK_SESSION_HANDLE hSession)
 
 CK_DEFINE_FUNCTION(CK_RV, C_EncryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechanism, CK_OBJECT_HANDLE hKey)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -942,7 +1000,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANIS
 	}
 	pkcs11_logger_log(" hKey: %lu", hKey);
 	
-	CK_RV rv = g_orig_lib_functions->C_EncryptInit(hSession, pMechanism, hKey);
+	rv = pkcs11_logger_orig_lib_functions->C_EncryptInit(hSession, pMechanism, hKey);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -951,6 +1009,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANIS
 
 CK_DEFINE_FUNCTION(CK_RV, C_Encrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pData, CK_ULONG ulDataLen, CK_BYTE_PTR pEncryptedData, CK_ULONG_PTR pulEncryptedDataLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -963,7 +1024,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Encrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDa
 	if (NULL != pulEncryptedDataLen)
 		pkcs11_logger_log(" *pulEncryptedDataLen: %lu", *pulEncryptedDataLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_Encrypt(hSession, pData, ulDataLen, pEncryptedData, pulEncryptedDataLen);
+	rv = pkcs11_logger_orig_lib_functions->C_Encrypt(hSession, pData, ulDataLen, pEncryptedData, pulEncryptedDataLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -984,6 +1045,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Encrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDa
 
 CK_DEFINE_FUNCTION(CK_RV, C_EncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pPart, CK_ULONG ulPartLen, CK_BYTE_PTR pEncryptedPart, CK_ULONG_PTR pulEncryptedPartLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -996,7 +1060,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_P
 	if (NULL != pulEncryptedPartLen)
 		pkcs11_logger_log(" *pulEncryptedPartLen: %lu", *pulEncryptedPartLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_EncryptUpdate(hSession, pPart, ulPartLen, pEncryptedPart, pulEncryptedPartLen);
+	rv = pkcs11_logger_orig_lib_functions->C_EncryptUpdate(hSession, pPart, ulPartLen, pEncryptedPart, pulEncryptedPartLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1017,6 +1081,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_P
 
 CK_DEFINE_FUNCTION(CK_RV, C_EncryptFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pLastEncryptedPart, CK_ULONG_PTR pulLastEncryptedPartLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1026,7 +1093,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
 	if (NULL != pulLastEncryptedPartLen)
 		pkcs11_logger_log(" *pulLastEncryptedPartLen: %lu", *pulLastEncryptedPartLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_EncryptFinal(hSession, pLastEncryptedPart, pulLastEncryptedPartLen);
+	rv = pkcs11_logger_orig_lib_functions->C_EncryptFinal(hSession, pLastEncryptedPart, pulLastEncryptedPartLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1047,6 +1114,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
 
 CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechanism, CK_OBJECT_HANDLE hKey)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1062,7 +1132,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANIS
 	
 	pkcs11_logger_log(" hKey: %lu", hKey);
 	
-	CK_RV rv = g_orig_lib_functions->C_DecryptInit(hSession, pMechanism, hKey);
+	rv = pkcs11_logger_orig_lib_functions->C_DecryptInit(hSession, pMechanism, hKey);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1071,6 +1141,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANIS
 
 CK_DEFINE_FUNCTION(CK_RV, C_Decrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pEncryptedData, CK_ULONG ulEncryptedDataLen, CK_BYTE_PTR pData, CK_ULONG_PTR pulDataLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1083,7 +1156,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pEn
 	if (NULL != pulDataLen)
 		pkcs11_logger_log(" *pulDataLen: %lu", *pulDataLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_Decrypt(hSession, pEncryptedData, ulEncryptedDataLen, pData, pulDataLen);
+	rv = pkcs11_logger_orig_lib_functions->C_Decrypt(hSession, pEncryptedData, ulEncryptedDataLen, pData, pulDataLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1104,6 +1177,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pEn
 
 CK_DEFINE_FUNCTION(CK_RV, C_DecryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pEncryptedPart, CK_ULONG ulEncryptedPartLen, CK_BYTE_PTR pPart, CK_ULONG_PTR pulPartLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1116,7 +1192,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_P
 	if (NULL != pulPartLen)
 		pkcs11_logger_log(" *pulPartLen: %lu", *pulPartLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_DecryptUpdate(hSession, pEncryptedPart, ulEncryptedPartLen, pPart, pulPartLen);
+	rv = pkcs11_logger_orig_lib_functions->C_DecryptUpdate(hSession, pEncryptedPart, ulEncryptedPartLen, pPart, pulPartLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1137,6 +1213,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_P
 
 CK_DEFINE_FUNCTION(CK_RV, C_DecryptFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pLastPart, CK_ULONG_PTR pulLastPartLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1146,7 +1225,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
 	if (NULL != pulLastPartLen)
 		pkcs11_logger_log(" *pulLastPartLen: %lu", *pulLastPartLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_DecryptFinal(hSession, pLastPart, pulLastPartLen);
+	rv = pkcs11_logger_orig_lib_functions->C_DecryptFinal(hSession, pLastPart, pulLastPartLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1167,6 +1246,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
 
 CK_DEFINE_FUNCTION(CK_RV, C_DigestInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechanism)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1180,7 +1262,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM
 		pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);		
 	}
 	
-	CK_RV rv = g_orig_lib_functions->C_DigestInit(hSession, pMechanism);
+	rv = pkcs11_logger_orig_lib_functions->C_DigestInit(hSession, pMechanism);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1189,6 +1271,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM
 
 CK_DEFINE_FUNCTION(CK_RV, C_Digest)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pData, CK_ULONG ulDataLen, CK_BYTE_PTR pDigest, CK_ULONG_PTR pulDigestLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1201,7 +1286,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Digest)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDat
 	if (NULL != pulDigestLen)
 		pkcs11_logger_log(" *pulDigestLen: %lu", *pulDigestLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_Digest(hSession, pData, ulDataLen, pDigest, pulDigestLen);
+	rv = pkcs11_logger_orig_lib_functions->C_Digest(hSession, pData, ulDataLen, pDigest, pulDigestLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1222,6 +1307,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Digest)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDat
 
 CK_DEFINE_FUNCTION(CK_RV, C_DigestUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pPart, CK_ULONG ulPartLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1230,7 +1318,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
 	pkcs11_logger_log_byte_array(" *pPart", pPart, ulPartLen);
 	pkcs11_logger_log(" ulPartLen: %lu", ulPartLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_DigestUpdate(hSession, pPart, ulPartLen);
+	rv = pkcs11_logger_orig_lib_functions->C_DigestUpdate(hSession, pPart, ulPartLen);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1239,13 +1327,16 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
 
 CK_DEFINE_FUNCTION(CK_RV, C_DigestKey)(CK_SESSION_HANDLE hSession, CK_OBJECT_HANDLE hKey)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" hSession: %lu", hSession);
 	pkcs11_logger_log(" hKey: %lu", hKey);
 	
-	CK_RV rv = g_orig_lib_functions->C_DigestKey(hSession, hKey);
+	rv = pkcs11_logger_orig_lib_functions->C_DigestKey(hSession, hKey);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1254,6 +1345,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestKey)(CK_SESSION_HANDLE hSession, CK_OBJECT_HAN
 
 CK_DEFINE_FUNCTION(CK_RV, C_DigestFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDigest, CK_ULONG_PTR pulDigestLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1263,7 +1357,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
 	if (NULL != pulDigestLen)
 		pkcs11_logger_log(" *pulDigestLen: %lu", *pulDigestLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_DigestFinal(hSession, pDigest, pulDigestLen);
+	rv = pkcs11_logger_orig_lib_functions->C_DigestFinal(hSession, pDigest, pulDigestLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1284,6 +1378,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
 
 CK_DEFINE_FUNCTION(CK_RV, C_SignInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechanism, CK_OBJECT_HANDLE hKey)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1298,7 +1395,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_P
 	}
 	pkcs11_logger_log(" hKey: %lu", hKey);
 	
-	CK_RV rv = g_orig_lib_functions->C_SignInit(hSession, pMechanism, hKey);
+	rv = pkcs11_logger_orig_lib_functions->C_SignInit(hSession, pMechanism, hKey);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1307,6 +1404,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_P
 
 CK_DEFINE_FUNCTION(CK_RV, C_Sign)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pData, CK_ULONG ulDataLen, CK_BYTE_PTR pSignature, CK_ULONG_PTR pulSignatureLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1319,7 +1419,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Sign)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pData,
 	if (NULL != pulSignatureLen)
 		pkcs11_logger_log(" *pulSignatureLen: %lu", *pulSignatureLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_Sign(hSession, pData, ulDataLen, pSignature, pulSignatureLen);
+	rv = pkcs11_logger_orig_lib_functions->C_Sign(hSession, pData, ulDataLen, pSignature, pulSignatureLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1340,6 +1440,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Sign)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pData,
 
 CK_DEFINE_FUNCTION(CK_RV, C_SignUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pPart, CK_ULONG ulPartLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1348,7 +1451,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR 
 	pkcs11_logger_log_byte_array(" *pPart", pPart, ulPartLen);
 	pkcs11_logger_log(" ulPartLen: %lu", ulPartLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_SignUpdate(hSession, pPart, ulPartLen);
+	rv = pkcs11_logger_orig_lib_functions->C_SignUpdate(hSession, pPart, ulPartLen);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1357,6 +1460,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR 
 
 CK_DEFINE_FUNCTION(CK_RV, C_SignFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pSignature, CK_ULONG_PTR pulSignatureLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1366,7 +1472,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR p
 	if (NULL != pulSignatureLen)
 		pkcs11_logger_log(" *pulSignatureLen: %lu", *pulSignatureLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_SignFinal(hSession, pSignature, pulSignatureLen);
+	rv = pkcs11_logger_orig_lib_functions->C_SignFinal(hSession, pSignature, pulSignatureLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1387,6 +1493,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR p
 
 CK_DEFINE_FUNCTION(CK_RV, C_SignRecoverInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechanism, CK_OBJECT_HANDLE hKey)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1401,7 +1510,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignRecoverInit)(CK_SESSION_HANDLE hSession, CK_MECH
 	}
 	pkcs11_logger_log(" hKey: %lu", hKey);
 	
-	CK_RV rv = g_orig_lib_functions->C_SignRecoverInit(hSession, pMechanism, hKey);
+	rv = pkcs11_logger_orig_lib_functions->C_SignRecoverInit(hSession, pMechanism, hKey);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1410,6 +1519,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignRecoverInit)(CK_SESSION_HANDLE hSession, CK_MECH
 
 CK_DEFINE_FUNCTION(CK_RV, C_SignRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pData, CK_ULONG ulDataLen, CK_BYTE_PTR pSignature, CK_ULONG_PTR pulSignatureLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1422,7 +1534,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
 	if (NULL != pulSignatureLen)
 		pkcs11_logger_log(" *pulSignatureLen: %lu", *pulSignatureLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_SignRecover(hSession, pData, ulDataLen, pSignature, pulSignatureLen);
+	rv = pkcs11_logger_orig_lib_functions->C_SignRecover(hSession, pData, ulDataLen, pSignature, pulSignatureLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1443,6 +1555,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
 
 CK_DEFINE_FUNCTION(CK_RV, C_VerifyInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechanism, CK_OBJECT_HANDLE hKey)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1457,7 +1572,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM
 	}
 	pkcs11_logger_log(" hKey: %lu", hKey);
 	
-	CK_RV rv = g_orig_lib_functions->C_VerifyInit(hSession, pMechanism, hKey);
+	rv = pkcs11_logger_orig_lib_functions->C_VerifyInit(hSession, pMechanism, hKey);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1466,6 +1581,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM
 
 CK_DEFINE_FUNCTION(CK_RV, C_Verify)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pData, CK_ULONG ulDataLen, CK_BYTE_PTR pSignature, CK_ULONG ulSignatureLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1477,7 +1595,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Verify)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDat
 	pkcs11_logger_log_byte_array(" *pSignature", pSignature, ulSignatureLen);
 	pkcs11_logger_log(" ulSignatureLen: %lu", ulSignatureLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_Verify(hSession, pData, ulDataLen, pSignature, ulSignatureLen);
+	rv = pkcs11_logger_orig_lib_functions->C_Verify(hSession, pData, ulDataLen, pSignature, ulSignatureLen);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1486,6 +1604,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Verify)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDat
 
 CK_DEFINE_FUNCTION(CK_RV, C_VerifyUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pPart, CK_ULONG ulPartLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1494,7 +1615,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
 	pkcs11_logger_log_byte_array(" *pPart", pPart, ulPartLen);
 	pkcs11_logger_log(" ulPartLen: %lu", ulPartLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_VerifyUpdate(hSession, pPart, ulPartLen);
+	rv = pkcs11_logger_orig_lib_functions->C_VerifyUpdate(hSession, pPart, ulPartLen);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1503,6 +1624,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
 
 CK_DEFINE_FUNCTION(CK_RV, C_VerifyFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pSignature, CK_ULONG ulSignatureLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1511,7 +1635,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
 	pkcs11_logger_log_byte_array(" *pSignature", pSignature, ulSignatureLen);
 	pkcs11_logger_log(" ulSignatureLen: %lu", ulSignatureLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_VerifyFinal(hSession, pSignature, ulSignatureLen);
+	rv = pkcs11_logger_orig_lib_functions->C_VerifyFinal(hSession, pSignature, ulSignatureLen);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1520,6 +1644,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
 
 CK_DEFINE_FUNCTION(CK_RV, C_VerifyRecoverInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechanism, CK_OBJECT_HANDLE hKey)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1534,7 +1661,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyRecoverInit)(CK_SESSION_HANDLE hSession, CK_ME
 	}
 	pkcs11_logger_log(" hKey: %lu", hKey);
 	
-	CK_RV rv = g_orig_lib_functions->C_VerifyRecoverInit(hSession, pMechanism, hKey);
+	rv = pkcs11_logger_orig_lib_functions->C_VerifyRecoverInit(hSession, pMechanism, hKey);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1543,6 +1670,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyRecoverInit)(CK_SESSION_HANDLE hSession, CK_ME
 
 CK_DEFINE_FUNCTION(CK_RV, C_VerifyRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pSignature, CK_ULONG ulSignatureLen, CK_BYTE_PTR pData, CK_ULONG_PTR pulDataLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1555,7 +1685,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_P
 	if (NULL != pulDataLen)
 		pkcs11_logger_log(" *pulDataLen: %lu", *pulDataLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_VerifyRecover(hSession, pSignature, ulSignatureLen, pData, pulDataLen);
+	rv = pkcs11_logger_orig_lib_functions->C_VerifyRecover(hSession, pSignature, ulSignatureLen, pData, pulDataLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1576,6 +1706,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_P
 
 CK_DEFINE_FUNCTION(CK_RV, C_DigestEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pPart, CK_ULONG ulPartLen, CK_BYTE_PTR pEncryptedPart, CK_ULONG_PTR pulEncryptedPartLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1588,7 +1721,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_
 	if (NULL != pulEncryptedPartLen)
 		pkcs11_logger_log(" *pulEncryptedPartLen: %lu", *pulEncryptedPartLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_DigestEncryptUpdate(hSession, pPart, ulPartLen, pEncryptedPart, pulEncryptedPartLen);
+	rv = pkcs11_logger_orig_lib_functions->C_DigestEncryptUpdate(hSession, pPart, ulPartLen, pEncryptedPart, pulEncryptedPartLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1609,6 +1742,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_
 
 CK_DEFINE_FUNCTION(CK_RV, C_DecryptDigestUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pEncryptedPart, CK_ULONG ulEncryptedPartLen, CK_BYTE_PTR pPart, CK_ULONG_PTR pulPartLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1621,7 +1757,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptDigestUpdate)(CK_SESSION_HANDLE hSession, CK_
 	if (NULL != pulPartLen)
 		pkcs11_logger_log(" *pulPartLen: %lu", *pulPartLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_DecryptDigestUpdate(hSession, pEncryptedPart, ulEncryptedPartLen, pPart, pulPartLen);
+	rv = pkcs11_logger_orig_lib_functions->C_DecryptDigestUpdate(hSession, pEncryptedPart, ulEncryptedPartLen, pPart, pulPartLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1642,6 +1778,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptDigestUpdate)(CK_SESSION_HANDLE hSession, CK_
 
 CK_DEFINE_FUNCTION(CK_RV, C_SignEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pPart, CK_ULONG ulPartLen, CK_BYTE_PTR pEncryptedPart, CK_ULONG_PTR pulEncryptedPartLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1654,7 +1793,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BY
 	if (NULL != pulEncryptedPartLen)
 		pkcs11_logger_log(" *pulEncryptedPartLen: %lu", *pulEncryptedPartLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_SignEncryptUpdate(hSession, pPart, ulPartLen, pEncryptedPart, pulEncryptedPartLen);
+	rv = pkcs11_logger_orig_lib_functions->C_SignEncryptUpdate(hSession, pPart, ulPartLen, pEncryptedPart, pulEncryptedPartLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1675,6 +1814,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BY
 
 CK_DEFINE_FUNCTION(CK_RV, C_DecryptVerifyUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pEncryptedPart, CK_ULONG ulEncryptedPartLen, CK_BYTE_PTR pPart, CK_ULONG_PTR pulPartLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1687,7 +1829,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptVerifyUpdate)(CK_SESSION_HANDLE hSession, CK_
 	if (NULL != pulPartLen)
 		pkcs11_logger_log(" *pulPartLen: %lu", *pulPartLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_DecryptVerifyUpdate(hSession, pEncryptedPart, ulEncryptedPartLen, pPart, pulPartLen);
+	rv = pkcs11_logger_orig_lib_functions->C_DecryptVerifyUpdate(hSession, pEncryptedPart, ulEncryptedPartLen, pPart, pulPartLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1708,6 +1850,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptVerifyUpdate)(CK_SESSION_HANDLE hSession, CK_
 
 CK_DEFINE_FUNCTION(CK_RV, C_GenerateKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechanism, CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulCount, CK_OBJECT_HANDLE_PTR phKey)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1727,7 +1872,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateKey)(CK_SESSION_HANDLE hSession, CK_MECHANIS
 	if (NULL != phKey)
 		pkcs11_logger_log(" *phKey: %lu", *phKey);
 	
-	CK_RV rv = g_orig_lib_functions->C_GenerateKey(hSession, pMechanism, pTemplate, ulCount, phKey);
+	rv = pkcs11_logger_orig_lib_functions->C_GenerateKey(hSession, pMechanism, pTemplate, ulCount, phKey);
 	
 	if (CKR_OK == rv)
 	{
@@ -1745,6 +1890,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateKey)(CK_SESSION_HANDLE hSession, CK_MECHANIS
 
 CK_DEFINE_FUNCTION(CK_RV, C_GenerateKeyPair)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechanism, CK_ATTRIBUTE_PTR pPublicKeyTemplate, CK_ULONG ulPublicKeyAttributeCount, CK_ATTRIBUTE_PTR pPrivateKeyTemplate, CK_ULONG ulPrivateKeyAttributeCount, CK_OBJECT_HANDLE_PTR phPublicKey, CK_OBJECT_HANDLE_PTR phPrivateKey)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1770,7 +1918,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateKeyPair)(CK_SESSION_HANDLE hSession, CK_MECH
 	if (NULL != phPrivateKey)
 		pkcs11_logger_log(" *phPrivateKey: %lu", *phPrivateKey);
 	
-	CK_RV rv = g_orig_lib_functions->C_GenerateKeyPair(hSession, pMechanism, pPublicKeyTemplate, ulPublicKeyAttributeCount, pPrivateKeyTemplate, ulPrivateKeyAttributeCount, phPublicKey, phPrivateKey);
+	rv = pkcs11_logger_orig_lib_functions->C_GenerateKeyPair(hSession, pMechanism, pPublicKeyTemplate, ulPublicKeyAttributeCount, pPrivateKeyTemplate, ulPrivateKeyAttributeCount, phPublicKey, phPrivateKey);
 	
 	if (CKR_OK == rv)
 	{
@@ -1791,6 +1939,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateKeyPair)(CK_SESSION_HANDLE hSession, CK_MECH
 
 CK_DEFINE_FUNCTION(CK_RV, C_WrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechanism, CK_OBJECT_HANDLE hWrappingKey, CK_OBJECT_HANDLE hKey, CK_BYTE_PTR pWrappedKey, CK_ULONG_PTR pulWrappedKeyLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1809,7 +1960,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_WrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PT
 	if (NULL != pulWrappedKeyLen)
 		pkcs11_logger_log(" *pulWrappedKeyLen: %lu", *pulWrappedKeyLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_WrapKey(hSession, pMechanism, hWrappingKey, hKey, pWrappedKey, pulWrappedKeyLen);
+	rv = pkcs11_logger_orig_lib_functions->C_WrapKey(hSession, pMechanism, hWrappingKey, hKey, pWrappedKey, pulWrappedKeyLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1830,6 +1981,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_WrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PT
 
 CK_DEFINE_FUNCTION(CK_RV, C_UnwrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechanism, CK_OBJECT_HANDLE hUnwrappingKey, CK_BYTE_PTR pWrappedKey, CK_ULONG ulWrappedKeyLen, CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulAttributeCount, CK_OBJECT_HANDLE_PTR phKey)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1853,7 +2007,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_UnwrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_
 	if (NULL != phKey)
 		pkcs11_logger_log(" *phKey: %lu", *phKey);
 	
-	CK_RV rv = g_orig_lib_functions->C_UnwrapKey(hSession, pMechanism, hUnwrappingKey, pWrappedKey, ulWrappedKeyLen, pTemplate, ulAttributeCount, phKey);
+	rv = pkcs11_logger_orig_lib_functions->C_UnwrapKey(hSession, pMechanism, hUnwrappingKey, pWrappedKey, ulWrappedKeyLen, pTemplate, ulAttributeCount, phKey);
 	
 	if (CKR_OK == rv)
 	{
@@ -1871,6 +2025,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_UnwrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_
 
 CK_DEFINE_FUNCTION(CK_RV, C_DeriveKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechanism, CK_OBJECT_HANDLE hBaseKey, CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulAttributeCount, CK_OBJECT_HANDLE_PTR phKey)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1891,7 +2048,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DeriveKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_
 	if (NULL != phKey)
 		pkcs11_logger_log(" *phKey: %lu", *phKey);
 	
-	CK_RV rv = g_orig_lib_functions->C_DeriveKey(hSession, pMechanism, hBaseKey, pTemplate, ulAttributeCount, phKey);
+	rv = pkcs11_logger_orig_lib_functions->C_DeriveKey(hSession, pMechanism, hBaseKey, pTemplate, ulAttributeCount, phKey);
 	
 	if (CKR_OK == rv)
 	{
@@ -1909,6 +2066,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DeriveKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_
 
 CK_DEFINE_FUNCTION(CK_RV, C_SeedRandom)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pSeed, CK_ULONG ulSeedLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1917,7 +2077,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SeedRandom)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR 
 	pkcs11_logger_log_byte_array(" *pSeed", pSeed, ulSeedLen);
 	pkcs11_logger_log(" ulSeedLen: %lu",  ulSeedLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_SeedRandom(hSession, pSeed, ulSeedLen);
+	rv = pkcs11_logger_orig_lib_functions->C_SeedRandom(hSession, pSeed, ulSeedLen);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1926,6 +2086,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SeedRandom)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR 
 
 CK_DEFINE_FUNCTION(CK_RV, C_GenerateRandom)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR RandomData, CK_ULONG ulRandomLen)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1934,7 +2097,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateRandom)(CK_SESSION_HANDLE hSession, CK_BYTE_
 	pkcs11_logger_log_byte_array(" *RandomData", RandomData, ulRandomLen);
 	pkcs11_logger_log(" ulRandomLen: %lu", ulRandomLen);
 	
-	CK_RV rv = g_orig_lib_functions->C_GenerateRandom(hSession, RandomData, ulRandomLen);
+	rv = pkcs11_logger_orig_lib_functions->C_GenerateRandom(hSession, RandomData, ulRandomLen);
 	
 	if (CKR_OK == rv)
 	{
@@ -1952,12 +2115,15 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateRandom)(CK_SESSION_HANDLE hSession, CK_BYTE_
 
 CK_DEFINE_FUNCTION(CK_RV, C_GetFunctionStatus)(CK_SESSION_HANDLE hSession)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" hSession: %lu", hSession);
 	
-	CK_RV rv = g_orig_lib_functions->C_GetFunctionStatus(hSession);
+	rv = pkcs11_logger_orig_lib_functions->C_GetFunctionStatus(hSession);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1966,12 +2132,15 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetFunctionStatus)(CK_SESSION_HANDLE hSession)
 
 CK_DEFINE_FUNCTION(CK_RV, C_CancelFunction)(CK_SESSION_HANDLE hSession)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
 	pkcs11_logger_log(" hSession: %lu", hSession);
 	
-	CK_RV rv = g_orig_lib_functions->C_CancelFunction(hSession);
+	rv = pkcs11_logger_orig_lib_functions->C_CancelFunction(hSession);
 	
 	pkcs11_logger_log_function_exit(rv);
 	return rv;
@@ -1980,6 +2149,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_CancelFunction)(CK_SESSION_HANDLE hSession)
 
 CK_DEFINE_FUNCTION(CK_RV, C_WaitForSlotEvent)(CK_FLAGS flags, CK_SLOT_ID_PTR pSlot, CK_VOID_PTR pReserved)
 {
+	CK_RV rv = CKR_OK;
+
+	SAFELY_INIT_ORIG_LIB_OR_FAIL();
 	pkcs11_logger_log_function_enter(__FUNCTION__);
 	pkcs11_logger_log_input_params();
 	
@@ -1988,7 +2160,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_WaitForSlotEvent)(CK_FLAGS flags, CK_SLOT_ID_PTR pSl
 	pkcs11_logger_log(" pSlot: %p", pSlot);
 	pkcs11_logger_log(" pReserved: %p", pReserved);
 	
-	CK_RV rv = g_orig_lib_functions->C_WaitForSlotEvent(flags, pSlot, pReserved);
+	rv = pkcs11_logger_orig_lib_functions->C_WaitForSlotEvent(flags, pSlot, pReserved);
 	
 	if (CKR_OK == rv)
 	{
