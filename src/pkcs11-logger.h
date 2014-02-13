@@ -131,7 +131,7 @@ typedef void* DLHANDLE;
 #define PKCS11_LOGGER_FLAG_ENABLE_STDERR        0x00000020
 
 // Library name
-#define PKCS11_LOGGER_NAME "PCKS11-LOGGER"
+#define PKCS11_LOGGER_NAME "PKCS11-LOGGER"
 // Library version
 #define PKCS11_LOGGER_VERSION "2.0.0"
 // Library description
