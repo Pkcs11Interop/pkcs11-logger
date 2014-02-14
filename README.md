@@ -101,23 +101,23 @@ Logger behavior can be controlled with the following [environment variables]
 
 ## Download
 
-Signed precompiled binaries as well as source releases can be downloaded from 
+Signed precompiled binaries as well as source code releases can be downloaded from 
 [sourceforge.net](http://sourceforge.net/projects/pkcs11-logger/):
 
  * **Windows**  
-   32-bit version: ~~[pkcs11-logger-x86.dll](http://sourceforge.net/projects/pkcs11-logger/)~~  
-   64-bit version: ~~[pkcs11-logger-x64.dll](http://sourceforge.net/projects/pkcs11-logger/)~~  
+   32-bit version: [pkcs11-logger-x86.dll](http://sourceforge.net/projects/pkcs11-logger/files/2.0.0/windows/pkcs11-logger-x86.dll/download)  
+   64-bit version: [pkcs11-logger-x64.dll](http://sourceforge.net/projects/pkcs11-logger/files/2.0.0/windows/pkcs11-logger-x64.dll/download)  
    <sub>Requires [Visual C++ Redistributable for Visual Studio 2012]
 (http://www.microsoft.com/en-us/download/details.aspx?id=30679) 
 to be installed on the target system.</sub>
 
  * **Ubuntu 12.04**  
-   32-bit version: ~~[pkcs11-logger-x86.so](http://sourceforge.net/projects/pkcs11-logger/)~~  
-   64-bit version: ~~[pkcs11-logger-x64.so](http://sourceforge.net/projects/pkcs11-logger/)~~
+   32-bit version: [pkcs11-logger-x86.so](http://sourceforge.net/projects/pkcs11-logger/files/2.0.0/linux/pkcs11-logger-x86.so/download)  
+   64-bit version: [pkcs11-logger-x64.so](http://sourceforge.net/projects/pkcs11-logger/files/2.0.0/linux/pkcs11-logger-x64.so/download)
    
  * **Mac OS X**  
-   32-bit version: ~~[pkcs11-logger-x86.dylib](http://sourceforge.net/projects/pkcs11-logger/)~~  
-   64-bit version: ~~[pkcs11-logger-x64.dylib](http://sourceforge.net/projects/pkcs11-logger/)~~
+   32-bit version: [pkcs11-logger-x86.dylib](http://sourceforge.net/projects/pkcs11-logger/files/2.0.0/osx/pkcs11-logger-x86.dylib/download)  
+   64-bit version: [pkcs11-logger-x64.dylib](http://sourceforge.net/projects/pkcs11-logger/files/2.0.0/osx/pkcs11-logger-x64.dylib/download)
 
 Archives with source code are signed with [GnuPG key of Jaroslav Imrich]
 (http://crypto.jimrich.sk/gnupg-jimrich-2010.asc).  
