@@ -120,9 +120,9 @@ to be installed on the target system.</sub>
    64-bit version: [pkcs11-logger-x64.dylib](http://sourceforge.net/projects/pkcs11-logger/files/2.0.0/osx/pkcs11-logger-x64.dylib/download)
 
 Archives with source code are signed with [GnuPG key of Jaroslav Imrich]
-(http://crypto.jimrich.sk/gnupg-jimrich-2010.asc).  
+(https://www.jimrich.sk/crypto/).  
 Windows libraries are signed with [code-signing certificate of Jaroslav Imrich]
-(http://crypto.jimrich.sk/code-signing-certum-2013.cer).
+(https://www.jimrich.sk/crypto/).
 
 ## Building the source
 
