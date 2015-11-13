@@ -94,6 +94,8 @@ Logger behavior can be controlled with the following [environment variables]
   * 0x08 hex or 8 dec enables logging of PINs
   * 0x10 hex or 16 dec enables logging to the stdout
   * 0x20 hex or 32 dec enables logging to the stderr
+  * 0x40 hex or 64 dec enables reopening of log file (decreases performance but
+    log file can be deleted when needed)
 
   Value needs to be provided as a decimal number that represents the sum of 
   requested features. For example value 6 can be used to disable logging of 

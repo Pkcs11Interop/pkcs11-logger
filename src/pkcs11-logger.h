@@ -118,17 +118,19 @@ typedef void* DLHANDLE;
 #define PKCS11_LOGGER_FLAGS "PKCS11_LOGGER_FLAGS"
 
 // Flag that disables logging into the log file
-#define PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE     0x00000001
+#define PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE		0x00000001
 // Flag that disables logging of process ID
-#define PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID   0x00000002
+#define PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID	0x00000002
 // Flag that disables logging of thread ID
-#define PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID    0x00000004
+#define PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID	0x00000004
 // Flag that enables logging of PINs
-#define PKCS11_LOGGER_FLAG_ENABLE_PIN           0x00000008
+#define PKCS11_LOGGER_FLAG_ENABLE_PIN			0x00000008
 // Flag that enables logging to the stdout
-#define PKCS11_LOGGER_FLAG_ENABLE_STDOUT        0x00000010
+#define PKCS11_LOGGER_FLAG_ENABLE_STDOUT		0x00000010
 // Flag that enables logging to the stderr
-#define PKCS11_LOGGER_FLAG_ENABLE_STDERR        0x00000020
+#define PKCS11_LOGGER_FLAG_ENABLE_STDERR		0x00000020
+// Flag that enables reopening of log file
+#define PKCS11_LOGGER_FLAG_ENABLE_FCLOSE		0x00000040
 
 // Library name
 #define PKCS11_LOGGER_NAME "PKCS11-LOGGER"

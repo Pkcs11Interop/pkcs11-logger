@@ -73,6 +73,11 @@ namespace Pkcs11Logger.Tests
         /// </summary>
         public const uint PKCS11_LOGGER_FLAG_ENABLE_STDERR = 0x00000020;
 
+        /// <summary>
+        /// Flag that enables reopening of log file
+        /// </summary>
+        public const uint PKCS11_LOGGER_FLAG_ENABLE_FCLOSE = 0x00000040;
+
         #endregion
 
         /// <summary>
@@ -354,6 +359,161 @@ namespace Pkcs11Logger.Tests
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (Pkcs11 pkcs11 = new Pkcs11(Settings.Pkcs11LoggerLibraryPath, true))
                 pkcs11.GetInfo();
+        }
+
+        /// <summary>
+        /// Test PKCS11_LOGGER_FLAG_ENABLE_FCLOSE flag
+        /// </summary>
+        [Test()]
+        public void EnableFcloseTest()
+        {
+            uint flags = 0;
+
+            // Delete log file
+            if (File.Exists(Settings.Pkcs11LoggerLogPath1))
+                File.Delete(Settings.Pkcs11LoggerLogPath1);
+
+            // Log to Pkcs11LoggerLogPath1 with fclose disabled
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            flags = flags & ~PKCS11_LOGGER_FLAG_ENABLE_FCLOSE;
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            using (Pkcs11 pkcs11 = new Pkcs11(Settings.Pkcs11LoggerLibraryPath, true))
+            {
+                pkcs11.GetInfo();
+
+                // Check whether log file exists
+                if (!File.Exists(Settings.Pkcs11LoggerLogPath1))
+                    Assert.Fail("File " + Settings.Pkcs11LoggerLogPath1 + " does not exist");
+
+                try
+                {
+                    // It should not be possible to delete log file
+                    File.Delete(Settings.Pkcs11LoggerLogPath1);
+                    Assert.Fail("Exception expected but not thrown");
+                }
+                catch (Exception ex)
+                {
+                    Assert.IsTrue(ex is IOException);
+                }
+
+                // Check whether log file was not deleted
+                if (!File.Exists(Settings.Pkcs11LoggerLogPath1))
+                    Assert.Fail("File " + Settings.Pkcs11LoggerLogPath1 + " does not exist");
+            }
+
+            // Delete log file
+            if (File.Exists(Settings.Pkcs11LoggerLogPath1))
+                File.Delete(Settings.Pkcs11LoggerLogPath1);
+
+            // Log to Pkcs11LoggerLogPath1 with fclose enabled
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            flags = flags | PKCS11_LOGGER_FLAG_ENABLE_FCLOSE;
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            using (Pkcs11 pkcs11 = new Pkcs11(Settings.Pkcs11LoggerLibraryPath, true))
+            {
+                pkcs11.GetInfo();
+
+                // Check whether log file exists
+                if (!File.Exists(Settings.Pkcs11LoggerLogPath1))
+                    Assert.Fail("File " + Settings.Pkcs11LoggerLogPath1 + " does not exist");
+
+                // It should be possible to delete log file
+                File.Delete(Settings.Pkcs11LoggerLogPath1);
+
+                // Check whether log file was deleted
+                if (File.Exists(Settings.Pkcs11LoggerLogPath1))
+                    Assert.Fail("File " + Settings.Pkcs11LoggerLogPath1 + " exists");
+
+                pkcs11.GetInfo();
+
+                // Check whether log file exists
+                if (!File.Exists(Settings.Pkcs11LoggerLogPath1))
+                    Assert.Fail("File " + Settings.Pkcs11LoggerLogPath1 + " does not exist");
+            }
+
+            // Delete log file
+            if (File.Exists(Settings.Pkcs11LoggerLogPath1))
+                File.Delete(Settings.Pkcs11LoggerLogPath1);
+        }
+
+        /// <summary>
+        /// Test performance with PKCS11_LOGGER_FLAG_ENABLE_FCLOSE flag
+        /// </summary>
+        [Test()]
+        public void EnableFclosePerformanceTest()
+        {
+            uint flags = 0;
+            int fcloseDisabledTicks = 0;
+            int fcloseEnabledTicks = 0;
+
+            // Delete log file
+            if (File.Exists(Settings.Pkcs11LoggerLogPath1))
+                File.Delete(Settings.Pkcs11LoggerLogPath1);
+
+            // Log to Pkcs11LoggerLogPath1 with fclose disabled
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            flags = flags & ~PKCS11_LOGGER_FLAG_ENABLE_FCLOSE;
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            using (Pkcs11 pkcs11 = new Pkcs11(Settings.Pkcs11LoggerLibraryPath, true))
+            {
+                int tickCountStart = Environment.TickCount;
+
+                for (int i = 0; i < 10; i++)
+                {
+                    pkcs11.GetInfo();
+                    foreach (Slot slot in pkcs11.GetSlotList(true))
+                    {
+                        slot.GetTokenInfo();
+                        foreach (CKM mechanism in slot.GetMechanismList())
+                        {
+                            slot.GetMechanismInfo(mechanism);
+                        }
+                    }
+                }
+
+                int tickCountStop = Environment.TickCount;
+                fcloseDisabledTicks = tickCountStop - tickCountStart;
+            }
+
+            // Delete log file
+            if (File.Exists(Settings.Pkcs11LoggerLogPath1))
+                File.Delete(Settings.Pkcs11LoggerLogPath1);
+
+            // Log to Pkcs11LoggerLogPath1 with fclose enabled
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            flags = flags | PKCS11_LOGGER_FLAG_ENABLE_FCLOSE;
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            using (Pkcs11 pkcs11 = new Pkcs11(Settings.Pkcs11LoggerLibraryPath, true))
+            {
+                int tickCountStart = Environment.TickCount;
+
+                for (int i = 0; i < 10; i++)
+                {
+                    pkcs11.GetInfo();
+                    foreach (Slot slot in pkcs11.GetSlotList(true))
+                    {
+                        slot.GetTokenInfo();
+                        foreach (CKM mechanism in slot.GetMechanismList())
+                        {
+                            slot.GetMechanismInfo(mechanism);
+                        }
+                    }
+                }
+
+                int tickCountStop = Environment.TickCount;
+                fcloseEnabledTicks = tickCountStop - tickCountStart;
+            }
+            
+            // Delete log file
+            if (File.Exists(Settings.Pkcs11LoggerLogPath1))
+                File.Delete(Settings.Pkcs11LoggerLogPath1);
+
+            // PKCS11_LOGGER_FLAG_ENABLE_FCLOSE decreases performance
+            Assert.IsTrue(fcloseEnabledTicks > fcloseDisabledTicks);
         }
     }
 }

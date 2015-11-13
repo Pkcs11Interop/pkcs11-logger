@@ -25,7 +25,7 @@ extern CK_ULONG pkcs11_logger_flags;
 // Logs message
 void pkcs11_logger_log(const char* message, ...)
 {
-	FILE *fw = NULL;
+	static FILE *fw = NULL;
 	va_list ap;
 
 	unsigned long disable_log_file = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE) == PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE);
@@ -33,18 +33,21 @@ void pkcs11_logger_log(const char* message, ...)
 	unsigned long disable_thread_id = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID) == PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID);
 	unsigned long enable_stdout = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_ENABLE_STDOUT) == PKCS11_LOGGER_FLAG_ENABLE_STDOUT);
 	unsigned long enable_stderr = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_ENABLE_STDERR) == PKCS11_LOGGER_FLAG_ENABLE_STDERR);
+	unsigned long enable_fclose = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_ENABLE_FCLOSE) == PKCS11_LOGGER_FLAG_ENABLE_FCLOSE);
 
 	// Acquire exclusive access to the file
 	pkcs11_logger_lock_acquire();
-	
+
 #ifdef _WIN32
 #pragma warning(push)
 #pragma warning(disable: 4996)
 #endif
 
 	// Open log file
-	if (!disable_log_file && pkcs11_logger_log_file_path != NULL)
-		fw = fopen((const char *) pkcs11_logger_log_file_path, "a");
+	if ((!disable_log_file) && (NULL != pkcs11_logger_log_file_path) && (NULL == fw))
+	{
+		fw = fopen((const char *)pkcs11_logger_log_file_path, "a");
+	}
 
 #ifdef _WIN32
 #pragma warning(pop)
@@ -76,12 +79,12 @@ void pkcs11_logger_log(const char* message, ...)
 			fprintf(stdout, "%0#10x : ", pkcs11_logger_utils_get_thread_id());
 		vfprintf(stdout, message, ap);
 		fprintf(stdout, "\n");
-		
+
 		va_end(ap);
 	}
 
 	// Log to stderr
-	if (enable_stderr || pkcs11_logger_env_vars_read == CK_FALSE)
+	if (enable_stderr || CK_FALSE == pkcs11_logger_env_vars_read)
 	{
 		va_start(ap, message);
 
@@ -94,9 +97,12 @@ void pkcs11_logger_log(const char* message, ...)
 
 		va_end(ap);
 	}
-	
+
 	// Cleanup
-	CALL_N_CLEAR(fclose, fw);
+	if (enable_fclose)
+	{
+		CALL_N_CLEAR(fclose, fw);
+	}
 	
 	// Release exclusive access to the file
 	pkcs11_logger_lock_release();
