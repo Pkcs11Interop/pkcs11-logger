@@ -367,6 +367,10 @@ namespace Pkcs11Logger.Tests
         [Test()]
         public void EnableFcloseTest()
         {
+            // Tested file locking behavior is valid only on Windows platform
+            if (!Platform.IsWindows)
+                Assert.Inconclusive("Test cannot be executed on this platform");
+
             uint flags = 0;
 
             // Delete log file
