@@ -103,6 +103,11 @@ void pkcs11_logger_log(const char* message, ...)
     {
         CALL_N_CLEAR(fclose, fw);
     }
+    else
+    {
+        if (NULL != fw)
+            fflush(fw);
+    }
     
     // Release exclusive access to the file
     pkcs11_logger_lock_release();
