@@ -28,38 +28,38 @@ static pthread_mutex_t pkcs11_logger_lock;
 // Creates lock for log file access synchronization
 int pkcs11_logger_lock_create(void)
 {
-	int rv = PKCS11_LOGGER_RV_ERROR;
+    int rv = PKCS11_LOGGER_RV_ERROR;
 
 #ifdef _WIN32
 
-	if (NULL != pkcs11_logger_lock)
-	{
-		pkcs11_logger_log("Lock already exists");
-		goto end;
-	}
+    if (NULL != pkcs11_logger_lock)
+    {
+        pkcs11_logger_log("Lock already exists");
+        goto end;
+    }
 
-	pkcs11_logger_lock = CreateMutex(NULL, FALSE, NULL);
-	if (NULL == pkcs11_logger_lock)
-	{
-		pkcs11_logger_log("Unable to create lock");
-		goto end;
-	}
+    pkcs11_logger_lock = CreateMutex(NULL, FALSE, NULL);
+    if (NULL == pkcs11_logger_lock)
+    {
+        pkcs11_logger_log("Unable to create lock");
+        goto end;
+    }
 
 #else
 
-	if (0 != pthread_mutex_init(&pkcs11_logger_lock, NULL))
-	{
-		pkcs11_logger_log("Unable to create lock");
-		goto end;
-	}
+    if (0 != pthread_mutex_init(&pkcs11_logger_lock, NULL))
+    {
+        pkcs11_logger_log("Unable to create lock");
+        goto end;
+    }
 
 #endif
 
-	rv = PKCS11_LOGGER_RV_SUCCESS;
+    rv = PKCS11_LOGGER_RV_SUCCESS;
 
 end:
 
-	return rv;
+    return rv;
 }
 
 
@@ -68,16 +68,16 @@ void pkcs11_logger_lock_acquire(void)
 {
 #ifdef _WIN32
 
-	if (NULL == pkcs11_logger_lock)
-		return;
+    if (NULL == pkcs11_logger_lock)
+        return;
 
-	if (WAIT_OBJECT_0 != WaitForSingleObject(pkcs11_logger_lock, INFINITE))
-		pkcs11_logger_log("Unable to get lock ownership");
+    if (WAIT_OBJECT_0 != WaitForSingleObject(pkcs11_logger_lock, INFINITE))
+        pkcs11_logger_log("Unable to get lock ownership");
 
 #else
 
-	if (0 != pthread_mutex_lock(&pkcs11_logger_lock))
-		pkcs11_logger_log("Unable to get lock ownership");
+    if (0 != pthread_mutex_lock(&pkcs11_logger_lock))
+        pkcs11_logger_log("Unable to get lock ownership");
 
 #endif
 }
@@ -88,16 +88,16 @@ void pkcs11_logger_lock_release(void)
 {
 #ifdef _WIN32
 
-	if (NULL == pkcs11_logger_lock)
-		return;
+    if (NULL == pkcs11_logger_lock)
+        return;
 
-	if (!ReleaseMutex(pkcs11_logger_lock)) 
-		pkcs11_logger_log("Unable to release lock ownership");
+    if (!ReleaseMutex(pkcs11_logger_lock)) 
+        pkcs11_logger_log("Unable to release lock ownership");
 
 #else
 
-	if (0 != pthread_mutex_unlock(&pkcs11_logger_lock))
-		pkcs11_logger_log("Unable to release lock ownership");
+    if (0 != pthread_mutex_unlock(&pkcs11_logger_lock))
+        pkcs11_logger_log("Unable to release lock ownership");
 
 #endif
 }
@@ -108,11 +108,11 @@ void pkcs11_logger_lock_destroy(void)
 {
 #ifdef _WIN32
 
-	CALL_N_CLEAR(CloseHandle, pkcs11_logger_lock);
+    CALL_N_CLEAR(CloseHandle, pkcs11_logger_lock);
 
 #else
 
-	pthread_mutex_destroy(&pkcs11_logger_lock);
+    pthread_mutex_destroy(&pkcs11_logger_lock);
 
 #endif
 }
