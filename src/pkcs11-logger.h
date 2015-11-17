@@ -63,11 +63,6 @@ typedef HINSTANCE DLHANDLE;
 // Platform dependend function that unloads dynamic library
 #define DLCLOSE FreeLibrary
 
-// Platform dependend function for case insensitive string comparison
-#define STRCASECMP _stricmp
-// Platform dependend function for string duplication
-#define STRDUP _strdup
-
 
 #else // #ifdef _WIN32
 
@@ -100,11 +95,6 @@ typedef void* DLHANDLE;
 #define DLSYM(lib, func) dlsym((lib), (func))
 // Platform dependend function that unloads dynamic library
 #define DLCLOSE dlclose
-
-// Platform dependend function for case insensitive string comparison
-#define STRCASECMP strcasecmp
-// Platform dependend function for string duplication
-#define STRDUP strdup
 
 
 #endif // #ifdef _WIN32
