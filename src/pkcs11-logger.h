@@ -163,8 +163,11 @@ PKCS11_LOGGER_GLOBALS;
 #define CALL_N_CLEAR(function, pointer) if (NULL != pointer) { function(pointer); pointer = NULL; }
 // Macro for safe initialization of original PKCS#11 library
 #define SAFELY_INIT_ORIG_LIB_OR_FAIL() if (pkcs11_logger_init_orig_lib() != PKCS11_LOGGER_RV_SUCCESS) return CKR_GENERAL_ERROR;
+// Macro that removes unused argument warning
+#define IGNORE_ARG(P) (void)(P)
 
 // init.c - declaration of functions
+void pkcs11_logger_init_globals(void);
 int pkcs11_logger_init_orig_lib(void);
 int pkcs11_logger_init_parse_env_vars(void);
 CK_CHAR_PTR pkcs11_logger_init_read_env_var(const char *env_var_name);

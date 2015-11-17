@@ -20,6 +20,41 @@
 extern PKCS11_LOGGER_GLOBALS pkcs11_logger_globals;
 
 
+#ifdef _WIN32
+
+// Entry point for the shared library on Windows platform
+// TODO : Can this function be replaced by __attribute__((constructor)) and __attribute__((destructor)) on other platforms ?
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
+{
+    IGNORE_ARG(hModule);
+    IGNORE_ARG(lpReserved);
+
+    if ((DLL_PROCESS_ATTACH == ul_reason_for_call) || (DLL_PROCESS_DETACH == ul_reason_for_call))
+        pkcs11_logger_init_globals();
+
+    return TRUE;
+}
+
+#endif
+
+
+// Initializes/frees global variables
+void pkcs11_logger_init_globals(void)
+{
+    // Note: Calling LoadLibrary() or FreeLibrary() in DllMain() can cause a deadlock or a crash.
+    //       See "Dynamic-Link Library Best Practices" article on MSDN for more details.
+    pkcs11_logger_globals.orig_lib_handle = NULL;
+    pkcs11_logger_globals.orig_lib_functions = NULL;
+    // Note: There is no need to modify pkcs11_logger_globals.logger_functions
+    pkcs11_logger_globals.env_vars_read = CK_FALSE;
+    CALL_N_CLEAR(free, pkcs11_logger_globals.env_var_library_path);
+    CALL_N_CLEAR(free, pkcs11_logger_globals.env_var_log_file_path);
+    CALL_N_CLEAR(free, pkcs11_logger_globals.env_var_flags);
+    pkcs11_logger_globals.flags = 0;
+    CALL_N_CLEAR(fclose, pkcs11_logger_globals.log_file_handle);
+}
+
+
 // Loads original PKCS#11 library
 int pkcs11_logger_init_orig_lib(void)
 {
@@ -28,6 +63,9 @@ int pkcs11_logger_init_orig_lib(void)
 
     if (NULL != pkcs11_logger_globals.orig_lib_handle)
         return PKCS11_LOGGER_RV_SUCCESS;
+
+    // Initialize global variables
+    pkcs11_logger_init_globals();
 
     // Create lock for synchronization of log file access
     if (PKCS11_LOGGER_RV_SUCCESS != pkcs11_logger_lock_create())
