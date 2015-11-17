@@ -1143,7 +1143,7 @@ char* pkcs11_logger_translate_ck_byte_ptr(CK_BYTE_PTR bytes, CK_ULONG length)
     CK_ULONG output_len = (length * 2) + 1;
     char *t = "0123456789ABCDEF";
     
-    output = (char *) malloc(output_len * sizeof(char));
+    output = (char *) malloc(output_len);
     if (NULL == output)
         return NULL;
 
