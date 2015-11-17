@@ -110,6 +110,25 @@ typedef void* DLHANDLE;
 #endif // #ifdef _WIN32
 
 
+// Structure that holds global variables
+typedef struct
+{
+    // Handle to original PKCS#11 library
+    DLHANDLE orig_lib_handle;
+    // Pointers to all functions in original PKCS#11 library
+    CK_FUNCTION_LIST_PTR orig_lib_functions;
+    // Flag indicating whether environment variables has been successfuly read
+    CK_BBOOL env_vars_read;
+    // Value of PKCS11_LOGGER_LIBRARY_PATH environment variable
+    CK_CHAR_PTR env_var_library_path;
+    // Value of PKCS11_LOGGER_LOG_FILE_PATH environment variable
+    CK_CHAR_PTR env_var_log_file_path;
+    // Value of PKCS11_LOGGER_FLAGS environment variable
+    CK_ULONG flags;
+}
+PKCS11_LOGGER_GLOBALS;
+
+
 // Environment variable that specifies path to the original PKCS#11 library
 #define PKCS11_LOGGER_LIBRARY_PATH "PKCS11_LOGGER_LIBRARY_PATH"
 // Environment variable that specifies path to the log file

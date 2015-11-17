@@ -17,9 +17,7 @@
 #include "pkcs11-logger.h"
 
 
-extern CK_BBOOL pkcs11_logger_env_vars_read;
-extern CK_CHAR_PTR pkcs11_logger_log_file_path;
-extern CK_ULONG pkcs11_logger_flags;
+extern PKCS11_LOGGER_GLOBALS pkcs11_logger_globals;
 
 
 // Logs message
@@ -28,12 +26,12 @@ void pkcs11_logger_log(const char* message, ...)
     static FILE *fw = NULL;
     va_list ap;
 
-    unsigned long disable_log_file = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE) == PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE);
-    unsigned long disable_process_id = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID) == PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID);
-    unsigned long disable_thread_id = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID) == PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID);
-    unsigned long enable_stdout = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_ENABLE_STDOUT) == PKCS11_LOGGER_FLAG_ENABLE_STDOUT);
-    unsigned long enable_stderr = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_ENABLE_STDERR) == PKCS11_LOGGER_FLAG_ENABLE_STDERR);
-    unsigned long enable_fclose = ((pkcs11_logger_flags & PKCS11_LOGGER_FLAG_ENABLE_FCLOSE) == PKCS11_LOGGER_FLAG_ENABLE_FCLOSE);
+    unsigned long disable_log_file = ((pkcs11_logger_globals.flags & PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE) == PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE);
+    unsigned long disable_process_id = ((pkcs11_logger_globals.flags & PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID) == PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID);
+    unsigned long disable_thread_id = ((pkcs11_logger_globals.flags & PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID) == PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID);
+    unsigned long enable_stdout = ((pkcs11_logger_globals.flags & PKCS11_LOGGER_FLAG_ENABLE_STDOUT) == PKCS11_LOGGER_FLAG_ENABLE_STDOUT);
+    unsigned long enable_stderr = ((pkcs11_logger_globals.flags & PKCS11_LOGGER_FLAG_ENABLE_STDERR) == PKCS11_LOGGER_FLAG_ENABLE_STDERR);
+    unsigned long enable_fclose = ((pkcs11_logger_globals.flags & PKCS11_LOGGER_FLAG_ENABLE_FCLOSE) == PKCS11_LOGGER_FLAG_ENABLE_FCLOSE);
 
     // Acquire exclusive access to the file
     pkcs11_logger_lock_acquire();
@@ -44,9 +42,9 @@ void pkcs11_logger_log(const char* message, ...)
 #endif
 
     // Open log file
-    if ((!disable_log_file) && (NULL != pkcs11_logger_log_file_path) && (NULL == fw))
+    if ((!disable_log_file) && (NULL != pkcs11_logger_globals.env_var_log_file_path) && (NULL == fw))
     {
-        fw = fopen((const char *)pkcs11_logger_log_file_path, "a");
+        fw = fopen((const char *)pkcs11_logger_globals.env_var_log_file_path, "a");
     }
 
 #ifdef _WIN32
@@ -84,7 +82,7 @@ void pkcs11_logger_log(const char* message, ...)
     }
 
     // Log to stderr
-    if (enable_stderr || CK_FALSE == pkcs11_logger_env_vars_read)
+    if (enable_stderr || CK_FALSE == pkcs11_logger_globals.env_vars_read)
     {
         va_start(ap, message);
 
