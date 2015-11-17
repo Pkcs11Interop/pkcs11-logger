@@ -115,8 +115,10 @@ typedef struct
 {
     // Handle to original PKCS#11 library
     DLHANDLE orig_lib_handle;
-    // Pointers to all functions in original PKCS#11 library
+    // Pointers to all cryptoki functions in original PKCS#11 library
     CK_FUNCTION_LIST_PTR orig_lib_functions;
+    // Pointers to all cryptoki functions in PKCS11-LOGGER library
+    CK_FUNCTION_LIST logger_functions;
     // Flag indicating whether environment variables has been successfuly read
     CK_BBOOL env_vars_read;
     // Value of PKCS11_LOGGER_LIBRARY_PATH environment variable
