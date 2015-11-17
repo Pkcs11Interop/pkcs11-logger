@@ -23,7 +23,7 @@ namespace Pkcs11Logger.Tests
         /// <summary>
         /// The PKCS#11 unmanaged library path
         /// </summary>
-        public static string Pkcs11LibraryPath = @"siecap11.dll";
+        public static string Pkcs11LibraryPath = @"c:\test\pkcs11-mock-x86.dll";
 
         /// <summary>
         /// The normal user pin
@@ -33,16 +33,16 @@ namespace Pkcs11Logger.Tests
         /// <summary>
         /// The PKCS11-LOGGER unmanaged library path
         /// </summary>
-        public static string Pkcs11LoggerLibraryPath = @"c:\pkcs11-logger-x86.dll";
+        public static string Pkcs11LoggerLibraryPath = @"c:\test\pkcs11-logger-x86.dll";
 
         /// <summary>
         /// Primary log file path
         /// </summary>
-        public static string Pkcs11LoggerLogPath1 = @"c:\pkcs11-logger-x86-1.txt";
+        public static string Pkcs11LoggerLogPath1 = @"c:\test\pkcs11-logger-x86-1.txt";
 
         /// <summary>
         /// Alternative log file path
         /// </summary>
-        public static string Pkcs11LoggerLogPath2 = @"c:\pkcs11-logger-x86-2.txt";
+        public static string Pkcs11LoggerLogPath2 = @"c:\test\pkcs11-logger-x86-2.txt";
     }
 }
