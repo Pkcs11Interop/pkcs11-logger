@@ -81,11 +81,107 @@ namespace Pkcs11Logger.Tests
         #endregion
 
         /// <summary>
+        /// Deletes environment variables used by PKCS11-LOGGER library 
+        /// </summary>
+        private void DeleteEnvironmentVariables()
+        {
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, null);
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, null);
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
+        }
+
+        /// <summary>
+        /// Test environment variable processing
+        /// </summary>
+        [Test()]
+        public void EnvironmentVariableProcessingTest()
+        {
+            DeleteEnvironmentVariables();
+
+            // PKCS11_LOGGER_LIBRARY_PATH is required
+            try
+            {
+                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, null);
+                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, null);
+                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
+                using (Pkcs11 pkcs11 = new Pkcs11(Settings.Pkcs11LoggerLibraryPath, true))
+                    pkcs11.GetInfo();
+
+                Assert.Fail("Exception expected but not thrown");
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex is Pkcs11Exception);
+                Assert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
+            }
+
+            // PKCS11_LOGGER_LOG_FILE_PATH and PKCS11_LOGGER_FLAGS are optional
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, null);
+            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
+            using (Pkcs11 pkcs11 = new Pkcs11(Settings.Pkcs11LoggerLibraryPath, true))
+                pkcs11.GetInfo();
+
+            // PKCS11_LOGGER_LIBRARY_PATH has to be provided without enclosing quotes
+            try
+            {
+                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, "\"" + Settings.Pkcs11LibraryPath + "\"");
+                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, null);
+                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
+                using (Pkcs11 pkcs11 = new Pkcs11(Settings.Pkcs11LoggerLibraryPath, true))
+                    pkcs11.GetInfo();
+
+                Assert.Fail("Exception expected but not thrown");
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex is Pkcs11Exception);
+                Assert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
+            }
+
+            // PKCS11_LOGGER_LOG_FILE_PATH has to be provided without enclosing quotes
+            try
+            {
+                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, "\"" + Settings.Pkcs11LoggerLogPath1 + "\"");
+                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
+                using (Pkcs11 pkcs11 = new Pkcs11(Settings.Pkcs11LoggerLibraryPath, true))
+                    pkcs11.GetInfo();
+
+                Assert.Fail("Exception expected but not thrown");
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex is Pkcs11Exception);
+                Assert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
+            }
+
+            // PKCS11_LOGGER_FLAGS must contain a number
+            try
+            {
+                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, "InvalidValue");
+                using (Pkcs11 pkcs11 = new Pkcs11(Settings.Pkcs11LoggerLibraryPath, true))
+                    pkcs11.GetInfo();
+
+                Assert.Fail("Exception expected but not thrown");
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex is Pkcs11Exception);
+                Assert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
+            }
+        }
+
+        /// <summary>
         /// Test PKCS11_LOGGER_LIBRARY_PATH environment variable
         /// </summary>
         [Test()]
         public void LibraryPathTest()
         {
+            DeleteEnvironmentVariables();
+
             // Delete log file
             if (File.Exists(Settings.Pkcs11LoggerLogPath1))
                 File.Delete(Settings.Pkcs11LoggerLogPath1);
@@ -137,6 +233,8 @@ namespace Pkcs11Logger.Tests
         [Test()]
         public void LogFilePathTest()
         {
+            DeleteEnvironmentVariables();
+
             // Delete log files
             if (File.Exists(Settings.Pkcs11LoggerLogPath1))
                 File.Delete(Settings.Pkcs11LoggerLogPath1);
@@ -196,6 +294,8 @@ namespace Pkcs11Logger.Tests
         [Test()]
         public void DisableLogFileTest()
         {
+            DeleteEnvironmentVariables();
+
             uint flags = 0;
 
             // Delete log file
@@ -231,6 +331,8 @@ namespace Pkcs11Logger.Tests
         [Test()]
         public void DisableProcessIdAndThreadIdTest()
         {
+            DeleteEnvironmentVariables();
+
             uint flags = 0;
 
             // Delete log file
@@ -295,6 +397,8 @@ namespace Pkcs11Logger.Tests
         [Test()]
         public void EnablePinTest()
         {
+            DeleteEnvironmentVariables();
+
             uint flags = 0;
 
             // Delete log file
@@ -331,6 +435,8 @@ namespace Pkcs11Logger.Tests
         [Test()]
         public void EnableStdOutTest()
         {
+            DeleteEnvironmentVariables();
+
             uint flags = 0;
 
             // Test result needs to be verified visually in NUnit console.
@@ -349,6 +455,8 @@ namespace Pkcs11Logger.Tests
         [Test()]
         public void EnableStdErrTest()
         {
+            DeleteEnvironmentVariables();
+
             uint flags = 0;
 
             // Test result needs to be verified visually in NUnit console.
@@ -367,6 +475,8 @@ namespace Pkcs11Logger.Tests
         [Test()]
         public void EnableFcloseTest()
         {
+            DeleteEnvironmentVariables();
+
             // Tested file locking behavior is valid only on Windows platform
             if (!Platform.IsWindows)
                 Assert.Inconclusive("Test cannot be executed on this platform");
@@ -448,6 +558,8 @@ namespace Pkcs11Logger.Tests
         [Test()]
         public void EnableFclosePerformanceTest()
         {
+            DeleteEnvironmentVariables();
+
             uint flags = 0;
             int fcloseDisabledTicks = 0;
             int fcloseEnabledTicks = 0;
