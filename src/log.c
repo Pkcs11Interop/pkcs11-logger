@@ -23,7 +23,6 @@ extern PKCS11_LOGGER_GLOBALS pkcs11_logger_globals;
 // Logs message
 void pkcs11_logger_log(const char* message, ...)
 {
-    static FILE *fw = NULL;
     va_list ap;
 
     unsigned long disable_log_file = ((pkcs11_logger_globals.flags & PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE) == PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE);
@@ -42,9 +41,9 @@ void pkcs11_logger_log(const char* message, ...)
 #endif
 
     // Open log file
-    if ((!disable_log_file) && (NULL != pkcs11_logger_globals.env_var_log_file_path) && (NULL == fw))
+    if ((!disable_log_file) && (NULL != pkcs11_logger_globals.env_var_log_file_path) && (NULL == pkcs11_logger_globals.log_file_handle))
     {
-        fw = fopen((const char *)pkcs11_logger_globals.env_var_log_file_path, "a");
+        pkcs11_logger_globals.log_file_handle = fopen((const char *)pkcs11_logger_globals.env_var_log_file_path, "a");
     }
 
 #ifdef _WIN32
@@ -52,16 +51,16 @@ void pkcs11_logger_log(const char* message, ...)
 #endif
 
     // Log to file
-    if ((!disable_log_file) && (NULL != fw))
+    if ((!disable_log_file) && (NULL != pkcs11_logger_globals.log_file_handle))
     {
         va_start(ap, message);
 
         if (!disable_process_id)
-            fprintf(fw, "%0#10x : ", pkcs11_logger_utils_get_process_id());
+            fprintf(pkcs11_logger_globals.log_file_handle, "%0#10x : ", pkcs11_logger_utils_get_process_id());
         if (!disable_thread_id)
-            fprintf(fw, "%0#10x : ", pkcs11_logger_utils_get_thread_id());
-        vfprintf(fw, message, ap);
-        fprintf(fw, "\n");
+            fprintf(pkcs11_logger_globals.log_file_handle, "%0#10x : ", pkcs11_logger_utils_get_thread_id());
+        vfprintf(pkcs11_logger_globals.log_file_handle, message, ap);
+        fprintf(pkcs11_logger_globals.log_file_handle, "\n");
 
         va_end(ap);
     }
@@ -99,12 +98,12 @@ void pkcs11_logger_log(const char* message, ...)
     // Cleanup
     if (enable_fclose)
     {
-        CALL_N_CLEAR(fclose, fw);
+        CALL_N_CLEAR(fclose, pkcs11_logger_globals.log_file_handle);
     }
     else
     {
-        if (NULL != fw)
-            fflush(fw);
+        if (NULL != pkcs11_logger_globals.log_file_handle)
+            fflush(pkcs11_logger_globals.log_file_handle);
     }
     
     // Release exclusive access to the file

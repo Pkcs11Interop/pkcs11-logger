@@ -96,7 +96,8 @@ PKCS11_LOGGER_GLOBALS pkcs11_logger_globals =
     CK_FALSE,   // env_vars_read
     NULL,       // env_var_library_path
     NULL,       // env_var_log_file_path
-    0           // flags
+    0,          // flags
+    NULL        // log_file_handle
 };
 
 

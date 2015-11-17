@@ -127,6 +127,8 @@ typedef struct
     CK_CHAR_PTR env_var_log_file_path;
     // Value of PKCS11_LOGGER_FLAGS environment variable
     CK_ULONG flags;
+    // Handle to log file
+    FILE *log_file_handle;
 }
 PKCS11_LOGGER_GLOBALS;
 
