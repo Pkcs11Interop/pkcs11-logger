@@ -175,7 +175,6 @@ PKCS11_LOGGER_GLOBALS;
 // init.c - declaration of functions
 int pkcs11_logger_init_orig_lib(void);
 int pkcs11_logger_init_parse_env_vars(void);
-int pkcs11_logger_init_str_to_long(const char *str, unsigned long *val);
 
 // lock.c - declaration of functions
 int pkcs11_logger_lock_create(void);
