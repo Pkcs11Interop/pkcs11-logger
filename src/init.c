@@ -89,66 +89,42 @@ int pkcs11_logger_init_orig_lib(void)
 int pkcs11_logger_init_parse_env_vars(void)
 {
     int rv = PKCS11_LOGGER_RV_ERROR;
-    char *env_var = NULL;
-
-#ifdef _WIN32
-#pragma warning(push)
-#pragma warning(disable: 4996)
-#endif
 
     // Read PKCS11_LOGGER_LIBRARY_PATH environment variable
-    env_var = getenv(PKCS11_LOGGER_LIBRARY_PATH);
-    if (NULL == env_var)
-    {
-        pkcs11_logger_log("Environment variable PKCS11_LOGGER_LIBRARY_PATH is not defined");
-        goto err;
-    }
-
-    if (('"' == env_var[0]) || ('\'' == env_var[0]))
-    {
-        pkcs11_logger_log("Value of PKCS11_LOGGER_LIBRARY_PATH environment variable needs to be provided without enclosing quotes");
-        goto err;
-    }
-
-    pkcs11_logger_globals.env_var_library_path = (CK_CHAR_PTR) STRDUP(env_var);
+    pkcs11_logger_globals.env_var_library_path = pkcs11_logger_init_read_env_var(PKCS11_LOGGER_LIBRARY_PATH);
     if (NULL == pkcs11_logger_globals.env_var_library_path)
     {
-        pkcs11_logger_log("Unable to copy the value of PKCS11_LOGGER_LIBRARY_PATH environment variable");
+        pkcs11_logger_log("Environment variable %s is not defined", PKCS11_LOGGER_LIBRARY_PATH);
+        goto err;
+    }
+
+    if (('"' == pkcs11_logger_globals.env_var_library_path[0]) || ('\'' == pkcs11_logger_globals.env_var_library_path[0]))
+    {
+        pkcs11_logger_log("Value of %s environment variable needs to be provided without enclosing quotes", PKCS11_LOGGER_LIBRARY_PATH);
         goto err;
     }
 
     // Read PKCS11_LOGGER_LOG_FILE_PATH environment variable
-    env_var = getenv(PKCS11_LOGGER_LOG_FILE_PATH);
-    if (NULL != env_var)
+    pkcs11_logger_globals.env_var_log_file_path = pkcs11_logger_init_read_env_var(PKCS11_LOGGER_LOG_FILE_PATH);
+    if (NULL != pkcs11_logger_globals.env_var_log_file_path)
     {
-        if (('"' == env_var[0]) || ('\'' == env_var[0]))
+        if (('"' == pkcs11_logger_globals.env_var_log_file_path[0]) || ('\'' == pkcs11_logger_globals.env_var_log_file_path[0]))
         {
-            pkcs11_logger_log("Value of PKCS11_LOGGER_LOG_FILE_PATH environment variable needs to be provided without enclosing quotes");
-            goto err;
-        }
-
-        pkcs11_logger_globals.env_var_log_file_path = (CK_CHAR_PTR) STRDUP(env_var);
-        if (NULL == pkcs11_logger_globals.env_var_log_file_path)
-        {
-            pkcs11_logger_log("Unable to copy the value of PKCS11_LOGGER_LOG_FILE_PATH environment variable");
+            pkcs11_logger_log("Value of %s environment variable needs to be provided without enclosing quotes", PKCS11_LOGGER_LOG_FILE_PATH);
             goto err;
         }
     }
 
     // Read PKCS11_LOGGER_FLAGS environment variable
-    env_var = getenv(PKCS11_LOGGER_FLAGS);
-    if (NULL != env_var)
+    pkcs11_logger_globals.env_var_flags = pkcs11_logger_init_read_env_var(PKCS11_LOGGER_FLAGS);
+    if (NULL != pkcs11_logger_globals.env_var_flags)
     {
-        if (PKCS11_LOGGER_RV_SUCCESS != pkcs11_logger_utils_str_to_long(env_var, &(pkcs11_logger_globals.flags)))
+        if (PKCS11_LOGGER_RV_SUCCESS != pkcs11_logger_utils_str_to_long((const char *)pkcs11_logger_globals.env_var_flags, &(pkcs11_logger_globals.flags)))
         {
-            pkcs11_logger_log("Unable to read the value of PKCS11_LOGGER_FLAGS environment variable as a number");
+            pkcs11_logger_log("Unable to read the value of %s environment variable as a number", PKCS11_LOGGER_FLAGS);
             goto err;
         }
     }
-
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
 
     rv = PKCS11_LOGGER_RV_SUCCESS;
 
@@ -158,7 +134,69 @@ err:
     {
         CALL_N_CLEAR(free, pkcs11_logger_globals.env_var_library_path);
         CALL_N_CLEAR(free, pkcs11_logger_globals.env_var_log_file_path);
+        CALL_N_CLEAR(free, pkcs11_logger_globals.env_var_flags);
     }
 
     return rv;
+}
+
+
+// Reads environment variable
+CK_CHAR_PTR pkcs11_logger_init_read_env_var(const char *env_var_name)
+{
+    CK_CHAR_PTR output_value = NULL;
+
+#ifdef _WIN32
+
+    LPSTR env_var_value = NULL;
+    DWORD env_var_value_size = 0;
+
+    env_var_value_size = GetEnvironmentVariableA(env_var_name, env_var_value, env_var_value_size);
+    if (0 == env_var_value_size)
+    {
+        // Note: Environment variable is not defined
+        goto err;
+    }
+
+    env_var_value = (LPSTR) malloc(env_var_value_size);
+    if (NULL == env_var_value)
+    {
+        pkcs11_logger_log("Unable to allocate memory for the value of %s environment variable", env_var_name);
+        goto err;
+    }
+
+    if ((env_var_value_size - 1) != GetEnvironmentVariableA(env_var_name, env_var_value, env_var_value_size))
+    {
+        pkcs11_logger_log("Unable to read the value of %s environment variable", env_var_name);
+        goto err;
+    }
+
+    output_value = (CK_CHAR_PTR) env_var_value;
+    env_var_value = NULL;
+
+#else
+
+    char *env_var_value = NULL;
+
+    env_var_value = getenv(env_var_name);
+    if (NULL == env_var_value)
+    {
+        // Note: Environment variable is not defined
+        goto err;
+    }
+
+    output_value = (CK_CHAR_PTR) strdup(env_var_value);
+    if (NULL == output_value)
+    {
+        pkcs11_logger_log("Unable to copy the value of %s environment variable", env_var_name);
+        goto err;
+    }
+
+#endif
+
+err:
+
+    CALL_N_CLEAR(free, env_var_value);
+
+    return output_value;
 }

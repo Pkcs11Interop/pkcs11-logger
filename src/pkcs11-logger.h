@@ -126,6 +126,8 @@ typedef struct
     // Value of PKCS11_LOGGER_LOG_FILE_PATH environment variable
     CK_CHAR_PTR env_var_log_file_path;
     // Value of PKCS11_LOGGER_FLAGS environment variable
+    CK_CHAR_PTR env_var_flags;
+    // Value of PKCS11_LOGGER_FLAGS environment variable
     CK_ULONG flags;
     // Handle to log file
     FILE *log_file_handle;
@@ -175,6 +177,7 @@ PKCS11_LOGGER_GLOBALS;
 // init.c - declaration of functions
 int pkcs11_logger_init_orig_lib(void);
 int pkcs11_logger_init_parse_env_vars(void);
+CK_CHAR_PTR pkcs11_logger_init_read_env_var(const char *env_var_name);
 
 // lock.c - declaration of functions
 int pkcs11_logger_lock_create(void);
