@@ -22,8 +22,7 @@ extern PKCS11_LOGGER_GLOBALS pkcs11_logger_globals;
 
 #ifdef _WIN32
 
-// Entry point for the shared library on Windows platform
-// TODO : Can this function be replaced by __attribute__((constructor)) and __attribute__((destructor)) on other platforms ?
+// Entry and exit point for the shared library on windows platforms
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     IGNORE_ARG(hModule);
@@ -33,6 +32,20 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         pkcs11_logger_init_globals();
 
     return TRUE;
+}
+
+#else
+
+// Entry point for the shared library on unix platforms
+__attribute__((constructor)) void pkcs11_logger_init_entry_point()
+{
+    pkcs11_logger_init_globals();
+}
+
+// Exit point for the shared library on unix platforms
+__attribute__((destructor)) void pkcs11_logger_init_exit_point()
+{
+    pkcs11_logger_init_globals();
 }
 
 #endif
