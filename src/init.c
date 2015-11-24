@@ -182,10 +182,9 @@ err:
 // Reads environment variable
 CK_CHAR_PTR pkcs11_logger_init_read_env_var(const char *env_var_name)
 {
-    CK_CHAR_PTR output_value = NULL;
-
 #ifdef _WIN32
 
+    CK_CHAR_PTR output_value = NULL;
     LPSTR env_var_value = NULL;
     DWORD env_var_value_size = 0;
 
@@ -212,8 +211,15 @@ CK_CHAR_PTR pkcs11_logger_init_read_env_var(const char *env_var_name)
     output_value = (CK_CHAR_PTR) env_var_value;
     env_var_value = NULL;
 
+err:
+
+    CALL_N_CLEAR(free, env_var_value);
+
+    return output_value;
+
 #else
 
+    CK_CHAR_PTR output_value = NULL;
     char *env_var_value = NULL;
 
     env_var_value = getenv(env_var_name);
@@ -230,11 +236,10 @@ CK_CHAR_PTR pkcs11_logger_init_read_env_var(const char *env_var_name)
         goto err;
     }
 
-#endif
-
 err:
 
-    CALL_N_CLEAR(free, env_var_value);
-
     return output_value;
+
+#endif
 }
+
