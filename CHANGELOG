@@ -1,0 +1,12 @@
+PKCS11-LOGGER 2.1.0 (2015-11-25)
+ - Increased performance when logging into the file
+ - Fixed reading of environment variables on Windows
+
+PKCS11-LOGGER 2.0.0 (2014-02-14)
+ - Introduced PKCS11_LOGGER_FLAGS environment variable
+ - Added support for Visual Studio builds
+ - Added support for Mac OS X
+ - Added support for 64-bit platforms
+
+PKCS11-LOGGER 1.0 (2013-01-13)
+ - Initial stable release
