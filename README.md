@@ -17,10 +17,9 @@ PKCS11-LOGGER
 
 ## Overview
 
-PKCS#11 is cryptography standard originally published by RSA Laboratories that 
-defines ANSI C API (called cryptoki) to access smart cards and other types 
-of cryptographic hardware. Standard is currently being maintained and developed 
-by the OASIS PKCS 11 Technical Committee.
+PKCS#11 is cryptography standard maintained by the OASIS PKCS 11 Technical 
+Committee (originally published by RSA Laboratories) that defines ANSI C API 
+to access smart cards and other types of cryptographic hardware.
 
 Library implementing PKCS#11 interface is usually used in the following scenario:
 
@@ -107,19 +106,19 @@ Signed precompiled binaries as well as source code releases can be downloaded fr
 [sourceforge.net](http://sourceforge.net/projects/pkcs11-logger/):
 
  * **Windows**  
-   32-bit version: [pkcs11-logger-x86.dll](http://sourceforge.net/projects/pkcs11-logger/files/2.0.0/windows/pkcs11-logger-x86.dll/download)  
-   64-bit version: [pkcs11-logger-x64.dll](http://sourceforge.net/projects/pkcs11-logger/files/2.0.0/windows/pkcs11-logger-x64.dll/download)  
-   <sub>Requires [Visual C++ Redistributable for Visual Studio 2012]
-(http://www.microsoft.com/en-us/download/details.aspx?id=30679) 
+   32-bit version: [pkcs11-logger-x86.dll](http://sourceforge.net/projects/pkcs11-logger/files/2.1.0/windows/pkcs11-logger-x86.dll/download)  
+   64-bit version: [pkcs11-logger-x64.dll](http://sourceforge.net/projects/pkcs11-logger/files/2.1.0/windows/pkcs11-logger-x64.dll/download)  
+   <sub>Requires [Visual C++ Redistributable for Visual Studio 2015]
+(http://www.microsoft.com/en-us/download/details.aspx?id=48145) 
 to be installed on the target system.</sub>
 
- * **Ubuntu 12.04**  
-   32-bit version: [pkcs11-logger-x86.so](http://sourceforge.net/projects/pkcs11-logger/files/2.0.0/linux/pkcs11-logger-x86.so/download)  
-   64-bit version: [pkcs11-logger-x64.so](http://sourceforge.net/projects/pkcs11-logger/files/2.0.0/linux/pkcs11-logger-x64.so/download)
+ * **Ubuntu 14.04**  
+   32-bit version: [pkcs11-logger-x86.so](http://sourceforge.net/projects/pkcs11-logger/files/2.1.0/linux/pkcs11-logger-x86.so/download)  
+   64-bit version: [pkcs11-logger-x64.so](http://sourceforge.net/projects/pkcs11-logger/files/2.1.0/linux/pkcs11-logger-x64.so/download)
    
- * **Mac OS X**  
-   32-bit version: [pkcs11-logger-x86.dylib](http://sourceforge.net/projects/pkcs11-logger/files/2.0.0/osx/pkcs11-logger-x86.dylib/download)  
-   64-bit version: [pkcs11-logger-x64.dylib](http://sourceforge.net/projects/pkcs11-logger/files/2.0.0/osx/pkcs11-logger-x64.dylib/download)
+ * **Mac OS X 10.11**  
+   32-bit version: [pkcs11-logger-x86.dylib](http://sourceforge.net/projects/pkcs11-logger/files/2.1.0/osx/pkcs11-logger-x86.dylib/download)  
+   64-bit version: [pkcs11-logger-x64.dylib](http://sourceforge.net/projects/pkcs11-logger/files/2.1.0/osx/pkcs11-logger-x64.dylib/download)
 
 Archives with source code are signed with [GnuPG key of Jaroslav Imrich]
 (https://www.jimrich.sk/crypto/).  
@@ -130,8 +129,7 @@ Windows libraries are signed with [code-signing certificate of Jaroslav Imrich]
 
 ### Windows
 
-Execute the build script on a 64-bit Windows machine with [Visual Studio 
-Express 2012 for Windows Desktop](http://www.microsoft.com/en-us/download/details.aspx?id=34673) 
+Execute the build script on a 64-bit Windows machine with [Visual Studio 2015 Community](https://www.visualstudio.com/products/visual-studio-community-vs) 
 (or higher) installed:
 
 	cd build/windows/
@@ -143,8 +141,8 @@ and 64-bit (pkcs11-logger-x64.dll) versions of logger library.
 ### Linux
 
 Execute the build script on a 64-bit Linux machine with GCC, GNU Make and GCC 
-multilib support installed (available in [build-essential](http://packages.ubuntu.com/precise/build-essential) 
-and [gcc-multilib](http://packages.ubuntu.com/precise/gcc-multilib) packages on Ubuntu 12.04 LTS):
+multilib support installed (available in [build-essential](http://packages.ubuntu.com/trusty/build-essential) 
+and [gcc-multilib](http://packages.ubuntu.com/trusty/gcc-multilib) packages on Ubuntu 14.04 LTS):
 
 	cd build/linux/
 	sh build.sh
