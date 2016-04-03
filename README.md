@@ -163,19 +163,11 @@ and 64-bit (pkcs11-logger-x64.dylib) versions of logger library.
 
 ## License
 
-PKCS11-LOGGER uses dual-licensing model:
-
-* **Licensing for open source projects:** PKCS11-LOGGER is available under the 
-terms of the [GNU Affero General Public License version 3]
-(http://www.gnu.org/licenses/agpl-3.0.html) as published by the Free Software 
-Foundation.  
-* **Licensing for other types of projects:** PKCS11-LOGGER is available under 
-the terms of flexible commercial license. Please contact JWC s.r.o. at 
-[info@pkcs11interop.net](mailto:info@pkcs11interop.net) for more details.
+PKCS11-LOGGER is available under the terms of the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).  
+[Human friendly license summary](https://www.tldrlegal.com/l/apache2) is available at tldrlegal.com but the [full license text](LICENSE.md) always prevails.
 
 ## About
 
 PKCS11-LOGGER has been developed as a part of [Pkcs11Interop]
 (http://www.pkcs11interop.net/) project by [Jaroslav Imrich](http://www.jimrich.sk/).  
-Commercial license and support are provided by Slovakia (EU) based company 
-[JWC s.r.o.](http://www.jwc.sk/)
+Please visit project website - [pkcs11interop.net](http://www.pkcs11interop.net) - for more information.

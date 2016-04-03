@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Pkcs11LoggerTests")]
 [assembly: AssemblyDescription("PKCS#11 logging proxy module")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("JWC s.r.o.")]
-[assembly: AssemblyProduct("PKCS11-LOGGER (AGPL)")]
-[assembly: AssemblyCopyright("Copyright © 2011-2015 JWC s.r.o. All Rights Reserved.")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("PKCS11-LOGGER")]
+[assembly: AssemblyCopyright("Copyright 2011-2016 The Pkcs11Interop Project")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
