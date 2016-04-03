@@ -88,17 +88,17 @@ Logger behavior can be controlled with the following [environment variables](htt
 Signed precompiled binaries as well as source code releases can be downloaded from [releases page](https://github.com/Pkcs11Interop/pkcs11-logger/releases):
 
  * **Windows**  
-   32-bit version: [pkcs11-logger-x86.dll](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.1.0/pkcs11-logger-x86.dll)  
-   64-bit version: [pkcs11-logger-x64.dll](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.1.0/pkcs11-logger-x64.dll)  
+   32-bit version: [pkcs11-logger-x86.dll](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x86.dll)  
+   64-bit version: [pkcs11-logger-x64.dll](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x64.dll)  
    <sub>Requires [Visual C++ Redistributable for Visual Studio 2015](http://www.microsoft.com/en-us/download/details.aspx?id=48145) to be installed on the target system.</sub>
    
  * **Ubuntu 14.04**  
-   32-bit version: [pkcs11-logger-x86.so](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.1.0/pkcs11-logger-x86.so)  
-   64-bit version: [pkcs11-logger-x64.so](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.1.0/pkcs11-logger-x64.so)
+   32-bit version: [pkcs11-logger-x86.so](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x86.so)  
+   64-bit version: [pkcs11-logger-x64.so](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x64.so)
    
  * **Mac OS X 10.11**  
-   32-bit version: [pkcs11-logger-x86.dylib](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.1.0/pkcs11-logger-x86.dylib)  
-   64-bit version: [pkcs11-logger-x64.dylib](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.1.0/pkcs11-logger-x64.dylib)
+   32-bit version: [pkcs11-logger-x86.dylib](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x86.dylib)  
+   64-bit version: [pkcs11-logger-x64.dylib](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x64.dylib)
 
 Archives with source code are signed with [GnuPG key of Jaroslav Imrich](https://www.jimrich.sk/crypto/).  
 Windows libraries are signed with [code-signing certificate of Jaroslav Imrich](https://www.jimrich.sk/crypto/).

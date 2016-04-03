@@ -156,7 +156,7 @@ PKCS11_LOGGER_GLOBALS;
 // Library name
 #define PKCS11_LOGGER_NAME "PKCS11-LOGGER"
 // Library version
-#define PKCS11_LOGGER_VERSION "2.1.0"
+#define PKCS11_LOGGER_VERSION "2.2.0"
 // Library description
 #define PKCS11_LOGGER_DESCRIPTION "PKCS#11 logging proxy module"
 

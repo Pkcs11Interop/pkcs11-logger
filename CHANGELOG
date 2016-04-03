@@ -1,3 +1,6 @@
+PKCS11-LOGGER 2.2.0 (2016-04-03)
+ - License changed to the Apache License, Version 2.0
+
 PKCS11-LOGGER 2.1.0 (2015-11-25)
  - Increased performance when logging into the file
  - Fixed reading of environment variables on Windows
