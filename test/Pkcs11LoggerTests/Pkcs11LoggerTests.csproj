@@ -36,8 +36,8 @@
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Pkcs11Interop, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Pkcs11Interop.3.0.0\lib\net20\Pkcs11Interop.dll</HintPath>
+    <Reference Include="Pkcs11Interop, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Pkcs11Interop.3.1.0\lib\net20\Pkcs11Interop.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
