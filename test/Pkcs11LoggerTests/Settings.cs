@@ -19,6 +19,8 @@
  *  Jaroslav IMRICH <jimrich@jimrich.sk>
  */
 
+using Net.Pkcs11Interop.Common;
+
 namespace Pkcs11Logger.Tests
 {
     /// <summary>
@@ -29,7 +31,7 @@ namespace Pkcs11Logger.Tests
         /// <summary>
         /// The PKCS#11 unmanaged library path
         /// </summary>
-        public static string Pkcs11LibraryPath = @"c:\test\pkcs11-mock-x86.dll";
+        public static string Pkcs11LibraryPath = null;
 
         /// <summary>
         /// The normal user pin
@@ -39,16 +41,74 @@ namespace Pkcs11Logger.Tests
         /// <summary>
         /// The PKCS11-LOGGER unmanaged library path
         /// </summary>
-        public static string Pkcs11LoggerLibraryPath = @"c:\test\pkcs11-logger-x86.dll";
+        public static string Pkcs11LoggerLibraryPath = null;
 
         /// <summary>
         /// Primary log file path
         /// </summary>
-        public static string Pkcs11LoggerLogPath1 = @"c:\test\pkcs11-logger-x86-1.txt";
+        public static string Pkcs11LoggerLogPath1 = null;
 
         /// <summary>
         /// Alternative log file path
         /// </summary>
-        public static string Pkcs11LoggerLogPath2 = @"c:\test\pkcs11-logger-x86-2.txt";
+        public static string Pkcs11LoggerLogPath2 = null;
+
+        /// <summary>
+        /// Class constructor
+        /// </summary>
+        static Settings()
+        {
+            if (Platform.IsWindows)
+            {
+                if (Platform.Uses32BitRuntime)
+                {
+                    Pkcs11LibraryPath = @"c:\pkcs11-logger-test\pkcs11-mock-x86.dll";
+                    Pkcs11LoggerLibraryPath = @"c:\pkcs11-logger-test\pkcs11-logger-x86.dll";
+                    Pkcs11LoggerLogPath1 = @"c:\pkcs11-logger-test\pkcs11-logger-x86-1.txt";
+                    Pkcs11LoggerLogPath2 = @"c:\pkcs11-logger-test\pkcs11-logger-x86-2.txt";
+                }
+                else
+                {
+                    Pkcs11LibraryPath = @"c:\pkcs11-logger-test\pkcs11-mock-x64.dll";
+                    Pkcs11LoggerLibraryPath = @"c:\pkcs11-logger-test\pkcs11-logger-x64.dll";
+                    Pkcs11LoggerLogPath1 = @"c:\pkcs11-logger-test\pkcs11-logger-x64-1.txt";
+                    Pkcs11LoggerLogPath2 = @"c:\pkcs11-logger-test\pkcs11-logger-x64-2.txt";
+                }
+            }
+            else if (Platform.IsLinux)
+            {
+                if (Platform.Uses32BitRuntime)
+                {
+                    Pkcs11LibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-mock-x86.so";
+                    Pkcs11LoggerLibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-logger-x86.so";
+                    Pkcs11LoggerLogPath1 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x86-1.txt";
+                    Pkcs11LoggerLogPath2 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x86-2.txt";
+                }
+                else
+                {
+                    Pkcs11LibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-mock-x64.so";
+                    Pkcs11LoggerLibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-logger-x64.so";
+                    Pkcs11LoggerLogPath1 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x64-1.txt";
+                    Pkcs11LoggerLogPath2 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x64-2.txt";
+                }
+            }
+            else if (Platform.IsMacOsX)
+            {
+                if (Platform.Uses32BitRuntime)
+                {
+                    Pkcs11LibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-mock-x86.dylib";
+                    Pkcs11LoggerLibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-logger-x86.dylib";
+                    Pkcs11LoggerLogPath1 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x86-1.txt";
+                    Pkcs11LoggerLogPath2 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x86-2.txt";
+                }
+                else
+                {
+                    Pkcs11LibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-mock-x64.dylib";
+                    Pkcs11LoggerLibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-logger-x64.dylib";
+                    Pkcs11LoggerLogPath1 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x64-1.txt";
+                    Pkcs11LoggerLogPath2 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x64-2.txt";
+                }
+            }
+        }
     }
 }
