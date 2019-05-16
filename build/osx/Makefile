@@ -5,7 +5,7 @@ SRC_DIR=../../src
 
 CC= gcc
 ARCH_FLAGS= -m32
-CFLAGS= $(ARCH_FLAGS) -Wall -Wextra -Werror -O2 -I$(SRC_DIR)
+CFLAGS := $(CFLAGS) $(ARCH_FLAGS) -Wall -Wextra -Werror -O2 -I$(SRC_DIR)
 LIBNAME=pkcs11-logger-x86.dylib
 
 all: init.o lock.o log.o pkcs11-logger.o translate.o utils.o
