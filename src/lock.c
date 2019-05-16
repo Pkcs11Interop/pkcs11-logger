@@ -18,7 +18,7 @@
  *  Written for the Pkcs11Interop project by:
  *  Jaroslav IMRICH <jimrich@jimrich.sk>
  */
- 
+
 
 #include "pkcs11-logger.h"
 
@@ -97,7 +97,7 @@ void pkcs11_logger_lock_release(void)
     if (NULL == pkcs11_logger_lock)
         return;
 
-    if (!ReleaseMutex(pkcs11_logger_lock)) 
+    if (!ReleaseMutex(pkcs11_logger_lock))
         pkcs11_logger_log("Unable to release lock ownership");
 
 #else

@@ -18,7 +18,7 @@
  *  Written for the Pkcs11Interop project by:
  *  Jaroslav IMRICH <jimrich@jimrich.sk>
  */
- 
+
 
 #include "pkcs11-logger.h"
 
@@ -61,7 +61,7 @@ void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
 
     struct timeval tv;
     struct tm tm;
-    
+
     memset(buff, 0, buff_len * sizeof(char));
 
     if (gettimeofday(&tv, NULL) == 0)
@@ -80,7 +80,7 @@ int pkcs11_logger_utils_get_thread_id()
 #else
 #ifdef __APPLE__
     // TODO - This is ugly (but it works)
-    return (int) (intptr_t) pthread_self();
+    return (int) (void *) pthread_self();
 #else
     return (int) pthread_self();
 #endif

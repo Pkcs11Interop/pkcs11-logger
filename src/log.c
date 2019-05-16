@@ -111,7 +111,7 @@ void pkcs11_logger_log(const char* message, ...)
         if (NULL != pkcs11_logger_globals.log_file_handle)
             fflush(pkcs11_logger_globals.log_file_handle);
     }
-    
+
     // Release exclusive access to the file
     pkcs11_logger_lock_release();
 }
@@ -211,12 +211,12 @@ void pkcs11_logger_log_byte_array(const char *name, CK_BYTE_PTR byte_array, CK_U
 void pkcs11_logger_log_attribute_template(CK_ATTRIBUTE_PTR pTemplate, CK_ULONG ulCount)
 {
     CK_ULONG i = 0;
-    
+
     if ((NULL == pTemplate) || (ulCount < 1))
         return;
-    
+
     pkcs11_logger_log("  *** Begin attribute template ***");
-    
+
     for (i = 0; i < ulCount; i++)
     {
         pkcs11_logger_log("  Attribute %d", i);

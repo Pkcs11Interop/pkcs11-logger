@@ -36,15 +36,15 @@
 // PKCS#11 related stuff
 #pragma pack(push, cryptoki, 1)
 
-#define CK_IMPORT_SPEC __declspec(dllimport) 
+#define CK_IMPORT_SPEC __declspec(dllimport)
 
-#ifdef CRYPTOKI_EXPORTS 
-#define CK_EXPORT_SPEC __declspec(dllexport) 
-#else 
-#define CK_EXPORT_SPEC CK_IMPORT_SPEC 
-#endif 
+#ifdef CRYPTOKI_EXPORTS
+#define CK_EXPORT_SPEC __declspec(dllexport)
+#else
+#define CK_EXPORT_SPEC CK_IMPORT_SPEC
+#endif
 
-#define CK_CALL_SPEC __cdecl 
+#define CK_CALL_SPEC __cdecl
 
 #define CK_PTR *
 #define CK_DEFINE_FUNCTION(returnType, name) returnType CK_EXPORT_SPEC CK_CALL_SPEC name
@@ -207,5 +207,5 @@ const char* pkcs11_logger_translate_ck_attribute(CK_ATTRIBUTE_TYPE type);
 // utils.c - declaration of functions
 int pkcs11_logger_utils_str_to_long(const char *str, unsigned long *val);
 void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len);
-int pkcs11_logger_utils_get_thread_id();
-int pkcs11_logger_utils_get_process_id();
+int pkcs11_logger_utils_get_thread_id(void);
+int pkcs11_logger_utils_get_process_id(void);
