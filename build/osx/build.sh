@@ -2,6 +2,8 @@
 
 set -e
 
+cd $(dirname $0)
+
 make distclean
 
 cat Makefile | sed 's/^ARCH_FLAGS=.*/ARCH_FLAGS= -m32/' | sed 's/^LIBNAME=.*/LIBNAME=pkcs11-logger-x86.dylib/' > Makefile.x86
