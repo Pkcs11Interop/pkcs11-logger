@@ -80,7 +80,7 @@ int pkcs11_logger_utils_get_thread_id()
 #else
 #ifdef __APPLE__
     // TODO - This is ugly (but it works)
-    return (int) (intptr_t) pthread_self();
+    return (int) (void *) pthread_self();
 #else
     return (int) pthread_self();
 #endif
