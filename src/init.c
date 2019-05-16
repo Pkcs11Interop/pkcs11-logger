@@ -43,13 +43,15 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 #else
 
 // Entry point for the shared library on unix platforms
-__attribute__((constructor)) void pkcs11_logger_init_entry_point()
+void pkcs11_logger_init_entry_point(void);
+__attribute__((constructor)) void pkcs11_logger_init_entry_point(void)
 {
     pkcs11_logger_init_globals();
 }
 
 // Exit point for the shared library on unix platforms
-__attribute__((destructor)) void pkcs11_logger_init_exit_point()
+void pkcs11_logger_init_exit_point(void);
+__attribute__((destructor)) void pkcs11_logger_init_exit_point(void)
 {
     pkcs11_logger_init_globals();
 }
