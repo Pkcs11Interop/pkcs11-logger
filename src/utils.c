@@ -18,7 +18,7 @@
  *  Written for the Pkcs11Interop project by:
  *  Jaroslav IMRICH <jimrich@jimrich.sk>
  */
- 
+
 
 #include "pkcs11-logger.h"
 
@@ -61,7 +61,7 @@ void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
 
     struct timeval tv;
     struct tm tm;
-    
+
     memset(buff, 0, buff_len * sizeof(char));
 
     if (gettimeofday(&tv, NULL) == 0)

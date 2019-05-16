@@ -135,7 +135,7 @@ int pkcs11_logger_init_orig_lib(void)
     // Lets present version of orig library as ours - that's what proxies do :)
     pkcs11_logger_globals.logger_functions.version.major = pkcs11_logger_globals.orig_lib_functions->version.major;
     pkcs11_logger_globals.logger_functions.version.minor = pkcs11_logger_globals.orig_lib_functions->version.minor;
-    
+
     // Everything is set up
     pkcs11_logger_log("Successfuly loaded %s", pkcs11_logger_globals.env_var_library_path);
     pkcs11_logger_log("Memory contents are dumped without endianness conversion");

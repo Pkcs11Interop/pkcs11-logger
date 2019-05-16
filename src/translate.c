@@ -18,7 +18,7 @@
  *  Written for the Pkcs11Interop project by:
  *  Jaroslav IMRICH <jimrich@jimrich.sk>
  */
- 
+
 
 #include "pkcs11-logger.h"
 
@@ -1082,7 +1082,7 @@ const char* pkcs11_logger_translate_ck_mechanism_type(CK_MECHANISM_TYPE type)
         default:
             type_name = "Unknown";
     }
-    
+
     return type_name;
 }
 
@@ -1106,7 +1106,7 @@ const char* pkcs11_logger_translate_ck_user_type(CK_USER_TYPE type)
         default:
             type_name = "Unknown";
     }
-    
+
     return type_name;
 }
 
@@ -1136,7 +1136,7 @@ const char* pkcs11_logger_translate_ck_state(CK_STATE state)
         default:
             state_name = "Unknown";
     }
-    
+
     return state_name;
 }
 
@@ -1148,7 +1148,7 @@ char* pkcs11_logger_translate_ck_byte_ptr(CK_BYTE_PTR bytes, CK_ULONG length)
     char *output = NULL;
     CK_ULONG output_len = (length * 2) + 1;
     const char *t = "0123456789ABCDEF";
-    
+
     output = (char *) malloc(output_len);
     if (NULL == output)
         return NULL;
@@ -1348,7 +1348,7 @@ const char* pkcs11_logger_translate_ck_attribute(CK_ATTRIBUTE_TYPE type)
         case CKA_MODIFIABLE:
             type_name = "CKA_MODIFIABLE";
             break;
-        // Duplicate values in PKCS#11 specification    
+        // Duplicate values in PKCS#11 specification
         // #define CKA_ECDSA_PARAMS       0x00000180
         // #define CKA_EC_PARAMS          0x00000180
         case CKA_EC_PARAMS:
@@ -1477,6 +1477,6 @@ const char* pkcs11_logger_translate_ck_attribute(CK_ATTRIBUTE_TYPE type)
         default:
             type_name = "Unknown";
     }
-    
+
     return type_name;
 }

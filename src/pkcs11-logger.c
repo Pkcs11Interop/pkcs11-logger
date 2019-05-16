@@ -24,7 +24,7 @@
 
 
 // Structure that holds global variables
-PKCS11_LOGGER_GLOBALS pkcs11_logger_globals = 
+PKCS11_LOGGER_GLOBALS pkcs11_logger_globals =
 {
     NULL,       // orig_lib_handle
     NULL,       // orig_lib_functions
@@ -129,7 +129,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Initialize)(CK_VOID_PTR pInitArgs)
         pkcs11_logger_log_flag(args->flags, CKF_OS_LOCKING_OK, "   CKF_OS_LOCKING_OK");
         pkcs11_logger_log("  pReserved: %p", args->pReserved);
     }
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_Initialize(pInitArgs);
 
     pkcs11_logger_log_function_exit(rv);
@@ -144,11 +144,11 @@ CK_DEFINE_FUNCTION(CK_RV, C_Finalize)(CK_VOID_PTR pReserved)
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" pReserved: %p", pReserved);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_Finalize(pReserved);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -161,11 +161,11 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetInfo)(CK_INFO_PTR pInfo)
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" pInfo: %p", pInfo);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetInfo(pInfo);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
@@ -178,13 +178,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetInfo)(CK_INFO_PTR pInfo)
             pkcs11_logger_log("   minor: %d", pInfo->cryptokiVersion.minor);
             pkcs11_logger_log("  manufacturerID: %.32s", pInfo->manufacturerID);
             pkcs11_logger_log("  flags: %lu", pInfo->flags);
-            pkcs11_logger_log("  libraryDescription: %.32s", pInfo->libraryDescription);        
+            pkcs11_logger_log("  libraryDescription: %.32s", pInfo->libraryDescription);
             pkcs11_logger_log("  libraryVersion:");
             pkcs11_logger_log("   major: %d", pInfo->libraryVersion.major);
-            pkcs11_logger_log("   minor: %d", pInfo->libraryVersion.minor);        
+            pkcs11_logger_log("   minor: %d", pInfo->libraryVersion.minor);
         }
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -197,15 +197,15 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetFunctionList)(CK_FUNCTION_LIST_PTR_PTR ppFunction
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" ppFunctionList: %p", ppFunctionList);
-    
+
     *ppFunctionList = &(pkcs11_logger_globals.logger_functions);
-    
+
     pkcs11_logger_log_output_params();
-    
+
     pkcs11_logger_log(" Note: Returning function list of %s", PKCS11_LOGGER_NAME);
-    
+
     rv = CKR_OK;
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -220,7 +220,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetSlotList)(CK_BBOOL tokenPresent, CK_SLOT_ID_PTR p
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" tokenPresent: %d", tokenPresent);
     pkcs11_logger_log(" pSlotList: %p", pSlotList);
     pkcs11_logger_log(" pulCount: %p", pulCount);
@@ -241,12 +241,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetSlotList)(CK_BBOOL tokenPresent, CK_SLOT_ID_PTR p
                 pkcs11_logger_log(" pSlotList[%d]: %lu", i, pSlotList[i]);
             }
         }
-        
+
         pkcs11_logger_log(" pulCount: %p", pulCount);
         if (NULL != pulCount)
             pkcs11_logger_log(" *pulCount: %lu", *pulCount);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -259,12 +259,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetSlotInfo)(CK_SLOT_ID slotID, CK_SLOT_INFO_PTR pIn
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" slotID: %lu", slotID);
     pkcs11_logger_log(" pInfo: %p", pInfo);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetSlotInfo(slotID, pInfo);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
@@ -286,7 +286,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetSlotInfo)(CK_SLOT_ID slotID, CK_SLOT_INFO_PTR pIn
             pkcs11_logger_log("   minor: %d", pInfo->firmwareVersion.minor);
         }
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -299,12 +299,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetTokenInfo)(CK_SLOT_ID slotID, CK_TOKEN_INFO_PTR p
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" slotID: %lu", slotID);
     pkcs11_logger_log(" pInfo: %p", pInfo);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetTokenInfo(slotID, pInfo);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
@@ -354,7 +354,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetTokenInfo)(CK_SLOT_ID slotID, CK_TOKEN_INFO_PTR p
             pkcs11_logger_log("  utcTime: %.16s", pInfo->utcTime);
         }
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -374,14 +374,14 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetMechanismList)(CK_SLOT_ID slotID, CK_MECHANISM_TY
     pkcs11_logger_log(" pulCount: %p", pulCount);
     if (NULL != pulCount)
         pkcs11_logger_log(" *pulCount: %lu", *pulCount);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetMechanismList(slotID, pMechanismList, pulCount);
 
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
 
-        pkcs11_logger_log(" pMechanismList: %p", pMechanismList);            
+        pkcs11_logger_log(" pMechanismList: %p", pMechanismList);
         if ((NULL != pMechanismList) && (NULL != pulCount))
         {
             for (i = 0; i < *pulCount; i++)
@@ -389,12 +389,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetMechanismList)(CK_SLOT_ID slotID, CK_MECHANISM_TY
                 pkcs11_logger_log("  pMechanismList[%d]: %lu (%s)", i, pMechanismList[i], pkcs11_logger_translate_ck_mechanism_type(pMechanismList[i]));
             }
         }
-        
+
         pkcs11_logger_log(" pulCount: %p", pulCount);
         if (NULL != pulCount)
             pkcs11_logger_log(" *pulCount: %lu", *pulCount);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -407,13 +407,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetMechanismInfo)(CK_SLOT_ID slotID, CK_MECHANISM_TY
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" slotID: %lu", slotID);
     pkcs11_logger_log(" type: %lu (%s)", type, pkcs11_logger_translate_ck_mechanism_type(type));
     pkcs11_logger_log(" pInfo: %p", pInfo);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetMechanismInfo(slotID, type, pInfo);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
@@ -446,7 +446,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetMechanismInfo)(CK_SLOT_ID slotID, CK_MECHANISM_TY
             pkcs11_logger_log_flag(pInfo->flags, CKF_EXTENSION, "   CKF_EXTENSION");
         }
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -459,7 +459,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_InitToken)(CK_SLOT_ID slotID, CK_UTF8CHAR_PTR pPin, 
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" slotID: %lu", slotID);
     pkcs11_logger_log(" pPin: %p", pPin);
     if ((pkcs11_logger_globals.flags & PKCS11_LOGGER_FLAG_ENABLE_PIN) == PKCS11_LOGGER_FLAG_ENABLE_PIN)
@@ -470,9 +470,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_InitToken)(CK_SLOT_ID slotID, CK_UTF8CHAR_PTR pPin, 
     pkcs11_logger_log(" pLabel: %p", pLabel);
     if (NULL != pLabel)
         pkcs11_logger_log(" *pLabel: %.32s", pLabel);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_InitToken(slotID, pPin, ulPinLen, pLabel);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -485,7 +485,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_InitPIN)(CK_SESSION_HANDLE hSession, CK_UTF8CHAR_PTR
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pPin: %p", pPin);
     if ((pkcs11_logger_globals.flags & PKCS11_LOGGER_FLAG_ENABLE_PIN) == PKCS11_LOGGER_FLAG_ENABLE_PIN)
@@ -495,7 +495,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_InitPIN)(CK_SESSION_HANDLE hSession, CK_UTF8CHAR_PTR
     pkcs11_logger_log(" ulPinLen: %lu", ulPinLen);
 
     rv = pkcs11_logger_globals.orig_lib_functions->C_InitPIN(hSession, pPin, ulPinLen);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -508,7 +508,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SetPIN)(CK_SESSION_HANDLE hSession, CK_UTF8CHAR_PTR 
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pOldPin: %p", pOldPin);
     if ((pkcs11_logger_globals.flags & PKCS11_LOGGER_FLAG_ENABLE_PIN) == PKCS11_LOGGER_FLAG_ENABLE_PIN)
@@ -522,9 +522,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SetPIN)(CK_SESSION_HANDLE hSession, CK_UTF8CHAR_PTR 
     else
         pkcs11_logger_log(" *pNewPin: *** Intentionally hidden ***");
     pkcs11_logger_log(" ulNewLen: %lu", ulNewLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_SetPIN(hSession, pOldPin, ulOldLen, pNewPin, ulNewLen);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -536,8 +536,8 @@ CK_DEFINE_FUNCTION(CK_RV, C_OpenSession)(CK_SLOT_ID slotID, CK_FLAGS flags, CK_V
 
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
-    pkcs11_logger_log_input_params();    
-    
+    pkcs11_logger_log_input_params();
+
     pkcs11_logger_log(" slotID: %lu", slotID);
     pkcs11_logger_log(" flags: %lu", flags);
     pkcs11_logger_log_flag(flags, CKF_RW_SESSION, "  CKF_RW_SESSION");
@@ -547,18 +547,18 @@ CK_DEFINE_FUNCTION(CK_RV, C_OpenSession)(CK_SLOT_ID slotID, CK_FLAGS flags, CK_V
     pkcs11_logger_log(" phSession: %p", phSession);
     if (NULL != phSession)
         pkcs11_logger_log(" *phSession: %lu", phSession);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_OpenSession(slotID, flags, pApplication, Notify, phSession);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" phSession: %p", phSession);
         if (NULL != phSession)
             pkcs11_logger_log(" *phSession: %lu", *phSession);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -570,12 +570,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_CloseSession)(CK_SESSION_HANDLE hSession)
 
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
-    pkcs11_logger_log_input_params();    
-    
+    pkcs11_logger_log_input_params();
+
     pkcs11_logger_log(" hSession: %lu", hSession);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_CloseSession(hSession);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -587,12 +587,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_CloseAllSessions)(CK_SLOT_ID slotID)
 
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
-    pkcs11_logger_log_input_params();    
-    
+    pkcs11_logger_log_input_params();
+
     pkcs11_logger_log(" slotID: %lu", slotID);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_CloseAllSessions(slotID);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -604,17 +604,17 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetSessionInfo)(CK_SESSION_HANDLE hSession, CK_SESSI
 
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
-    pkcs11_logger_log_input_params();    
-    
+    pkcs11_logger_log_input_params();
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pInfo: %p", pInfo);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetSessionInfo(hSession, pInfo);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pInfo: %p", pInfo);
         if (NULL != pInfo)
         {
@@ -626,7 +626,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetSessionInfo)(CK_SESSION_HANDLE hSession, CK_SESSI
             pkcs11_logger_log("  ulDeviceError: %lu", pInfo->ulDeviceError);
         }
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -638,20 +638,20 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetOperationState)(CK_SESSION_HANDLE hSession, CK_BY
 
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
-    pkcs11_logger_log_input_params();    
-    
+    pkcs11_logger_log_input_params();
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pOperationState: %p", pOperationState);
     pkcs11_logger_log(" pulOperationStateLen: %p", pulOperationStateLen);
     if (NULL != pulOperationStateLen)
         pkcs11_logger_log(" *pulOperationStateLen: %lu", *pulOperationStateLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetOperationState(hSession, pOperationState, pulOperationStateLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pOperationState: %p", pOperationState);
         if (NULL != pulOperationStateLen)
             pkcs11_logger_log_byte_array(" *pOperationState", pOperationState, *pulOperationStateLen);
@@ -659,7 +659,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetOperationState)(CK_SESSION_HANDLE hSession, CK_BY
         if (NULL != pulOperationStateLen)
             pkcs11_logger_log(" *pulOperationStateLen: %lu", *pulOperationStateLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -671,17 +671,17 @@ CK_DEFINE_FUNCTION(CK_RV, C_SetOperationState)(CK_SESSION_HANDLE hSession, CK_BY
 
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
-    pkcs11_logger_log_input_params();    
-    
+    pkcs11_logger_log_input_params();
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pOperationState: %p", pOperationState);
     pkcs11_logger_log_byte_array(" *pOperationState", pOperationState, ulOperationStateLen);
     pkcs11_logger_log(" ulOperationStateLen: %lu", ulOperationStateLen);
     pkcs11_logger_log(" hEncryptionKey: %lu", hEncryptionKey);
     pkcs11_logger_log(" hAuthenticationKey: %lu", hAuthenticationKey);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_SetOperationState(hSession, pOperationState, ulOperationStateLen, hEncryptionKey, hAuthenticationKey);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -694,7 +694,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Login)(CK_SESSION_HANDLE hSession, CK_USER_TYPE user
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" userType: %lu (%s)", userType, pkcs11_logger_translate_ck_user_type(userType));
     pkcs11_logger_log(" pPin: %p", pPin);
@@ -703,9 +703,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Login)(CK_SESSION_HANDLE hSession, CK_USER_TYPE user
     else
         pkcs11_logger_log(" *pPin: *** Intentionally hidden ***");
     pkcs11_logger_log(" ulPinLen: %lu", ulPinLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_Login(hSession, userType, pPin, ulPinLen);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -718,11 +718,11 @@ CK_DEFINE_FUNCTION(CK_RV, C_Logout)(CK_SESSION_HANDLE hSession)
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_Logout(hSession);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -735,7 +735,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_CreateObject)(CK_SESSION_HANDLE hSession, CK_ATTRIBU
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pTemplate: %p", pTemplate);
     pkcs11_logger_log(" ulCount: %lu", ulCount);
@@ -743,18 +743,18 @@ CK_DEFINE_FUNCTION(CK_RV, C_CreateObject)(CK_SESSION_HANDLE hSession, CK_ATTRIBU
     pkcs11_logger_log(" phObject: %p", phObject);
     if (NULL != phObject)
         pkcs11_logger_log(" *phObject: %lu", *phObject);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_CreateObject(hSession, pTemplate, ulCount, phObject);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" phObject: %p", phObject);
         if (NULL != phObject)
             pkcs11_logger_log(" *phObject: %lu", *phObject);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -767,7 +767,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_CopyObject)(CK_SESSION_HANDLE hSession, CK_OBJECT_HA
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" hObject: %lu", hObject);
     pkcs11_logger_log(" pTemplate: %p", pTemplate);
@@ -776,18 +776,18 @@ CK_DEFINE_FUNCTION(CK_RV, C_CopyObject)(CK_SESSION_HANDLE hSession, CK_OBJECT_HA
     pkcs11_logger_log(" phNewObject: %p", phNewObject);
     if (NULL != phNewObject)
         pkcs11_logger_log(" *phNewObject: %lu", *phNewObject);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_CopyObject(hSession, hObject, pTemplate, ulCount, phNewObject);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" phNewObject: %p", phNewObject);
         if (NULL != phNewObject)
             pkcs11_logger_log(" *phNewObject: %lu", *phNewObject);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -800,12 +800,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_DestroyObject)(CK_SESSION_HANDLE hSession, CK_OBJECT
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" hObject: %lu", hObject);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_DestroyObject(hSession, hObject);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -818,24 +818,24 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetObjectSize)(CK_SESSION_HANDLE hSession, CK_OBJECT
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" hObject: %lu", hObject);
     pkcs11_logger_log(" pulSize: %p", pulSize);
     if (NULL != pulSize)
         pkcs11_logger_log(" *pulSize: %lu", *pulSize);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetObjectSize(hSession, hObject, pulSize);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pulSize: %p", pulSize);
         if (NULL != pulSize)
             pkcs11_logger_log(" *pulSize: %lu", *pulSize);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -848,24 +848,24 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" hObject: %lu", hObject);
     pkcs11_logger_log(" pTemplate: %p", pTemplate);
     pkcs11_logger_log(" ulCount: %lu", ulCount);
     pkcs11_logger_log_attribute_template(pTemplate, ulCount);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetAttributeValue(hSession, hObject, pTemplate, ulCount);
-    
+
     if ((CKR_OK == rv) || (CKR_ATTRIBUTE_SENSITIVE == rv) || (CKR_ATTRIBUTE_TYPE_INVALID == rv) || (CKR_BUFFER_TOO_SMALL == rv))
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pTemplate: %p", pTemplate);
         pkcs11_logger_log(" ulCount: %lu", ulCount);
         pkcs11_logger_log_attribute_template(pTemplate, ulCount);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -878,15 +878,15 @@ CK_DEFINE_FUNCTION(CK_RV, C_SetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" hObject: %lu", hObject);
     pkcs11_logger_log(" pTemplate: %p", pTemplate);
     pkcs11_logger_log(" ulCount: %lu", ulCount);
-    pkcs11_logger_log_attribute_template(pTemplate, ulCount);    
-    
+    pkcs11_logger_log_attribute_template(pTemplate, ulCount);
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_SetAttributeValue(hSession, hObject, pTemplate, ulCount);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -899,14 +899,14 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjectsInit)(CK_SESSION_HANDLE hSession, CK_ATTR
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pTemplate: %p", pTemplate);
     pkcs11_logger_log(" ulCount: %lu", ulCount);
-    pkcs11_logger_log_attribute_template(pTemplate, ulCount);        
-    
+    pkcs11_logger_log_attribute_template(pTemplate, ulCount);
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_FindObjectsInit(hSession, pTemplate, ulCount);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -920,14 +920,14 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjects)(CK_SESSION_HANDLE hSession, CK_OBJECT_H
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" phObject: %p", phObject);
     pkcs11_logger_log(" ulMaxObjectCount: %lu", ulMaxObjectCount);
     pkcs11_logger_log(" pulObjectCount: %p", pulObjectCount);
     if (NULL != pulObjectCount)
-        pkcs11_logger_log(" *pulObjectCount: %lu", *pulObjectCount);    
-    
+        pkcs11_logger_log(" *pulObjectCount: %lu", *pulObjectCount);
+
     if ((NULL != phObject) && (ulMaxObjectCount > 0))
     {
         for (i = 0; i < ulMaxObjectCount; i++)
@@ -935,19 +935,19 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjects)(CK_SESSION_HANDLE hSession, CK_OBJECT_H
             pkcs11_logger_log("  *phObject[%d]: %lu", i, phObject[i]);
         }
     }
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_FindObjects(hSession, phObject, ulMaxObjectCount, pulObjectCount);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" phObject: %p", phObject);
         pkcs11_logger_log(" ulMaxObjectCount: %lu", ulMaxObjectCount);
         pkcs11_logger_log(" pulObjectCount: %p", pulObjectCount);
         if (NULL != pulObjectCount)
             pkcs11_logger_log(" *pulObjectCount: %lu", *pulObjectCount);
-        
+
         if ((NULL != phObject) && (ulMaxObjectCount > 0))
         {
             for (i = 0; i < ulMaxObjectCount; i++)
@@ -956,7 +956,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjects)(CK_SESSION_HANDLE hSession, CK_OBJECT_H
             }
         }
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -969,11 +969,11 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjectsFinal)(CK_SESSION_HANDLE hSession)
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_FindObjectsFinal(hSession);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -986,7 +986,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANIS
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pMechanism: %p", pMechanism);
     if (NULL != pMechanism)
@@ -997,9 +997,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANIS
         pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);
     }
     pkcs11_logger_log(" hKey: %lu", hKey);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_EncryptInit(hSession, pMechanism, hKey);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1012,7 +1012,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Encrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDa
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pData: %p", pData);
     pkcs11_logger_log_byte_array(" *pData", pData, ulDataLen);
@@ -1021,13 +1021,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_Encrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDa
     pkcs11_logger_log(" pulEncryptedDataLen: %p", pulEncryptedDataLen);
     if (NULL != pulEncryptedDataLen)
         pkcs11_logger_log(" *pulEncryptedDataLen: %lu", *pulEncryptedDataLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_Encrypt(hSession, pData, ulDataLen, pEncryptedData, pulEncryptedDataLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pEncryptedData: %p", pEncryptedData);
         pkcs11_logger_log(" pulEncryptedDataLen: %p", pulEncryptedDataLen);
         if (NULL != pulEncryptedDataLen)
@@ -1035,7 +1035,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Encrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDa
         if (NULL != pulEncryptedDataLen)
             pkcs11_logger_log(" *pulEncryptedDataLen: %lu", *pulEncryptedDataLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1048,7 +1048,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_P
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pPart: %p",  pPart);
     pkcs11_logger_log_byte_array(" *pPart", pPart, ulPartLen);
@@ -1057,13 +1057,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_P
     pkcs11_logger_log(" pulEncryptedPartLen: %p",  pulEncryptedPartLen);
     if (NULL != pulEncryptedPartLen)
         pkcs11_logger_log(" *pulEncryptedPartLen: %lu", *pulEncryptedPartLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_EncryptUpdate(hSession, pPart, ulPartLen, pEncryptedPart, pulEncryptedPartLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pEncryptedPart: %p", pEncryptedPart);
         pkcs11_logger_log(" pulEncryptedPartLen: %p", pulEncryptedPartLen);
         if (NULL != pulEncryptedPartLen)
@@ -1071,7 +1071,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_P
         if (NULL != pulEncryptedPartLen)
             pkcs11_logger_log(" *pulEncryptedPartLen: %lu", *pulEncryptedPartLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1084,19 +1084,19 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pLastEncryptedPart: %p", pLastEncryptedPart);
     pkcs11_logger_log(" pulLastEncryptedPartLen: %p", pulLastEncryptedPartLen);
     if (NULL != pulLastEncryptedPartLen)
         pkcs11_logger_log(" *pulLastEncryptedPartLen: %lu", *pulLastEncryptedPartLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_EncryptFinal(hSession, pLastEncryptedPart, pulLastEncryptedPartLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pLastEncryptedPart: %p", pLastEncryptedPart);
         pkcs11_logger_log(" pulLastEncryptedPartLen: %p", pulLastEncryptedPartLen);
         if (NULL != pulLastEncryptedPartLen)
@@ -1104,7 +1104,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
         if (NULL != pulLastEncryptedPartLen)
             pkcs11_logger_log(" *pulLastEncryptedPartLen: %lu", *pulLastEncryptedPartLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1117,7 +1117,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANIS
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pMechanism: %p", pMechanism);
     if (NULL != pMechanism)
@@ -1125,13 +1125,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANIS
         pkcs11_logger_log("  mechanism: %lu (%s)", pMechanism->mechanism, pkcs11_logger_translate_ck_mechanism_type(pMechanism->mechanism));
         pkcs11_logger_log("  pParameter: %p", pMechanism->pParameter);
         pkcs11_logger_log_byte_array(" *pParameter", pMechanism->pParameter, pMechanism->ulParameterLen);
-        pkcs11_logger_log("  ulParameterLen: %lu", pMechanism->ulParameterLen);        
+        pkcs11_logger_log("  ulParameterLen: %lu", pMechanism->ulParameterLen);
     }
-    
+
     pkcs11_logger_log(" hKey: %lu", hKey);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_DecryptInit(hSession, pMechanism, hKey);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1144,7 +1144,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pEn
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pEncryptedData: %p", pEncryptedData);
     pkcs11_logger_log_byte_array(" *pEncryptedData", pEncryptedData, ulEncryptedDataLen);
@@ -1153,13 +1153,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pEn
     pkcs11_logger_log(" pulDataLen: %p", pulDataLen);
     if (NULL != pulDataLen)
         pkcs11_logger_log(" *pulDataLen: %lu", *pulDataLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_Decrypt(hSession, pEncryptedData, ulEncryptedDataLen, pData, pulDataLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pData: %p", pData);
         pkcs11_logger_log(" pulDataLen: %p", pulDataLen);
         if (NULL != pulDataLen)
@@ -1167,7 +1167,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pEn
         if (NULL != pulDataLen)
             pkcs11_logger_log(" *pulDataLen: %lu", *pulDataLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1180,7 +1180,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_P
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pEncryptedPart: %p",  pEncryptedPart);
     pkcs11_logger_log_byte_array(" *pEncryptedPart", pEncryptedPart, ulEncryptedPartLen);
@@ -1189,13 +1189,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_P
     pkcs11_logger_log(" pulPartLen: %p",  pulPartLen);
     if (NULL != pulPartLen)
         pkcs11_logger_log(" *pulPartLen: %lu", *pulPartLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_DecryptUpdate(hSession, pEncryptedPart, ulEncryptedPartLen, pPart, pulPartLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pPart: %p", pPart);
         pkcs11_logger_log(" pulPartLen: %p", pulPartLen);
         if (NULL != pulPartLen)
@@ -1203,7 +1203,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_P
         if (NULL != pulPartLen)
             pkcs11_logger_log(" *pulPartLen: %lu", *pulPartLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1216,19 +1216,19 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pLastPart: %p", pLastPart);
     pkcs11_logger_log(" pulLastPartLen: %p", pulLastPartLen);
     if (NULL != pulLastPartLen)
         pkcs11_logger_log(" *pulLastPartLen: %lu", *pulLastPartLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_DecryptFinal(hSession, pLastPart, pulLastPartLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pLastPart: %p", pLastPart);
         pkcs11_logger_log(" pulLastPartLen: %p", pulLastPartLen);
         if (NULL != pulLastPartLen)
@@ -1236,7 +1236,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
         if (NULL != pulLastPartLen)
             pkcs11_logger_log(" *pulLastPartLen: %lu", *pulLastPartLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1249,7 +1249,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pMechanism: %p", pMechanism);
     if (NULL != pMechanism)
@@ -1257,11 +1257,11 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM
         pkcs11_logger_log("  mechanism: %lu (%s)", pMechanism->mechanism, pkcs11_logger_translate_ck_mechanism_type(pMechanism->mechanism));
         pkcs11_logger_log("  pParameter: %p", pMechanism->pParameter);
         pkcs11_logger_log_byte_array(" *pParameter", pMechanism->pParameter, pMechanism->ulParameterLen);
-        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);        
+        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);
     }
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_DigestInit(hSession, pMechanism);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1274,7 +1274,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Digest)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDat
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pData: %p", pData);
     pkcs11_logger_log_byte_array(" *pData", pData, ulDataLen);
@@ -1283,13 +1283,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_Digest)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDat
     pkcs11_logger_log(" pulDigestLen: %p", pulDigestLen);
     if (NULL != pulDigestLen)
         pkcs11_logger_log(" *pulDigestLen: %lu", *pulDigestLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_Digest(hSession, pData, ulDataLen, pDigest, pulDigestLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pDigest: %p", pDigest);
         pkcs11_logger_log(" pulDigestLen: %p", pulDigestLen);
         if (NULL != pulDigestLen)
@@ -1297,7 +1297,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Digest)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDat
         if (NULL != pulDigestLen)
             pkcs11_logger_log(" *pulDigestLen: %lu", *pulDigestLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1310,14 +1310,14 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pPart: %p",  pPart);
     pkcs11_logger_log_byte_array(" *pPart", pPart, ulPartLen);
     pkcs11_logger_log(" ulPartLen: %lu", ulPartLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_DigestUpdate(hSession, pPart, ulPartLen);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1330,12 +1330,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestKey)(CK_SESSION_HANDLE hSession, CK_OBJECT_HAN
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" hKey: %lu", hKey);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_DigestKey(hSession, hKey);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1348,19 +1348,19 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pDigest: %p", pDigest);
     pkcs11_logger_log(" pulDigestLen: %p", pulDigestLen);
     if (NULL != pulDigestLen)
         pkcs11_logger_log(" *pulDigestLen: %lu", *pulDigestLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_DigestFinal(hSession, pDigest, pulDigestLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pDigest: %p", pDigest);
         pkcs11_logger_log(" pulDigestLen: %p", pulDigestLen);
         if (NULL != pulDigestLen)
@@ -1368,7 +1368,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
         if (NULL != pulDigestLen)
             pkcs11_logger_log(" *pulDigestLen: %lu", *pulDigestLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1381,7 +1381,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_P
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pMechanism: %p", pMechanism);
     if (NULL != pMechanism)
@@ -1389,12 +1389,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_P
         pkcs11_logger_log("  mechanism: %lu (%s)", pMechanism->mechanism, pkcs11_logger_translate_ck_mechanism_type(pMechanism->mechanism));
         pkcs11_logger_log("  pParameter: %p", pMechanism->pParameter);
         pkcs11_logger_log_byte_array(" *pParameter", pMechanism->pParameter, pMechanism->ulParameterLen);
-        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);        
+        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);
     }
     pkcs11_logger_log(" hKey: %lu", hKey);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_SignInit(hSession, pMechanism, hKey);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1407,7 +1407,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Sign)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pData,
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pData: %p", pData);
     pkcs11_logger_log_byte_array(" *pData", pData, ulDataLen);
@@ -1416,13 +1416,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_Sign)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pData,
     pkcs11_logger_log(" pulSignatureLen: %p", pulSignatureLen);
     if (NULL != pulSignatureLen)
         pkcs11_logger_log(" *pulSignatureLen: %lu", *pulSignatureLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_Sign(hSession, pData, ulDataLen, pSignature, pulSignatureLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pSignature: %p", pSignature);
         pkcs11_logger_log(" pulSignatureLen: %p", pulSignatureLen);
         if (NULL != pulSignatureLen)
@@ -1430,7 +1430,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Sign)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pData,
         if (NULL != pulSignatureLen)
             pkcs11_logger_log(" *pulSignatureLen: %lu", *pulSignatureLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1443,14 +1443,14 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR 
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pPart: %p", pPart);
     pkcs11_logger_log_byte_array(" *pPart", pPart, ulPartLen);
     pkcs11_logger_log(" ulPartLen: %lu", ulPartLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_SignUpdate(hSession, pPart, ulPartLen);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1463,19 +1463,19 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR p
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pSignature: %p", pSignature);
     pkcs11_logger_log(" pulSignatureLen: %p", pulSignatureLen);
     if (NULL != pulSignatureLen)
         pkcs11_logger_log(" *pulSignatureLen: %lu", *pulSignatureLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_SignFinal(hSession, pSignature, pulSignatureLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pSignature: %p", pSignature);
         pkcs11_logger_log(" pulSignatureLen: %p", pulSignatureLen);
         if (NULL != pulSignatureLen)
@@ -1483,7 +1483,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR p
         if (NULL != pulSignatureLen)
             pkcs11_logger_log(" *pulSignatureLen: %lu", *pulSignatureLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1496,7 +1496,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignRecoverInit)(CK_SESSION_HANDLE hSession, CK_MECH
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pMechanism: %p", pMechanism);
     if (NULL != pMechanism)
@@ -1504,12 +1504,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignRecoverInit)(CK_SESSION_HANDLE hSession, CK_MECH
         pkcs11_logger_log("  mechanism: %lu (%s)", pMechanism->mechanism, pkcs11_logger_translate_ck_mechanism_type(pMechanism->mechanism));
         pkcs11_logger_log("  pParameter: %p", pMechanism->pParameter);
         pkcs11_logger_log_byte_array(" *pParameter", pMechanism->pParameter, pMechanism->ulParameterLen);
-        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);        
+        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);
     }
     pkcs11_logger_log(" hKey: %lu", hKey);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_SignRecoverInit(hSession, pMechanism, hKey);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1522,7 +1522,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pData: %p", pData);
     pkcs11_logger_log_byte_array(" *pData", pData, ulDataLen);
@@ -1531,13 +1531,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
     pkcs11_logger_log(" pulSignatureLen: %p", pulSignatureLen);
     if (NULL != pulSignatureLen)
         pkcs11_logger_log(" *pulSignatureLen: %lu", *pulSignatureLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_SignRecover(hSession, pData, ulDataLen, pSignature, pulSignatureLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pSignature: %p", pSignature);
         pkcs11_logger_log(" pulSignatureLen: %p", pulSignatureLen);
         if (NULL != pulSignatureLen)
@@ -1545,7 +1545,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
         if (NULL != pulSignatureLen)
             pkcs11_logger_log(" *pulSignatureLen: %lu", *pulSignatureLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1558,7 +1558,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pMechanism: %p", pMechanism);
     if (NULL != pMechanism)
@@ -1566,12 +1566,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM
         pkcs11_logger_log("  mechanism: %lu (%s)", pMechanism->mechanism, pkcs11_logger_translate_ck_mechanism_type(pMechanism->mechanism));
         pkcs11_logger_log("  pParameter: %p", pMechanism->pParameter);
         pkcs11_logger_log_byte_array(" *pParameter", pMechanism->pParameter, pMechanism->ulParameterLen);
-        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);        
+        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);
     }
     pkcs11_logger_log(" hKey: %lu", hKey);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_VerifyInit(hSession, pMechanism, hKey);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1584,7 +1584,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Verify)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDat
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pData: %p", pData);
     pkcs11_logger_log_byte_array(" *pData", pData, ulDataLen);
@@ -1592,9 +1592,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Verify)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDat
     pkcs11_logger_log(" pSignature: %p", pSignature);
     pkcs11_logger_log_byte_array(" *pSignature", pSignature, ulSignatureLen);
     pkcs11_logger_log(" ulSignatureLen: %lu", ulSignatureLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_Verify(hSession, pData, ulDataLen, pSignature, ulSignatureLen);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1607,14 +1607,14 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pPart: %p", pPart);
     pkcs11_logger_log_byte_array(" *pPart", pPart, ulPartLen);
     pkcs11_logger_log(" ulPartLen: %lu", ulPartLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_VerifyUpdate(hSession, pPart, ulPartLen);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1627,14 +1627,14 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pSignature: %p", pSignature);
     pkcs11_logger_log_byte_array(" *pSignature", pSignature, ulSignatureLen);
     pkcs11_logger_log(" ulSignatureLen: %lu", ulSignatureLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_VerifyFinal(hSession, pSignature, ulSignatureLen);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1647,7 +1647,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyRecoverInit)(CK_SESSION_HANDLE hSession, CK_ME
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pMechanism: %p", pMechanism);
     if (NULL != pMechanism)
@@ -1655,12 +1655,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyRecoverInit)(CK_SESSION_HANDLE hSession, CK_ME
         pkcs11_logger_log("  mechanism: %lu (%s)", pMechanism->mechanism, pkcs11_logger_translate_ck_mechanism_type(pMechanism->mechanism));
         pkcs11_logger_log("  pParameter: %p", pMechanism->pParameter);
         pkcs11_logger_log_byte_array(" *pParameter", pMechanism->pParameter, pMechanism->ulParameterLen);
-        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);        
+        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);
     }
     pkcs11_logger_log(" hKey: %lu", hKey);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_VerifyRecoverInit(hSession, pMechanism, hKey);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1673,7 +1673,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_P
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pSignature: %p", pSignature);
     pkcs11_logger_log_byte_array(" *pSignature", pSignature, ulSignatureLen);
@@ -1682,13 +1682,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_P
     pkcs11_logger_log(" pulDataLen: %p", pulDataLen);
     if (NULL != pulDataLen)
         pkcs11_logger_log(" *pulDataLen: %lu", *pulDataLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_VerifyRecover(hSession, pSignature, ulSignatureLen, pData, pulDataLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pData: %p", pData);
         pkcs11_logger_log(" pulDataLen: %p", pulDataLen);
         if (NULL != pulDataLen)
@@ -1696,7 +1696,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_P
         if (NULL != pulDataLen)
             pkcs11_logger_log(" *pulDataLen: %lu", *pulDataLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1709,7 +1709,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pPart: %p",  pPart);
     pkcs11_logger_log_byte_array(" *pPart", pPart, ulPartLen);
@@ -1718,13 +1718,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_
     pkcs11_logger_log(" pulEncryptedPartLen: %p",  pulEncryptedPartLen);
     if (NULL != pulEncryptedPartLen)
         pkcs11_logger_log(" *pulEncryptedPartLen: %lu", *pulEncryptedPartLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_DigestEncryptUpdate(hSession, pPart, ulPartLen, pEncryptedPart, pulEncryptedPartLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pEncryptedPart: %p", pEncryptedPart);
         pkcs11_logger_log(" pulEncryptedPartLen: %p", pulEncryptedPartLen);
         if (NULL != pulEncryptedPartLen)
@@ -1732,7 +1732,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_
         if (NULL != pulEncryptedPartLen)
             pkcs11_logger_log(" *pulEncryptedPartLen: %lu", *pulEncryptedPartLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1745,7 +1745,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptDigestUpdate)(CK_SESSION_HANDLE hSession, CK_
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pEncryptedPart: %p",  pEncryptedPart);
     pkcs11_logger_log_byte_array(" *pEncryptedPart", pEncryptedPart, ulEncryptedPartLen);
@@ -1754,13 +1754,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptDigestUpdate)(CK_SESSION_HANDLE hSession, CK_
     pkcs11_logger_log(" pulPartLen: %p",  pulPartLen);
     if (NULL != pulPartLen)
         pkcs11_logger_log(" *pulPartLen: %lu", *pulPartLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_DecryptDigestUpdate(hSession, pEncryptedPart, ulEncryptedPartLen, pPart, pulPartLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pPart: %p", pPart);
         pkcs11_logger_log(" pulPartLen: %p", pulPartLen);
         if (NULL != pulPartLen)
@@ -1768,7 +1768,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptDigestUpdate)(CK_SESSION_HANDLE hSession, CK_
         if (NULL != pulPartLen)
             pkcs11_logger_log(" *pulPartLen: %lu", *pulPartLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1781,7 +1781,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BY
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pPart: %p",  pPart);
     pkcs11_logger_log_byte_array(" *pPart", pPart, ulPartLen);
@@ -1790,13 +1790,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BY
     pkcs11_logger_log(" pulEncryptedPartLen: %p",  pulEncryptedPartLen);
     if (NULL != pulEncryptedPartLen)
         pkcs11_logger_log(" *pulEncryptedPartLen: %lu", *pulEncryptedPartLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_SignEncryptUpdate(hSession, pPart, ulPartLen, pEncryptedPart, pulEncryptedPartLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pEncryptedPart: %p", pEncryptedPart);
         pkcs11_logger_log(" pulEncryptedPartLen: %p", pulEncryptedPartLen);
         if (NULL != pulEncryptedPartLen)
@@ -1804,7 +1804,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BY
         if (NULL != pulEncryptedPartLen)
             pkcs11_logger_log(" *pulEncryptedPartLen: %lu", *pulEncryptedPartLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1817,7 +1817,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptVerifyUpdate)(CK_SESSION_HANDLE hSession, CK_
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pEncryptedPart: %p",  pEncryptedPart);
     pkcs11_logger_log_byte_array(" *pEncryptedPart", pEncryptedPart, ulEncryptedPartLen);
@@ -1826,13 +1826,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptVerifyUpdate)(CK_SESSION_HANDLE hSession, CK_
     pkcs11_logger_log(" pulPartLen: %p",  pulPartLen);
     if (NULL != pulPartLen)
         pkcs11_logger_log(" *pulPartLen: %lu", *pulPartLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_DecryptVerifyUpdate(hSession, pEncryptedPart, ulEncryptedPartLen, pPart, pulPartLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pPart: %p", pPart);
         pkcs11_logger_log(" pulPartLen: %p", pulPartLen);
         if (NULL != pulPartLen)
@@ -1840,7 +1840,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptVerifyUpdate)(CK_SESSION_HANDLE hSession, CK_
         if (NULL != pulPartLen)
             pkcs11_logger_log(" *pulPartLen: %lu", *pulPartLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1853,7 +1853,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateKey)(CK_SESSION_HANDLE hSession, CK_MECHANIS
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pMechanism: %p", pMechanism);
     if (NULL != pMechanism)
@@ -1861,7 +1861,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateKey)(CK_SESSION_HANDLE hSession, CK_MECHANIS
         pkcs11_logger_log("  mechanism: %lu (%s)", pMechanism->mechanism, pkcs11_logger_translate_ck_mechanism_type(pMechanism->mechanism));
         pkcs11_logger_log("  pParameter: %p", pMechanism->pParameter);
         pkcs11_logger_log_byte_array("  *pParameter", pMechanism->pParameter, pMechanism->ulParameterLen);
-        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);        
+        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);
     }
     pkcs11_logger_log(" pTemplate: %p", pTemplate);
     pkcs11_logger_log(" ulCount: %lu", ulCount);
@@ -1869,18 +1869,18 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateKey)(CK_SESSION_HANDLE hSession, CK_MECHANIS
     pkcs11_logger_log(" phKey: %p", phKey);
     if (NULL != phKey)
         pkcs11_logger_log(" *phKey: %lu", *phKey);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_GenerateKey(hSession, pMechanism, pTemplate, ulCount, phKey);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" phKey: %p", phKey);
         if (NULL != phKey)
             pkcs11_logger_log(" *phKey: %lu", *phKey);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1893,7 +1893,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateKeyPair)(CK_SESSION_HANDLE hSession, CK_MECH
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pMechanism: %p", pMechanism);
     if (NULL != pMechanism)
@@ -1901,7 +1901,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateKeyPair)(CK_SESSION_HANDLE hSession, CK_MECH
         pkcs11_logger_log("  mechanism: %lu (%s)", pMechanism->mechanism, pkcs11_logger_translate_ck_mechanism_type(pMechanism->mechanism));
         pkcs11_logger_log("  pParameter: %p", pMechanism->pParameter);
         pkcs11_logger_log_byte_array("  *pParameter", pMechanism->pParameter, pMechanism->ulParameterLen);
-        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);        
+        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);
     }
     pkcs11_logger_log(" pPublicKeyTemplate: %p", pPublicKeyTemplate);
     pkcs11_logger_log(" ulPublicKeyAttributeCount: %lu", ulPublicKeyAttributeCount);
@@ -1915,13 +1915,13 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateKeyPair)(CK_SESSION_HANDLE hSession, CK_MECH
     pkcs11_logger_log(" phPrivateKey: %p", phPrivateKey);
     if (NULL != phPrivateKey)
         pkcs11_logger_log(" *phPrivateKey: %lu", *phPrivateKey);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_GenerateKeyPair(hSession, pMechanism, pPublicKeyTemplate, ulPublicKeyAttributeCount, pPrivateKeyTemplate, ulPrivateKeyAttributeCount, phPublicKey, phPrivateKey);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" phPublicKey: %p", phPublicKey);
         if (NULL != phPublicKey)
             pkcs11_logger_log(" *phPublicKey: %lu", *phPublicKey);
@@ -1929,7 +1929,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateKeyPair)(CK_SESSION_HANDLE hSession, CK_MECH
         if (NULL != phPrivateKey)
             pkcs11_logger_log(" *phPrivateKey: %lu", *phPrivateKey);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1942,7 +1942,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_WrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PT
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pMechanism: %p", pMechanism);
     if (NULL != pMechanism)
@@ -1950,20 +1950,20 @@ CK_DEFINE_FUNCTION(CK_RV, C_WrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PT
         pkcs11_logger_log("  mechanism: %lu (%s)", pMechanism->mechanism, pkcs11_logger_translate_ck_mechanism_type(pMechanism->mechanism));
         pkcs11_logger_log("  pParameter: %p", pMechanism->pParameter);
         pkcs11_logger_log_byte_array(" *pParameter", pMechanism->pParameter, pMechanism->ulParameterLen);
-        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);        
+        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);
     }
     pkcs11_logger_log(" hWrappingKey: %lu", hWrappingKey);
     pkcs11_logger_log(" pWrappedKey: %p",  pWrappedKey);
     pkcs11_logger_log(" pulWrappedKeyLen: %p",  pulWrappedKeyLen);
     if (NULL != pulWrappedKeyLen)
         pkcs11_logger_log(" *pulWrappedKeyLen: %lu", *pulWrappedKeyLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_WrapKey(hSession, pMechanism, hWrappingKey, hKey, pWrappedKey, pulWrappedKeyLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pWrappedKey: %p", pWrappedKey);
         pkcs11_logger_log(" pulWrappedKeyLen: %p", pulWrappedKeyLen);
         if (NULL != pulWrappedKeyLen)
@@ -1971,7 +1971,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_WrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PT
         if (NULL != pulWrappedKeyLen)
             pkcs11_logger_log(" *pulWrappedKeyLen: %lu", *pulWrappedKeyLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -1984,7 +1984,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_UnwrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pMechanism: %p", pMechanism);
     if (NULL != pMechanism)
@@ -1992,7 +1992,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_UnwrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_
         pkcs11_logger_log("  mechanism: %lu (%s)", pMechanism->mechanism, pkcs11_logger_translate_ck_mechanism_type(pMechanism->mechanism));
         pkcs11_logger_log("  pParameter: %p", pMechanism->pParameter);
         pkcs11_logger_log_byte_array(" *pParameter", pMechanism->pParameter, pMechanism->ulParameterLen);
-        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);        
+        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);
     }
     pkcs11_logger_log(" hUnwrappingKey: %lu", hUnwrappingKey);
     pkcs11_logger_log(" pWrappedKey: %p",  pWrappedKey);
@@ -2004,18 +2004,18 @@ CK_DEFINE_FUNCTION(CK_RV, C_UnwrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_
     pkcs11_logger_log(" phKey: %p", phKey);
     if (NULL != phKey)
         pkcs11_logger_log(" *phKey: %lu", *phKey);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_UnwrapKey(hSession, pMechanism, hUnwrappingKey, pWrappedKey, ulWrappedKeyLen, pTemplate, ulAttributeCount, phKey);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" phKey: %p", phKey);
         if (NULL != phKey)
             pkcs11_logger_log(" *phKey: %lu", *phKey);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -2028,7 +2028,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DeriveKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pMechanism: %p", pMechanism);
     if (NULL != pMechanism)
@@ -2036,7 +2036,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DeriveKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_
         pkcs11_logger_log("  mechanism: %lu (%s)", pMechanism->mechanism, pkcs11_logger_translate_ck_mechanism_type(pMechanism->mechanism));
         pkcs11_logger_log("  pParameter: %p", pMechanism->pParameter);
         pkcs11_logger_log_byte_array(" *pParameter", pMechanism->pParameter, pMechanism->ulParameterLen);
-        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);        
+        pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);
     }
     pkcs11_logger_log(" hBaseKey: %lu", hBaseKey);
     pkcs11_logger_log(" pTemplate: %p", pTemplate);
@@ -2045,18 +2045,18 @@ CK_DEFINE_FUNCTION(CK_RV, C_DeriveKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_
     pkcs11_logger_log(" phKey: %p", phKey);
     if (NULL != phKey)
         pkcs11_logger_log(" *phKey: %lu", *phKey);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_DeriveKey(hSession, pMechanism, hBaseKey, pTemplate, ulAttributeCount, phKey);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" phKey: %p", phKey);
         if (NULL != phKey)
             pkcs11_logger_log(" *phKey: %lu", *phKey);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -2069,14 +2069,14 @@ CK_DEFINE_FUNCTION(CK_RV, C_SeedRandom)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR 
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pSeed: %p",  pSeed);
     pkcs11_logger_log_byte_array(" *pSeed", pSeed, ulSeedLen);
     pkcs11_logger_log(" ulSeedLen: %lu",  ulSeedLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_SeedRandom(hSession, pSeed, ulSeedLen);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -2089,23 +2089,23 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateRandom)(CK_SESSION_HANDLE hSession, CK_BYTE_
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" RandomData: %p",  RandomData);
     pkcs11_logger_log_byte_array(" *RandomData", RandomData, ulRandomLen);
     pkcs11_logger_log(" ulRandomLen: %lu", ulRandomLen);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_GenerateRandom(hSession, RandomData, ulRandomLen);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" RandomData: %p",  RandomData);
         pkcs11_logger_log_byte_array(" *RandomData", RandomData, ulRandomLen);
         pkcs11_logger_log(" ulRandomLen: %lu", ulRandomLen);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -2118,11 +2118,11 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetFunctionStatus)(CK_SESSION_HANDLE hSession)
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetFunctionStatus(hSession);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -2135,11 +2135,11 @@ CK_DEFINE_FUNCTION(CK_RV, C_CancelFunction)(CK_SESSION_HANDLE hSession)
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" hSession: %lu", hSession);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_CancelFunction(hSession);
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
@@ -2152,22 +2152,22 @@ CK_DEFINE_FUNCTION(CK_RV, C_WaitForSlotEvent)(CK_FLAGS flags, CK_SLOT_ID_PTR pSl
     SAFELY_INIT_ORIG_LIB_OR_FAIL();
     pkcs11_logger_log_function_enter(__FUNCTION__);
     pkcs11_logger_log_input_params();
-    
+
     pkcs11_logger_log(" flags: %lu", flags);
     pkcs11_logger_log_flag(flags, CKF_DONT_BLOCK, "  CKF_DONT_BLOCK");
     pkcs11_logger_log(" pSlot: %p", pSlot);
     pkcs11_logger_log(" pReserved: %p", pReserved);
-    
+
     rv = pkcs11_logger_globals.orig_lib_functions->C_WaitForSlotEvent(flags, pSlot, pReserved);
-    
+
     if (CKR_OK == rv)
     {
         pkcs11_logger_log_output_params();
-        
+
         pkcs11_logger_log(" pSlot: %p",  pSlot);
         pkcs11_logger_log(" *pSlot: %lu", pSlot);
     }
-    
+
     pkcs11_logger_log_function_exit(rv);
     return rv;
 }
