@@ -107,7 +107,7 @@ Windows libraries are signed with [code-signing certificate of Jaroslav Imrich](
 
 ### Windows
 
-Execute the build script on a 64-bit Windows machine with [Visual Studio 2015 Community](https://www.visualstudio.com/products/visual-studio-community-vs) (or higher) installed:
+Execute the build script on a 64-bit Windows machine with [Visual Studio 2022 Community](https://visualstudio.microsoft.com/vs/community/) (or higher) installed:
 
 	cd build/windows/
 	build.bat

@@ -1,7 +1,7 @@
 @setlocal
 
-@rem Initialize build environment of Visual Studio 2015
-call "c:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat"
+@rem Initialize build environment of Visual Studio 2022
+call "c:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat" 
 
 @rem Build for x86 platform
 msbuild pkcs11-logger.sln /p:Configuration=Release /p:Platform=Win32 /target:Clean || goto :error

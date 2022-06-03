@@ -9,3 +9,6 @@ TestResults/
 Debug/
 Release/
 ipch/
+.vs/
+/build/windows/pkcs11-logger-x86.dll
+/build/windows/pkcs11-logger-x64.dll
