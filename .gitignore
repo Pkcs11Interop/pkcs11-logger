@@ -12,3 +12,5 @@ ipch/
 .vs/
 /build/windows/pkcs11-logger-x86.dll
 /build/windows/pkcs11-logger-x64.dll
+/build/linux/pkcs11-logger-x86.so
+/build/linux/pkcs11-logger-x64.so

@@ -116,7 +116,7 @@ The script should use Visual Studio to build both 32-bit (pkcs11-logger-x86.dll)
 
 ### Linux
 
-Execute the build script on a 64-bit Linux machine with GCC, GNU Make and GCC multilib support installed (available in [build-essential](http://packages.ubuntu.com/trusty/build-essential) and [gcc-multilib](http://packages.ubuntu.com/trusty/gcc-multilib) packages on Ubuntu 14.04 LTS):
+Execute the build script on a 64-bit Linux machine with GCC, GNU Make and GCC multilib support installed (available in [build-essential](https://packages.ubuntu.com/jammy/build-essential) and [gcc-multilib](https://packages.ubuntu.com/jammy/gcc-multilib) packages on Ubuntu 22.04 LTS):
 
 	cd build/linux/
 	sh build.sh
