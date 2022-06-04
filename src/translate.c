@@ -293,6 +293,7 @@ const char* pkcs11_logger_translate_ck_rv(CK_RV rv)
             break;
         case CKR_VENDOR_DEFINED:
             rv_name = "CKR_VENDOR_DEFINED";
+            break;
         default:
             rv_name = "Unknown";
     }
