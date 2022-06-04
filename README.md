@@ -11,7 +11,7 @@ PKCS11-LOGGER
 * [Building the source](#building-the-source)
   * [Windows](#windows)
   * [Linux](#linux)
-  * [Mac OS X](#mac-os-x)
+  * [macOS](#macos)
 * [License](#license)
 * [About](#about)
 
@@ -123,14 +123,14 @@ Execute the build script on a 64-bit Linux machine with GCC, GNU Make and GCC mu
 
 The script should use GCC to build both 32-bit (pkcs11-logger-x86.so) and 64-bit (pkcs11-logger-x64.so) versions of logger library.
 
-### Mac OS X
+### macOS
 
-Execute the build script on a 64-bit Mac OS X machine with [Xcode](https://developer.apple.com/xcode/) and its "Command Line Tools" extension installed:
+Execute the build script on a 64-bit macOS machine with [Xcode](https://developer.apple.com/xcode/) and its "Command Line Tools" extension installed:
 
-	cd build/osx/
+	cd build/macos/
 	sh build.sh
 
-The script should use GCC to build both 32-bit (pkcs11-logger-x86.dylib) and 64-bit (pkcs11-logger-x64.dylib) versions of logger library.
+The script should use GCC to build 64-bit (pkcs11-logger-x64.dylib) version of logger library.
 
 ## License
 
