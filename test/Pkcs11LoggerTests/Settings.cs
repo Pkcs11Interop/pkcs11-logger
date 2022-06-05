@@ -20,6 +20,7 @@
  */
 
 using Net.Pkcs11Interop.Common;
+using Net.Pkcs11Interop.HighLevelAPI;
 
 namespace Pkcs11Logger.Tests
 {
@@ -28,6 +29,11 @@ namespace Pkcs11Logger.Tests
     /// </summary>
     public static class Settings
     {
+        /// <summary>
+        /// Factories to be used by Pkcs11Interop library
+        /// </summary>
+        public static Pkcs11InteropFactories Pkcs11InteropFactories = new Pkcs11InteropFactories();
+
         /// <summary>
         /// The PKCS#11 unmanaged library path
         /// </summary>

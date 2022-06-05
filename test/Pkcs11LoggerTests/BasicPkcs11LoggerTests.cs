@@ -33,8 +33,6 @@ namespace Pkcs11Logger.Tests
     [TestFixture()]
     public class BasicPkcs11LoggerTests
     {
-        private Pkcs11InteropFactories _factories = new Pkcs11InteropFactories();
-
         #region Imports from PKCS11-LOGGER
 
         /// <summary>
@@ -113,7 +111,7 @@ namespace Pkcs11Logger.Tests
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, null);
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, null);
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
-                using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+                using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                     pkcs11Library.GetInfo();
 
                 Assert.Fail("Exception expected but not thrown");
@@ -128,7 +126,7 @@ namespace Pkcs11Logger.Tests
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, null);
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
             // PKCS11_LOGGER_LIBRARY_PATH has to be provided without enclosing quotes
@@ -137,7 +135,7 @@ namespace Pkcs11Logger.Tests
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, "\"" + Settings.Pkcs11LibraryPath + "\"");
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, null);
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
-                using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+                using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                     pkcs11Library.GetInfo();
 
                 Assert.Fail("Exception expected but not thrown");
@@ -154,7 +152,7 @@ namespace Pkcs11Logger.Tests
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, "\"" + Settings.Pkcs11LoggerLogPath1 + "\"");
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
-                using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+                using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                     pkcs11Library.GetInfo();
 
                 Assert.Fail("Exception expected but not thrown");
@@ -171,7 +169,7 @@ namespace Pkcs11Logger.Tests
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, "InvalidValue");
-                using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+                using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                     pkcs11Library.GetInfo();
 
                 Assert.Fail("Exception expected but not thrown");
@@ -198,7 +196,7 @@ namespace Pkcs11Logger.Tests
             // Existing PKCS#11 library path should work
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
             // Check whether Pkcs11LoggerLogPath1 exists
@@ -209,7 +207,7 @@ namespace Pkcs11Logger.Tests
             try
             {
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, @"NonExistingLibrary.dll");
-                using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+                using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                     pkcs11Library.GetInfo();
 
                 Assert.Fail("Exception expected but not thrown");
@@ -224,7 +222,7 @@ namespace Pkcs11Logger.Tests
             try
             {
                 System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, null);
-                using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+                using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                     pkcs11Library.GetInfo();
 
                 Assert.Fail("Exception expected but not thrown");
@@ -253,7 +251,7 @@ namespace Pkcs11Logger.Tests
             // Log to Pkcs11LoggerLogPath1
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
             // Check whether Pkcs11LoggerLogPath1 exists
@@ -270,7 +268,7 @@ namespace Pkcs11Logger.Tests
 
             // Log to Pkcs11LoggerLogPath2
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath2);
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
             // Check whether Pkcs11LoggerLogPath2 exists
@@ -287,7 +285,7 @@ namespace Pkcs11Logger.Tests
 
             // Settings.LogFilePath may also be null
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, null);
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
             // Check whether Pkcs11LoggerLogPath1 exists
@@ -316,7 +314,7 @@ namespace Pkcs11Logger.Tests
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags | PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE;
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
             // Check whether Pkcs11LoggerLogPath1 exists
@@ -326,7 +324,7 @@ namespace Pkcs11Logger.Tests
             // Log to Pkcs11LoggerLogPath1 with enabled log file
             flags = flags & ~PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE;
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
             // Check whether Pkcs11LoggerLogPath1 exists
@@ -354,7 +352,7 @@ namespace Pkcs11Logger.Tests
             flags = flags & ~PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID;
             flags = flags & ~PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID;
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
             // Read first line from the log file
@@ -376,7 +374,7 @@ namespace Pkcs11Logger.Tests
             flags = flags | PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID;
             flags = flags & ~PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID;
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
             // Check if the first line starts with ThreadID
@@ -391,7 +389,7 @@ namespace Pkcs11Logger.Tests
             flags = flags | PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID;
             flags = flags | PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID;
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
             // Check if both IDs are missing
@@ -419,7 +417,7 @@ namespace Pkcs11Logger.Tests
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags & ~PKCS11_LOGGER_FLAG_ENABLE_PIN;
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
             using (ISession session = pkcs11Library.GetSlotList(SlotsType.WithTokenPresent)[0].OpenSession(SessionType.ReadOnly))
                 session.Login(CKU.CKU_USER, Settings.NormalUserPin);
 
@@ -431,7 +429,7 @@ namespace Pkcs11Logger.Tests
             // Log to Pkcs11LoggerLogPath1 with PIN logging enabled
             flags = flags | PKCS11_LOGGER_FLAG_ENABLE_PIN;
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
             using (ISession session = pkcs11Library.GetSlotList(SlotsType.WithTokenPresent)[0].OpenSession(SessionType.ReadOnly))
                 session.Login(CKU.CKU_USER, Settings.NormalUserPin);
 
@@ -454,7 +452,7 @@ namespace Pkcs11Logger.Tests
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags | PKCS11_LOGGER_FLAG_ENABLE_STDOUT;
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
         }
 
@@ -474,7 +472,7 @@ namespace Pkcs11Logger.Tests
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags | PKCS11_LOGGER_FLAG_ENABLE_STDERR;
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
         }
 
@@ -501,7 +499,7 @@ namespace Pkcs11Logger.Tests
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags & ~PKCS11_LOGGER_FLAG_ENABLE_FCLOSE;
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
             {
                 pkcs11Library.GetInfo();
 
@@ -534,7 +532,7 @@ namespace Pkcs11Logger.Tests
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags | PKCS11_LOGGER_FLAG_ENABLE_FCLOSE;
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
             {
                 pkcs11Library.GetInfo();
 
@@ -582,7 +580,7 @@ namespace Pkcs11Logger.Tests
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags & ~PKCS11_LOGGER_FLAG_ENABLE_FCLOSE;
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
             {
                 int tickCountStart = Environment.TickCount;
 
@@ -612,7 +610,7 @@ namespace Pkcs11Logger.Tests
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags | PKCS11_LOGGER_FLAG_ENABLE_FCLOSE;
             System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
-            using (IPkcs11Library pkcs11Library = _factories.Pkcs11LibraryFactory.LoadPkcs11Library(_factories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
+            using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
             {
                 int tickCountStart = Environment.TickCount;
 
