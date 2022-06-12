@@ -19,6 +19,9 @@
  *  Jaroslav IMRICH <jimrich@jimrich.sk>
  */
 
+using System;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using Net.Pkcs11Interop.Common;
 using Net.Pkcs11Interop.HighLevelAPI;
 
@@ -83,6 +86,8 @@ namespace Pkcs11Logger.Tests
             }
             else if (Platform.IsLinux)
             {
+                NativeLibrary.SetDllImportResolver(typeof(Pkcs11InteropFactories).Assembly, LinuxDllImportResolver);
+
                 if (Platform.Uses32BitRuntime)
                 {
                     Pkcs11LibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-mock-x86.so";
@@ -115,6 +120,12 @@ namespace Pkcs11Logger.Tests
                     Pkcs11LoggerLogPath2 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x64-2.txt";
                 }
             }
+        }
+
+        static IntPtr LinuxDllImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? dllImportSearchPath)
+        {
+            string mappedLibraryName = (libraryName == "libdl") ? "libdl.so.2" : libraryName;
+            return NativeLibrary.Load(mappedLibraryName, assembly, dllImportSearchPath);
         }
     }
 }

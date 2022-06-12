@@ -92,9 +92,9 @@ namespace Pkcs11Logger.Tests
         /// </summary>
         private void DeleteEnvironmentVariables()
         {
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, null);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, null);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, null);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, null);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, null);
         }
 
         /// <summary>
@@ -108,9 +108,9 @@ namespace Pkcs11Logger.Tests
             // PKCS11_LOGGER_LIBRARY_PATH is required
             try
             {
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, null);
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, null);
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, null);
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, null);
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, null);
                 using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                     pkcs11Library.GetInfo();
 
@@ -123,18 +123,18 @@ namespace Pkcs11Logger.Tests
             }
 
             // PKCS11_LOGGER_LOG_FILE_PATH and PKCS11_LOGGER_FLAGS are optional
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, null);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, null);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, null);
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
             // PKCS11_LOGGER_LIBRARY_PATH has to be provided without enclosing quotes
             try
             {
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, "\"" + Settings.Pkcs11LibraryPath + "\"");
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, null);
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, "\"" + Settings.Pkcs11LibraryPath + "\"");
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, null);
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, null);
                 using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                     pkcs11Library.GetInfo();
 
@@ -149,9 +149,9 @@ namespace Pkcs11Logger.Tests
             // PKCS11_LOGGER_LOG_FILE_PATH has to be provided without enclosing quotes
             try
             {
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, "\"" + Settings.Pkcs11LoggerLogPath1 + "\"");
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, null);
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, "\"" + Settings.Pkcs11LoggerLogPath1 + "\"");
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, null);
                 using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                     pkcs11Library.GetInfo();
 
@@ -166,9 +166,9 @@ namespace Pkcs11Logger.Tests
             // PKCS11_LOGGER_FLAGS must contain a number
             try
             {
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, "InvalidValue");
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, "InvalidValue");
                 using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                     pkcs11Library.GetInfo();
 
@@ -194,8 +194,8 @@ namespace Pkcs11Logger.Tests
                 File.Delete(Settings.Pkcs11LoggerLogPath1);
 
             // Existing PKCS#11 library path should work
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
@@ -206,7 +206,7 @@ namespace Pkcs11Logger.Tests
             // Non-existing PKCS#11 library path should not work
             try
             {
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, @"NonExistingLibrary.dll");
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, @"NonExistingLibrary.dll");
                 using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                     pkcs11Library.GetInfo();
 
@@ -221,7 +221,7 @@ namespace Pkcs11Logger.Tests
             // Unspecified PKCS#11 library should not work
             try
             {
-                System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, null);
+                EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, null);
                 using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                     pkcs11Library.GetInfo();
 
@@ -249,8 +249,8 @@ namespace Pkcs11Logger.Tests
                 File.Delete(Settings.Pkcs11LoggerLogPath2);
 
             // Log to Pkcs11LoggerLogPath1
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
@@ -267,7 +267,7 @@ namespace Pkcs11Logger.Tests
                 File.Delete(Settings.Pkcs11LoggerLogPath2);
 
             // Log to Pkcs11LoggerLogPath2
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath2);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath2);
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
@@ -284,7 +284,7 @@ namespace Pkcs11Logger.Tests
                 File.Delete(Settings.Pkcs11LoggerLogPath2);
 
             // Settings.LogFilePath may also be null
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, null);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, null);
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
@@ -310,10 +310,10 @@ namespace Pkcs11Logger.Tests
                 File.Delete(Settings.Pkcs11LoggerLogPath1);
 
             // Log to Pkcs11LoggerLogPath1 with disabled log file
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags | PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE;
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
@@ -323,7 +323,7 @@ namespace Pkcs11Logger.Tests
 
             // Log to Pkcs11LoggerLogPath1 with enabled log file
             flags = flags & ~PKCS11_LOGGER_FLAG_DISABLE_LOG_FILE;
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
@@ -347,11 +347,11 @@ namespace Pkcs11Logger.Tests
                 File.Delete(Settings.Pkcs11LoggerLogPath1);
 
             // Log to Pkcs11LoggerLogPath1 with both IDs enabled
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags & ~PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID;
             flags = flags & ~PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID;
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
@@ -373,7 +373,7 @@ namespace Pkcs11Logger.Tests
             // Log to Pkcs11LoggerLogPath1 with ProcessID disabled
             flags = flags | PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID;
             flags = flags & ~PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID;
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
@@ -388,7 +388,7 @@ namespace Pkcs11Logger.Tests
             // Log to Pkcs11LoggerLogPath1 with both IDs disabled
             flags = flags | PKCS11_LOGGER_FLAG_DISABLE_PROCESS_ID;
             flags = flags | PKCS11_LOGGER_FLAG_DISABLE_THREAD_ID;
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
 
@@ -413,10 +413,10 @@ namespace Pkcs11Logger.Tests
                 File.Delete(Settings.Pkcs11LoggerLogPath1);
 
             // Log to Pkcs11LoggerLogPath1 with PIN logging disabled
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags & ~PKCS11_LOGGER_FLAG_ENABLE_PIN;
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
             using (ISession session = pkcs11Library.GetSlotList(SlotsType.WithTokenPresent)[0].OpenSession(SessionType.ReadOnly))
                 session.Login(CKU.CKU_USER, Settings.NormalUserPin);
@@ -428,7 +428,7 @@ namespace Pkcs11Logger.Tests
 
             // Log to Pkcs11LoggerLogPath1 with PIN logging enabled
             flags = flags | PKCS11_LOGGER_FLAG_ENABLE_PIN;
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
             using (ISession session = pkcs11Library.GetSlotList(SlotsType.WithTokenPresent)[0].OpenSession(SessionType.ReadOnly))
                 session.Login(CKU.CKU_USER, Settings.NormalUserPin);
@@ -448,10 +448,10 @@ namespace Pkcs11Logger.Tests
 
             // Test result needs to be verified visually in NUnit console.
             // To see stdout NUnit GUI needs to be executed with console switch: "nunit-x86.exe /console"
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags | PKCS11_LOGGER_FLAG_ENABLE_STDOUT;
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
         }
@@ -468,10 +468,10 @@ namespace Pkcs11Logger.Tests
 
             // Test result needs to be verified visually in NUnit console.
             // To see stdout NUnit GUI needs to be executed with console switch: "nunit-x86.exe /console"
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags | PKCS11_LOGGER_FLAG_ENABLE_STDERR;
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
                 pkcs11Library.GetInfo();
         }
@@ -495,10 +495,10 @@ namespace Pkcs11Logger.Tests
                 File.Delete(Settings.Pkcs11LoggerLogPath1);
 
             // Log to Pkcs11LoggerLogPath1 with fclose disabled
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags & ~PKCS11_LOGGER_FLAG_ENABLE_FCLOSE;
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
             {
                 pkcs11Library.GetInfo();
@@ -528,10 +528,10 @@ namespace Pkcs11Logger.Tests
                 File.Delete(Settings.Pkcs11LoggerLogPath1);
 
             // Log to Pkcs11LoggerLogPath1 with fclose enabled
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags | PKCS11_LOGGER_FLAG_ENABLE_FCLOSE;
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
             {
                 pkcs11Library.GetInfo();
@@ -576,10 +576,10 @@ namespace Pkcs11Logger.Tests
                 File.Delete(Settings.Pkcs11LoggerLogPath1);
 
             // Log to Pkcs11LoggerLogPath1 with fclose disabled
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags & ~PKCS11_LOGGER_FLAG_ENABLE_FCLOSE;
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
             {
                 int tickCountStart = Environment.TickCount;
@@ -606,10 +606,10 @@ namespace Pkcs11Logger.Tests
                 File.Delete(Settings.Pkcs11LoggerLogPath1);
 
             // Log to Pkcs11LoggerLogPath1 with fclose enabled
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags | PKCS11_LOGGER_FLAG_ENABLE_FCLOSE;
-            System.Environment.SetEnvironmentVariable(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
+            EnvVarUtils.SetEnvVar(PKCS11_LOGGER_FLAGS, Convert.ToString(flags));
             using (IPkcs11Library pkcs11Library = Settings.Pkcs11InteropFactories.Pkcs11LibraryFactory.LoadPkcs11Library(Settings.Pkcs11InteropFactories, Settings.Pkcs11LoggerLibraryPath, AppType.MultiThreaded))
             {
                 int tickCountStart = Environment.TickCount;
