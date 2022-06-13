@@ -29,7 +29,7 @@ namespace Pkcs11Logger.Tests
     {
         public static void SetEnvVar(string name, string value)
         {
-            if (Platform.IsLinux)
+            if (Platform.IsLinux || Platform.IsMacOsX)
             {
                 if (value == null)
                 {
@@ -50,7 +50,7 @@ namespace Pkcs11Logger.Tests
 
         public static string GetEnvVar(string name)
         {
-            if (Platform.IsLinux)
+            if (Platform.IsLinux || Platform.IsMacOsX)
             {
                 return NativeMethods.getenv(name);
             }
