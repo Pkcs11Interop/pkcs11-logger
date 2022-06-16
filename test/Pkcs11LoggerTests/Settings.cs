@@ -19,7 +19,12 @@
  *  Jaroslav IMRICH <jimrich@jimrich.sk>
  */
 
+using System;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using Net.Pkcs11Interop.Common;
+using Net.Pkcs11Interop.HighLevelAPI;
 
 namespace Pkcs11Logger.Tests
 {
@@ -28,6 +33,11 @@ namespace Pkcs11Logger.Tests
     /// </summary>
     public static class Settings
     {
+        /// <summary>
+        /// Factories to be used by Pkcs11Interop library
+        /// </summary>
+        public static Pkcs11InteropFactories Pkcs11InteropFactories = new Pkcs11InteropFactories();
+
         /// <summary>
         /// The PKCS#11 unmanaged library path
         /// </summary>
@@ -58,57 +68,48 @@ namespace Pkcs11Logger.Tests
         /// </summary>
         static Settings()
         {
+            string testBasePath = Path.GetDirectoryName(typeof(Settings).Assembly.Location);
+            string repoBasePath = testBasePath.Replace(Path.Combine("test", "Pkcs11LoggerTests", "bin", "Debug", "net60"), string.Empty);
+            string platform = Platform.Uses32BitRuntime ? "x86" : "x64";
+
             if (Platform.IsWindows)
             {
-                if (Platform.Uses32BitRuntime)
-                {
-                    Pkcs11LibraryPath = @"c:\pkcs11-logger-test\pkcs11-mock-x86.dll";
-                    Pkcs11LoggerLibraryPath = @"c:\pkcs11-logger-test\pkcs11-logger-x86.dll";
-                    Pkcs11LoggerLogPath1 = @"c:\pkcs11-logger-test\pkcs11-logger-x86-1.txt";
-                    Pkcs11LoggerLogPath2 = @"c:\pkcs11-logger-test\pkcs11-logger-x86-2.txt";
-                }
-                else
-                {
-                    Pkcs11LibraryPath = @"c:\pkcs11-logger-test\pkcs11-mock-x64.dll";
-                    Pkcs11LoggerLibraryPath = @"c:\pkcs11-logger-test\pkcs11-logger-x64.dll";
-                    Pkcs11LoggerLogPath1 = @"c:\pkcs11-logger-test\pkcs11-logger-x64-1.txt";
-                    Pkcs11LoggerLogPath2 = @"c:\pkcs11-logger-test\pkcs11-logger-x64-2.txt";
-                }
+                Pkcs11LibraryPath = Path.Combine(testBasePath, "pkcs11-mock", "windows", $"pkcs11-mock-{platform}.dll");
+                Pkcs11LoggerLibraryPath = Path.Combine(repoBasePath, "build", "windows", $"pkcs11-logger-{platform}.dll");
+                Pkcs11LoggerLogPath1 = Path.Combine(testBasePath, $"pkcs11-logger-{platform}-1.txt");
+                Pkcs11LoggerLogPath2 = Path.Combine(testBasePath, $"pkcs11-logger-{platform}-2.txt");
             }
             else if (Platform.IsLinux)
             {
-                if (Platform.Uses32BitRuntime)
-                {
-                    Pkcs11LibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-mock-x86.so";
-                    Pkcs11LoggerLibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-logger-x86.so";
-                    Pkcs11LoggerLogPath1 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x86-1.txt";
-                    Pkcs11LoggerLogPath2 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x86-2.txt";
-                }
-                else
-                {
-                    Pkcs11LibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-mock-x64.so";
-                    Pkcs11LoggerLibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-logger-x64.so";
-                    Pkcs11LoggerLogPath1 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x64-1.txt";
-                    Pkcs11LoggerLogPath2 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x64-2.txt";
-                }
+                // Set callback for resolving native library imports from Pkcs11Interop
+                NativeLibrary.SetDllImportResolver(typeof(Pkcs11InteropFactories).Assembly, LinuxDllImportResolver);
+
+                Pkcs11LibraryPath = Path.Combine(testBasePath, "pkcs11-mock", "linux", $"pkcs11-mock-{platform}.so");
+                Pkcs11LoggerLibraryPath = Path.Combine(repoBasePath, "build", "linux", $"pkcs11-logger-{platform}.so");
+                Pkcs11LoggerLogPath1 = Path.Combine(testBasePath, $"pkcs11-logger-{platform}-1.txt");
+                Pkcs11LoggerLogPath2 = Path.Combine(testBasePath, $"pkcs11-logger-{platform}-2.txt");
             }
             else if (Platform.IsMacOsX)
             {
-                if (Platform.Uses32BitRuntime)
-                {
-                    Pkcs11LibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-mock-x86.dylib";
-                    Pkcs11LoggerLibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-logger-x86.dylib";
-                    Pkcs11LoggerLogPath1 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x86-1.txt";
-                    Pkcs11LoggerLogPath2 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x86-2.txt";
-                }
-                else
-                {
-                    Pkcs11LibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-mock-x64.dylib";
-                    Pkcs11LoggerLibraryPath = @"/tmp/pkcs11-logger-test/pkcs11-logger-x64.dylib";
-                    Pkcs11LoggerLogPath1 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x64-1.txt";
-                    Pkcs11LoggerLogPath2 = @"/tmp/pkcs11-logger-test/pkcs11-logger-x64-2.txt";
-                }
+                Pkcs11LibraryPath = Path.Combine(testBasePath, "pkcs11-mock", "macos", $"pkcs11-mock-{platform}.dylib");
+                Pkcs11LoggerLibraryPath = Path.Combine(repoBasePath, "build", "macos", $"pkcs11-logger-{platform}.dylib");
+                Pkcs11LoggerLogPath1 = Path.Combine(testBasePath, $"pkcs11-logger-{platform}-1.txt");
+                Pkcs11LoggerLogPath2 = Path.Combine(testBasePath, $"pkcs11-logger-{platform}-2.txt");
             }
+        }
+
+        /// <summary>
+        /// Callback for resolving native library imports
+        /// </summary>
+        /// <param name="libraryName">Name of the native library that needs to be resolved</param>
+        /// <param name="assembly">The assembly loading the native library</param>
+        /// <param name="dllImportSearchPath">The search path for native library</param>
+        /// <returns>The OS handle for the loaded native library library</returns>
+        static IntPtr LinuxDllImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? dllImportSearchPath)
+        {
+            // Note: Pkcs11Interop tries to load "libdl" but Ubuntu 22.04 provides "libdl.so.2"
+            string mappedLibraryName = (libraryName == "libdl") ? "libdl.so.2" : libraryName;
+            return NativeLibrary.Load(mappedLibraryName, assembly, dllImportSearchPath);
         }
     }
 }
