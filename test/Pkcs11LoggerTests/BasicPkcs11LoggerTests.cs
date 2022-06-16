@@ -446,8 +446,8 @@ namespace Pkcs11Logger.Tests
 
             uint flags = 0;
 
-            // Test result needs to be verified visually in NUnit console.
-            // To see stdout NUnit GUI needs to be executed with console switch: "nunit-x86.exe /console"
+            // Test result needs to be verified visually in NUnit console:
+            //   nunit3-console.exe Pkcs11LoggerTests.dll --test=Pkcs11Logger.Tests.BasicPkcs11LoggerTests.EnableStdOutTest
             EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
             EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags | PKCS11_LOGGER_FLAG_ENABLE_STDOUT;
@@ -466,8 +466,8 @@ namespace Pkcs11Logger.Tests
 
             uint flags = 0;
 
-            // Test result needs to be verified visually in NUnit console.
-            // To see stdout NUnit GUI needs to be executed with console switch: "nunit-x86.exe /console"
+            // Test result needs to be verified visually in NUnit console:
+            //   nunit3-console.exe Pkcs11LoggerTests.dll --test=Pkcs11Logger.Tests.BasicPkcs11LoggerTests.EnableStdErrTest
             EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LIBRARY_PATH, Settings.Pkcs11LibraryPath);
             EnvVarUtils.SetEnvVar(PKCS11_LOGGER_LOG_FILE_PATH, Settings.Pkcs11LoggerLogPath1);
             flags = flags | PKCS11_LOGGER_FLAG_ENABLE_STDERR;
