@@ -25,8 +25,16 @@ using Net.Pkcs11Interop.Common;
 
 namespace Pkcs11Logger.Tests
 {
+    /// <summary>
+    /// Utility class for environment variables
+    /// </summary>
     public class EnvVarUtils
     {
+        /// <summary>
+        /// Creates, modifies, or deletes an environment variable
+        /// </summary>
+        /// <param name="name">The name of an environment variable</param>
+        /// <param name="value">A value to assign to variable</param>
         public static void SetEnvVar(string name, string value)
         {
             if (Platform.IsLinux || Platform.IsMacOsX)
@@ -48,26 +56,26 @@ namespace Pkcs11Logger.Tests
             }
         }
 
-        public static string GetEnvVar(string name)
-        {
-            if (Platform.IsLinux || Platform.IsMacOsX)
-            {
-                return NativeMethods.getenv(name);
-            }
-            else
-            {
-                return System.Environment.GetEnvironmentVariable(name);
-            }
-        }
-
+        /// <summary>
+        /// Definition of unmanaged functions
+        /// </summary>
         private static class NativeMethods
         {
+            /// <summary>
+            /// Creates or modifies an environment variable
+            /// </summary>
+            /// <param name="name">The name of an environment variable</param>
+            /// <param name="value">A value to assign to variable</param>
+            /// <param name="overwrite">Indicates whether value of existing variable should be overwritten (nonzero) or not (zero)</param>
+            /// <returns>Zero on success, or -1 on error, with errno set to indicate the cause of the error</returns>
             [DllImport("libc", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, BestFitMapping = false, ThrowOnUnmappableChar = true)]
             internal static extern int setenv(string name, string value, int overwrite);
 
-            [DllImport("libc", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, BestFitMapping = false, ThrowOnUnmappableChar = true)]
-            internal static extern string getenv(string name);
-
+            /// <summary>
+            /// Deletes an environment variable
+            /// </summary>
+            /// <param name="name">The name of an environment variable</param>
+            /// <returns>Zero on success, or -1 on error, with errno set to indicate the cause of the error</returns>
             [DllImport("libc", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, BestFitMapping = false, ThrowOnUnmappableChar = true)]
             internal static extern int unsetenv(string name);
         }
