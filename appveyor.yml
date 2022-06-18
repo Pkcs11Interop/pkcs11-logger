@@ -8,16 +8,23 @@ skip_tags: true
 
 environment:
   matrix:
-#  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
-#  - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+  - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
   - APPVEYOR_BUILD_WORKER_IMAGE: macos-monterey
 
-build_script:
-- cmd: cd build\windows\ && build.bat
+install:
 - sh: |
     if [ "$CI_LINUX" = "true" ]; then
         sudo apt-get update &&
-        sudo apt-get -y install gcc-multilib &&
+        sudo apt-get -y install gcc-multilib
+    fi
+
+build_script:
+- cmd: |
+    cd build\windows\ && 
+    build.bat
+- sh: |
+    if [ "$CI_LINUX" = "true" ]; then
         cd build/linux/ &&
         ./build.sh &&
         cd ../..
@@ -28,8 +35,12 @@ build_script:
     fi
 
 test_script:
-- cmd: cd .\test\Pkcs11LoggerTests\ && nuget install Appveyor.TestLogger && dotnet build && cd ..\..
-- cmd: dotnet vstest .\test\Pkcs11LoggerTests\bin\Debug\net60\Pkcs11LoggerTests.dll --TestAdapterPath:. --logger:Appveyor
+- cmd: |
+    cd .\test\Pkcs11LoggerTests\ &&
+    nuget install Appveyor.TestLogger &&
+    dotnet build &&
+    cd ..\..
+    dotnet vstest .\test\Pkcs11LoggerTests\bin\Debug\net60\Pkcs11LoggerTests.dll --TestAdapterPath:. --logger:Appveyor
 - sh: |
     cd ./test/Pkcs11LoggerTests/ &&
     nuget install -Source https://api.nuget.org/v3/index.json Appveyor.TestLogger &&
@@ -38,6 +49,4 @@ test_script:
     dotnet test --test-adapter-path:. --logger:Appveyor ./test/Pkcs11LoggerTests/
 
 artifacts:
-- path: build/windows/pkcs11-logger-*.dll
-- path: build/linux/pkcs11-logger-*.so
-- path: build/macos/pkcs11-logger-*.dylib
+- path: build/windows/pkcs11-logger-*.*
