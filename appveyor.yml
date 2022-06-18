@@ -13,12 +13,12 @@ environment:
 
 build_script:
 - cmd: cd build\windows\ && build.bat
-- sh: sudo apt-get update && sudo apt-get -y install gcc-multilib && cd build/linux/ && ./build.sh
+- sh: sudo apt-get update && sudo apt-get -y install gcc-multilib && cd build/linux/ && ./build.sh && cd ../..
 
 test_script:
 - cmd: cd .\test\Pkcs11LoggerTests\ && nuget install Appveyor.TestLogger && dotnet build && cd ..\..
 - cmd: dotnet vstest .\test\Pkcs11LoggerTests\bin\Debug\net60\Pkcs11LoggerTests.dll --TestAdapterPath:. --logger:Appveyor
-- sh: pwd && cd ./test/Pkcs11LoggerTests/ && nuget install -Source https://api.nuget.org/v3/index.json Appveyor.TestLogger  && dotnet build && cd ../..
+- sh: cd ./test/Pkcs11LoggerTests/ && nuget install -Source https://api.nuget.org/v3/index.json Appveyor.TestLogger  && dotnet build && cd ../..
 - sh: dotnet test --test-adapter-path:. --logger:Appveyor ./test/Pkcs11LoggerTests/
 
 artifacts:
