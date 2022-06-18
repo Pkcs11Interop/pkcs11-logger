@@ -22,7 +22,8 @@ install:
 build_script:
 - cmd: |
     cd build\windows\ && ^
-    build.bat
+    build.bat ^
+    cd ..\..
 - sh: |
     if [ "$CI_LINUX" = "true" ]; then
         cd build/linux/ &&
