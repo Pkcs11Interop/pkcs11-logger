@@ -8,12 +8,12 @@ skip_tags: true
 
 environment:
   matrix:
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+#  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
   - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
 
 build_script:
 - cmd: cd build\windows\ && build.bat
-- sh: cd build/linux/ && ./build.sh
+- sh: sudo apt install gcc-multilib && cd build/linux/ && ./build.sh
 
 test_script:
 - cmd: cd .\test\Pkcs11LoggerTests\ && nuget install Appveyor.TestLogger && dotnet build && cd ..\..
