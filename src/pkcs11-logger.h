@@ -213,5 +213,5 @@ const char* pkcs11_logger_translate_ck_attribute(CK_ATTRIBUTE_TYPE type);
 // utils.c - declaration of functions
 int pkcs11_logger_utils_str_to_long(const char *str, unsigned long *val);
 void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len);
-int pkcs11_logger_utils_get_thread_id(void);
+unsigned long pkcs11_logger_utils_get_thread_id(void);
 int pkcs11_logger_utils_get_process_id(void);

@@ -64,7 +64,7 @@ void pkcs11_logger_log(const char* message, ...)
         if (!disable_process_id)
             fprintf(pkcs11_logger_globals.log_file_handle, "%0#10x : ", pkcs11_logger_utils_get_process_id());
         if (!disable_thread_id)
-            fprintf(pkcs11_logger_globals.log_file_handle, "%0#10x : ", pkcs11_logger_utils_get_thread_id());
+            fprintf(pkcs11_logger_globals.log_file_handle, "%0#10lx : ", pkcs11_logger_utils_get_thread_id());
         vfprintf(pkcs11_logger_globals.log_file_handle, message, ap);
         fprintf(pkcs11_logger_globals.log_file_handle, "\n");
 
@@ -79,7 +79,7 @@ void pkcs11_logger_log(const char* message, ...)
         if (!disable_process_id)
             fprintf(stdout, "%0#10x : ", pkcs11_logger_utils_get_process_id());
         if (!disable_thread_id)
-            fprintf(stdout, "%0#10x : ", pkcs11_logger_utils_get_thread_id());
+            fprintf(stdout, "%0#10lx : ", pkcs11_logger_utils_get_thread_id());
         vfprintf(stdout, message, ap);
         fprintf(stdout, "\n");
 
@@ -94,7 +94,7 @@ void pkcs11_logger_log(const char* message, ...)
         if (!disable_process_id)
             fprintf(stderr, "%0#10x : ", pkcs11_logger_utils_get_process_id());
         if (!disable_thread_id)
-            fprintf(stderr, "%0#10x : ", pkcs11_logger_utils_get_thread_id());
+            fprintf(stderr, "%0#10lx : ", pkcs11_logger_utils_get_thread_id());
         vfprintf(stderr, message, ap);
         fprintf(stderr, "\n");
 
