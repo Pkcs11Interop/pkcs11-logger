@@ -14,7 +14,7 @@ build_script:
 - cmd: cd build\windows\ && build.bat
 
 test_script:
-- cmd: cd .\test\Pkcs11LoggerTests\ && nuget install Appveyor.TestLogger && cd ..\..
+- cmd: cd .\test\Pkcs11LoggerTests\ && nuget install Appveyor.TestLogger && dotnet build && cd ..\..
 - cmd: dotnet vstest .\test\Pkcs11LoggerTests\bin\Debug\net60\Pkcs11LoggerTests.dll --TestAdapterPath:. --logger:Appveyor
 
 artifacts:
