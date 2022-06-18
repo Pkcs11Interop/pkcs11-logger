@@ -13,7 +13,7 @@ environment:
 
 build_script:
 - cmd: cd build\windows\ && build.bat
-- sh: sudo apt install gcc-multilib && cd build/linux/ && ./build.sh
+- sh: sudo apt-get -y install gcc-multilib && cd build/linux/ && ./build.sh
 
 test_script:
 - cmd: cd .\test\Pkcs11LoggerTests\ && nuget install Appveyor.TestLogger && dotnet build && cd ..\..
