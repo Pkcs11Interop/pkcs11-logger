@@ -40,7 +40,7 @@ test_script:
     cd .\test\Pkcs11LoggerTests\ && ^
     nuget install Appveyor.TestLogger && ^
     dotnet build && ^
-    cd ..\.. ^
+    cd ..\..
     dotnet vstest .\test\Pkcs11LoggerTests\bin\Debug\net60\Pkcs11LoggerTests.dll --TestAdapterPath:. --logger:Appveyor
 - sh: |
     cd ./test/Pkcs11LoggerTests/ &&
