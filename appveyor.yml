@@ -9,14 +9,18 @@ skip_tags: true
 environment:
   matrix:
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+  - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
 
 build_script:
 - cmd: cd build\windows\ && build.bat
+- sh: cd build/linux/ && ./build.sh
 
 test_script:
 - cmd: cd .\test\Pkcs11LoggerTests\ && nuget install Appveyor.TestLogger && dotnet build && cd ..\..
 - cmd: dotnet vstest .\test\Pkcs11LoggerTests\bin\Debug\net60\Pkcs11LoggerTests.dll --TestAdapterPath:. --logger:Appveyor
+- sh: cd ./test/Pkcs11LoggerTests/ && nuget install -Source https://api.nuget.org/v3/index.json Appveyor.TestLogger  && dotnet build && cd ../..
+- sh: dotnet test --test-adapter-path:. --logger:Appveyor ./test/Pkcs11LoggerTests/
 
 artifacts:
 - path: build/windows/pkcs11-logger-*.dll
-  name: pkcs11-logger
+- path: build/linux/pkcs11-logger-*.so
