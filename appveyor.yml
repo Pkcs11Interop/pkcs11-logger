@@ -18,7 +18,7 @@ build_script:
 test_script:
 - cmd: cd .\test\Pkcs11LoggerTests\ && nuget install Appveyor.TestLogger && dotnet build && cd ..\..
 - cmd: dotnet vstest .\test\Pkcs11LoggerTests\bin\Debug\net60\Pkcs11LoggerTests.dll --TestAdapterPath:. --logger:Appveyor
-- sh: cd ./test/Pkcs11LoggerTests/ && nuget install -Source https://api.nuget.org/v3/index.json Appveyor.TestLogger  && dotnet build && cd ../..
+- sh: pwd && cd ./test/Pkcs11LoggerTests/ && nuget install -Source https://api.nuget.org/v3/index.json Appveyor.TestLogger  && dotnet build && cd ../..
 - sh: dotnet test --test-adapter-path:. --logger:Appveyor ./test/Pkcs11LoggerTests/
 
 artifacts:
