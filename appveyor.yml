@@ -13,7 +13,15 @@ environment:
 
 build_script:
 - cmd: cd build\windows\ && build.bat
-- sh: sudo apt-get update && sudo apt-get -y install gcc-multilib && cd build/linux/ && ./build.sh && cd ../..
+#- sh: sudo apt-get update && sudo apt-get -y install gcc-multilib && cd build/linux/ && ./build.sh && cd ../..
+- sh: |
+    if [ "$CI_LINUX" = "true" ]; then
+        sudo apt-get update &&
+        sudo apt-get -y install gcc-multilib &&
+        cd build/linux/ &&
+        ./build.sh &&
+        cd ../..
+    fi
 
 test_script:
 - cmd: cd .\test\Pkcs11LoggerTests\ && nuget install Appveyor.TestLogger && dotnet build && cd ..\..
