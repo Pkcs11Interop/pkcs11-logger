@@ -18,5 +18,5 @@ test_script:
 - cmd: dotnet vstest .\test\Pkcs11LoggerTests\bin\Debug\net60\Pkcs11LoggerTests.dll --TestAdapterPath:. --logger:Appveyor
 
 artifacts:
-- path: build/windows/
-  name: pkcs11-logger-
+- path: build/windows/pkcs11-logger-*.dll
+  name: pkcs11-logger
