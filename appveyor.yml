@@ -9,8 +9,8 @@ skip_tags: true
 environment:
   matrix:
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
-#  - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
-#  - APPVEYOR_BUILD_WORKER_IMAGE: macos-monterey
+  - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
+  - APPVEYOR_BUILD_WORKER_IMAGE: macos-monterey
 
 install:
 - sh: |
@@ -50,4 +50,6 @@ test_script:
     dotnet test --test-adapter-path:. --logger:Appveyor ./test/Pkcs11LoggerTests/
 
 artifacts:
-- path: build/**/pkcs11-logger-*.*
+- path: build/windows/pkcs11-logger-*.dll
+- path: build/linux/pkcs11-logger-*.so
+- path: build/macos/pkcs11-logger-*.dylib
