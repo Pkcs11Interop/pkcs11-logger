@@ -73,7 +73,7 @@ void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
 
 
 // Gets ID of current thread
-int pkcs11_logger_utils_get_thread_id()
+int pkcs11_logger_utils_get_thread_id(void)
 {
 #ifdef _WIN32
     return GetCurrentThreadId();
@@ -89,7 +89,7 @@ int pkcs11_logger_utils_get_thread_id()
 
 
 // Gets ID of current process
-int pkcs11_logger_utils_get_process_id()
+int pkcs11_logger_utils_get_process_id(void)
 {
 #ifdef _WIN32
     return _getpid();
