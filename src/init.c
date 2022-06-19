@@ -104,15 +104,12 @@ int pkcs11_logger_init_orig_lib(void)
     pkcs11_logger_log("Please visit www.pkcs11interop.net for more information");
     pkcs11_logger_log_separator();
 #ifdef _WIN32
-    pkcs11_logger_log("sizeof(unsigned long) = %d", sizeof(unsigned long));
-    pkcs11_logger_log("sizeof(DWORD) = %d", sizeof(DWORD));
+    pkcs11_logger_log("sizeof(int) = %d", sizeof(int));
 #else
 #ifdef __APPLE__
-    pkcs11_logger_log("sizeof(unsigned long) = %d", sizeof(unsigned long));
-    pkcs11_logger_log("sizeof(uint64_t) = %d", sizeof(uint64_t));
+    pkcs11_logger_log("sizeof(pid_t) = %d", sizeof(pid_t));
 #else
-    pkcs11_logger_log("sizeof(unsigned long) = %d", sizeof(unsigned long));
-    pkcs11_logger_log("sizeof(pthread_t) = %d", sizeof(pthread_t));
+    pkcs11_logger_log("sizeof(pid_t) = %d", sizeof(pid_t));
 #endif
 #endif
     pkcs11_logger_log_separator();
