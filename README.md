@@ -2,6 +2,11 @@ PKCS11-LOGGER
 =============
 **PKCS#11 logging proxy module**
 
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/Pkcs11Interop/pkcs11-logger/blob/master/LICENSE.md)
+[![AppVeyor](https://ci.appveyor.com/api/projects/status/m4aidxggq1uo4fou/branch/master?svg=true)](https://ci.appveyor.com/project/pkcs11interop/pkcs11-logger/branch/master)
+[![Stack Overflow](https://img.shields.io/badge/stack-pkcs11interop-blue.svg)](https://stackoverflow.com/questions/tagged/pkcs11interop)
+[![Twitter](https://img.shields.io/badge/twitter-p11interop-blue.svg)](https://twitter.com/p11interop)
+
 ## Table of Contents
 
 * [Overview](#overview)
@@ -35,31 +40,41 @@ Application calls PKCS#11 function provided by logger, logger calls the same fun
 
 By default every logged line starts with the two hex numbers separated by a colon. The first hex number is process id and the second one is thread id.
 
-	0x000016ac : 0x00001020 : ****************************** 2014-02-10 22:42:01 ***
-	0x000016ac : 0x00001020 : Calling C_Initialize
-	0x000016ac : 0x00001020 : Input
-	0x000016ac : 0x00001020 :  pInitArgs: 00000000
-	0x000016ac : 0x00001020 : Returning 0 (CKR_OK)
-	0x000016ac : 0x00001020 : ****************************** 2014-02-10 22:42:01 ***
-	0x000016ac : 0x00001020 : Calling C_GetInfo
-	0x000016ac : 0x00001020 : Input
-	0x000016ac : 0x00001020 :  pInfo: 0022FECC
-	0x000016ac : 0x00001020 : Output
-	0x000016ac : 0x00001020 :  pInfo: 0022FECC
-	0x000016ac : 0x00001020 :   cryptokiVersion:
-	0x000016ac : 0x00001020 :    major: 2
-	0x000016ac : 0x00001020 :    minor: 20
-	0x000016ac : 0x00001020 :   manufacturerID: SoftHSM                         
-	0x000016ac : 0x00001020 :   flags: 0
-	0x000016ac : 0x00001020 :   libraryDescription: Implementation of PKCS11        
-	0x000016ac : 0x00001020 :   libraryVersion:
-	0x000016ac : 0x00001020 :    major: 1
-	0x000016ac : 0x00001020 :    minor: 3
-	0x000016ac : 0x00001020 : Returning 0 (CKR_OK)
+```
+0x000016ac : 0x00000000000014dc : ****************************** 2022-06-19 09:52:48 ***
+0x000016ac : 0x00000000000014dc : Calling C_Initialize
+0x000016ac : 0x00000000000014dc : Input
+0x000016ac : 0x00000000000014dc :  pInitArgs: 000002290F5A7D10
+0x000016ac : 0x00000000000014dc :   CreateMutex: 0000000000000000
+0x000016ac : 0x00000000000014dc :   DestroyMutex: 0000000000000000
+0x000016ac : 0x00000000000014dc :   LockMutex: 0000000000000000
+0x000016ac : 0x00000000000014dc :   UnlockMutex: 0000000000000000
+0x000016ac : 0x00000000000014dc :   Flags: 2
+0x000016ac : 0x00000000000014dc :    CKF_LIBRARY_CANT_CREATE_OS_THREADS: FALSE
+0x000016ac : 0x00000000000014dc :    CKF_OS_LOCKING_OK: TRUE
+0x000016ac : 0x00000000000014dc :   pReserved: 0000000000000000
+0x000016ac : 0x00000000000014dc : Returning 0 (CKR_OK)
+0x000016ac : 0x00000000000014dc : ****************************** 2022-06-19 09:52:48 ***
+0x000016ac : 0x00000000000014dc : Calling C_GetInfo
+0x000016ac : 0x00000000000014dc : Input
+0x000016ac : 0x00000000000014dc :  pInfo: 000000671F6FE040
+0x000016ac : 0x00000000000014dc : Output
+0x000016ac : 0x00000000000014dc :  pInfo: 000000671F6FE040
+0x000016ac : 0x00000000000014dc :   cryptokiVersion:
+0x000016ac : 0x00000000000014dc :    major: 2
+0x000016ac : 0x00000000000014dc :    minor: 20
+0x000016ac : 0x00000000000014dc :   manufacturerID: Pkcs11Interop Project           
+0x000016ac : 0x00000000000014dc :   flags: 0
+0x000016ac : 0x00000000000014dc :   libraryDescription: Mock module                     
+0x000016ac : 0x00000000000014dc :   libraryVersion:
+0x000016ac : 0x00000000000014dc :    major: 1
+0x000016ac : 0x00000000000014dc :    minor: 0
+0x000016ac : 0x00000000000014dc : Returning 0 (CKR_OK)
+```
 
 ## Configuration
 
-Logger behavior can be controlled with the following [environment variables](http://en.wikipedia.org/wiki/Environment_variable):
+Logger behavior can be controlled with the following [environment variables](https://en.wikipedia.org/wiki/Environment_variable):
 
 * **PKCS11_LOGGER_LIBRARY_PATH**
 
@@ -71,7 +86,7 @@ Logger behavior can be controlled with the following [environment variables](htt
 
 * **PKCS11_LOGGER_FLAGS**
 
-  Specifies [bit mask](http://en.wikipedia.org/wiki/Mask_(computing)) that controls multiple logger features with the following meaning of individual bits:
+  Specifies [bit mask](https://en.wikipedia.org/wiki/Mask_(computing)) that controls multiple logger features with the following meaning of individual bits:
   
   * 0x01 hex or 1 dec disables logging into the log file
   * 0x02 hex or 2 dec disables logging of process id
@@ -90,7 +105,7 @@ Signed precompiled binaries as well as source code releases can be downloaded fr
  * **Windows**  
    32-bit version: [pkcs11-logger-x86.dll](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x86.dll)  
    64-bit version: [pkcs11-logger-x64.dll](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x64.dll)  
-   <sub>Requires [Visual C++ Redistributable for Visual Studio 2015](http://www.microsoft.com/en-us/download/details.aspx?id=48145) to be installed on the target system.</sub>
+   <sub>Requires [Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145) to be installed on the target system.</sub>
    
  * **Ubuntu 14.04**  
    32-bit version: [pkcs11-logger-x86.so](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x86.so)  
@@ -109,8 +124,10 @@ Windows libraries are signed with [code-signing certificate of Jaroslav Imrich](
 
 Execute the build script on a 64-bit Windows machine with [Visual Studio 2022 Community](https://visualstudio.microsoft.com/vs/community/) (or higher) installed:
 
-	cd build/windows/
-	build.bat
+```
+cd build/windows/
+build.bat
+```
 	
 The script should use Visual Studio to build both 32-bit (pkcs11-logger-x86.dll) and 64-bit (pkcs11-logger-x64.dll) versions of logger library.
 
@@ -118,8 +135,10 @@ The script should use Visual Studio to build both 32-bit (pkcs11-logger-x86.dll)
 
 Execute the build script on a 64-bit Linux machine with GCC, GNU Make and GCC multilib support installed (available in [build-essential](https://packages.ubuntu.com/jammy/build-essential) and [gcc-multilib](https://packages.ubuntu.com/jammy/gcc-multilib) packages on Ubuntu 22.04 LTS):
 
-	cd build/linux/
-	sh build.sh
+```
+cd build/linux/
+sh build.sh
+```
 
 The script should use GCC to build both 32-bit (pkcs11-logger-x86.so) and 64-bit (pkcs11-logger-x64.so) versions of logger library.
 
@@ -127,17 +146,19 @@ The script should use GCC to build both 32-bit (pkcs11-logger-x86.so) and 64-bit
 
 Execute the build script on a 64-bit macOS machine with [Xcode](https://developer.apple.com/xcode/) and its "Command Line Tools" extension installed:
 
-	cd build/macos/
-	sh build.sh
+```
+cd build/macos/
+sh build.sh
+```
 
 The script should use GCC to build 64-bit (pkcs11-logger-x64.dylib) version of logger library.
 
 ## License
 
-PKCS11-LOGGER is available under the terms of the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).  
+PKCS11-LOGGER is available under the terms of the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).  
 [Human friendly license summary](https://www.tldrlegal.com/l/apache2) is available at tldrlegal.com but the [full license text](LICENSE.md) always prevails.
 
 ## About
 
-PKCS11-LOGGER has been developed as a part of [Pkcs11Interop](http://www.pkcs11interop.net/) project by [Jaroslav Imrich](http://www.jimrich.sk/).  
-Please visit project website - [pkcs11interop.net](http://www.pkcs11interop.net) - for more information.
+PKCS11-LOGGER has been written for the [Pkcs11Interop](https://www.pkcs11interop.net/) project by [Jaroslav Imrich](https://www.jimrich.sk/).  
+Please visit project website - [pkcs11interop.net](https://www.pkcs11interop.net) - for more information.
