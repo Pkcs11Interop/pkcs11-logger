@@ -224,7 +224,7 @@ void pkcs11_logger_log_attribute_template(CK_ATTRIBUTE_PTR pTemplate, CK_ULONG u
         pkcs11_logger_log("   pValue: %p", pTemplate[i].pValue);
         pkcs11_logger_log("   ulValueLen: %lu", pTemplate[i].ulValueLen);
 
-        if ((-1 != pTemplate[i].ulValueLen) && (NULL != pTemplate[i].pValue))
+        if ((-1 != (CK_LONG) pTemplate[i].ulValueLen) && (NULL != pTemplate[i].pValue))
         {
             char *value = NULL;
 
