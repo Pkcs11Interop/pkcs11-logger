@@ -173,6 +173,12 @@ PKCS11_LOGGER_GLOBALS;
 #define IGNORE_ARG(P) (void)(P)
 
 // init.c - declaration of functions
+#ifdef _WIN32
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved);
+#else
+__attribute__((constructor)) void pkcs11_logger_init_entry_point(void);
+__attribute__((destructor)) void pkcs11_logger_init_exit_point(void);
+#endif
 void pkcs11_logger_init_globals(void);
 int pkcs11_logger_init_orig_lib(void);
 int pkcs11_logger_init_parse_env_vars(void);
@@ -207,5 +213,5 @@ const char* pkcs11_logger_translate_ck_attribute(CK_ATTRIBUTE_TYPE type);
 // utils.c - declaration of functions
 int pkcs11_logger_utils_str_to_long(const char *str, unsigned long *val);
 void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len);
-int pkcs11_logger_utils_get_thread_id();
-int pkcs11_logger_utils_get_process_id();
+unsigned long pkcs11_logger_utils_get_thread_id(void);
+int pkcs11_logger_utils_get_process_id(void);

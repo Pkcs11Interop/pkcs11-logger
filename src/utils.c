@@ -73,23 +73,24 @@ void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
 
 
 // Gets ID of current thread
-int pkcs11_logger_utils_get_thread_id()
+unsigned long pkcs11_logger_utils_get_thread_id(void)
 {
 #ifdef _WIN32
     return GetCurrentThreadId();
 #else
 #ifdef __APPLE__
-    // TODO - This is ugly (but it works)
-    return (int) (intptr_t) pthread_self();
+    uint64_t tid = 0;
+    pthread_threadid_np(NULL, &tid);
+    return tid;
 #else
-    return (int) pthread_self();
+    return pthread_self();
 #endif
 #endif
 }
 
 
 // Gets ID of current process
-int pkcs11_logger_utils_get_process_id()
+int pkcs11_logger_utils_get_process_id(void)
 {
 #ifdef _WIN32
     return _getpid();
