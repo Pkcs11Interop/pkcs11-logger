@@ -103,6 +103,19 @@ int pkcs11_logger_init_orig_lib(void)
     pkcs11_logger_log("Developed as a part of the Pkcs11Interop project");
     pkcs11_logger_log("Please visit www.pkcs11interop.net for more information");
     pkcs11_logger_log_separator();
+#ifdef _WIN32
+    pkcs11_logger_log("sizeof(unsigned long) = %d", sizeof(unsigned long));
+    pkcs11_logger_log("sizeof(DWORD) = %d", sizeof(DWORD));
+#else
+#ifdef __APPLE__
+    pkcs11_logger_log("sizeof(unsigned long) = %d", sizeof(unsigned long));
+    pkcs11_logger_log("sizeof(uint64_t) = %d", sizeof(uint64_t));
+#else
+    pkcs11_logger_log("sizeof(unsigned long) = %d", sizeof(unsigned long));
+    pkcs11_logger_log("sizeof(pthread_t) = %d", sizeof(pthread_t));
+#endif
+#endif
+    pkcs11_logger_log_separator();
 
     // Load PKCS#11 library
     pkcs11_logger_globals.orig_lib_handle = DLOPEN((const char *)pkcs11_logger_globals.env_var_library_path);
