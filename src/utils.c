@@ -79,7 +79,7 @@ void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len, unsigned
                 char locBuf [buff_len];
                 memset(locBuf, 0, buff_len * sizeof(char));
                 strftime(locBuf, buff_len, "%Y-%m-%d %H:%M:%S", &tm);
-                snprintf(buff, buff_len-1, "%s.%06u", locBuf, tv.tv_usec);
+                snprintf(buff, buff_len-1, "%s.%06lu", locBuf, tv.tv_usec);
             }
             else {
                 strftime(buff, buff_len, "%Y-%m-%d %H:%M:%S", &tm);
