@@ -44,7 +44,7 @@ int pkcs11_logger_utils_str_to_long(const char *str, unsigned long *val)
 
 
 // Gets current system time as string
-void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
+void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len, unsigned long enable_usecs)
 {
 #ifdef _WIN32
 
@@ -54,8 +54,17 @@ void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
     memset(buff, 0, buff_len * sizeof(char));
 
     GetLocalTime(&systemtime);
-    GetDateFormatA(LOCALE_SYSTEM_DEFAULT, 0, &systemtime, "yyyy-MM-dd ", buff, buff_len);
-    GetTimeFormatA(LOCALE_SYSTEM_DEFAULT, 0, &systemtime, "HH:mm:ss", buff + 11, buff_len - 11);
+    if (enable_usecs) {
+        char locBuf [buff_len];
+        memset(locBuf, 0, buff_len * sizeof(char))
+        GetDateFormatA(LOCALE_SYSTEM_DEFAULT, 0, &systemtime, "yyyy-MM-dd ", locBuf, buff_len);
+        GetTimeFormatA(LOCALE_SYSTEM_DEFAULT, 0, &systemtime, "HH:mm:ss", locBuf + 11, buff_len - 11);
+        snprintf(buff, buff_len-1, "%s.03%d", locBuf, systemtime.wMilliseconds);
+    }
+    else {
+        GetDateFormatA(LOCALE_SYSTEM_DEFAULT, 0, &systemtime, "yyyy-MM-dd ", buff, buff_len);
+        GetTimeFormatA(LOCALE_SYSTEM_DEFAULT, 0, &systemtime, "HH:mm:ss", buff + 11, buff_len - 11);
+    }
 
 #else
 
@@ -64,9 +73,19 @@ void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
     
     memset(buff, 0, buff_len * sizeof(char));
 
-    if (gettimeofday(&tv, NULL) == 0)
-        if (localtime_r(&tv.tv_sec, &tm) != NULL)
-            strftime(buff, buff_len, "%Y-%m-%d %H:%M:%S", &tm);
+    if (gettimeofday(&tv, NULL) == 0) {
+        if (localtime_r(&tv.tv_sec, &tm) != NULL) {
+            if (enable_usecs) {
+                char locBuf [buff_len];
+                memset(locBuf, 0, buff_len * sizeof(char));
+                strftime(locBuf, buff_len, "%Y-%m-%d %H:%M:%S", &tm);
+                snprintf(buff, buff_len-1, "%s.%06u", locBuf, tv.tv_usec);
+            }
+            else {
+                strftime(buff, buff_len, "%Y-%m-%d %H:%M:%S", &tm);
+            }
+        }
+    }
 
 #endif
 }
