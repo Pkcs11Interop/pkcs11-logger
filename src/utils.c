@@ -55,10 +55,10 @@ void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len, unsigned
 
     GetLocalTime(&systemtime);
     if (enable_usecs) {
-        char locBuf [buff_len];
+        char locBuf [27];
         memset(locBuf, 0, buff_len * sizeof(char));
-        GetDateFormatA(LOCALE_SYSTEM_DEFAULT, 0, &systemtime, "yyyy-MM-dd ", locBuf, buff_len);
-        GetTimeFormatA(LOCALE_SYSTEM_DEFAULT, 0, &systemtime, "HH:mm:ss", locBuf + 11, buff_len - 11);
+        GetDateFormatA(LOCALE_SYSTEM_DEFAULT, 0, &systemtime, "yyyy-MM-dd ", locBuf, 27);
+        GetTimeFormatA(LOCALE_SYSTEM_DEFAULT, 0, &systemtime, "HH:mm:ss", locBuf + 11, 27 - 11);
         snprintf(buff, buff_len-1, "%s.03%d", locBuf, systemtime.wMilliseconds);
     }
     else {
