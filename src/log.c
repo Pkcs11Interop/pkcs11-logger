@@ -120,8 +120,9 @@ void pkcs11_logger_log(const char* message, ...)
 // Logs separator line
 void pkcs11_logger_log_separator(void)
 {
-    char str_time[20];
-    pkcs11_logger_utils_get_current_time_str(str_time, sizeof(str_time));
+    unsigned long enable_usecs = (pkcs11_logger_globals.flags & PKCS11_LOGGER_FLAG_ENABLE_USECS) == PKCS11_LOGGER_FLAG_ENABLE_USECS;
+    char str_time[27];
+    pkcs11_logger_utils_get_current_time_str(str_time, sizeof(str_time), enable_usecs);
     pkcs11_logger_log("****************************** %s ***", str_time);
 }
 

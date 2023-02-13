@@ -152,6 +152,8 @@ PKCS11_LOGGER_GLOBALS;
 #define PKCS11_LOGGER_FLAG_ENABLE_STDERR        0x00000020
 // Flag that enables reopening of log file
 #define PKCS11_LOGGER_FLAG_ENABLE_FCLOSE        0x00000040
+// Flag that enabled more precise timestamping
+#define PKCS11_LOGGER_FLAG_ENABLE_USECS         0x00000080
 
 // Library name
 #define PKCS11_LOGGER_NAME "PKCS11-LOGGER"
@@ -212,6 +214,6 @@ const char* pkcs11_logger_translate_ck_attribute(CK_ATTRIBUTE_TYPE type);
 
 // utils.c - declaration of functions
 int pkcs11_logger_utils_str_to_long(const char *str, unsigned long *val);
-void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len);
+void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len, unsigned long enable_usecs);
 unsigned long pkcs11_logger_utils_get_thread_id(void);
 int pkcs11_logger_utils_get_process_id(void);
