@@ -22,13 +22,13 @@ PKCS11-LOGGER
 
 ## Overview
 
-PKCS#11 is cryptography standard maintained by the OASIS PKCS 11 Technical Committee (originally published by RSA Laboratories) that defines ANSI C API to access smart cards and other types of cryptographic hardware.
+PKCS#11 is cryptography standard that defines ANSI C API to access smart cards and other types of cryptographic hardware.
 
 Library implementing PKCS#11 interface is usually used in the following scenario:
 
 	Application <--> PKCS#11 library <--> Device
 
-Due to the complexity of cryptoki it is not rare that user needs to troubleshoot communication problems between application and PKCS#11 library. That is the moment when PKCS11-LOGGER (logger) may come handy.
+Due to the complexity of PKCS#11 API it is not rare that user needs to troubleshoot communication problems between application and PKCS#11 library. That is the moment when PKCS11-LOGGER (logger) may come handy.
 
 Logger sits between the application and the original PKCS#11 library:
 
@@ -122,25 +122,25 @@ Windows libraries are signed with [code-signing certificate of Jaroslav Imrich](
 
 ### Windows
 
-Execute the build script on a 64-bit Windows machine with [Visual Studio 2022 Community](https://visualstudio.microsoft.com/vs/community/) (or higher) installed:
+Execute the build script on a 64-bit Windows machine with [Visual Studio 2022 Community](https://visualstudio.microsoft.com/vs/community/) (or newer) installed:
 
 ```
 cd build/windows/
 build.bat
 ```
 	
-The script should use Visual Studio to build both 32-bit (pkcs11-logger-x86.dll) and 64-bit (pkcs11-logger-x64.dll) versions of logger library.
+The script should use Visual Studio to build both 32-bit (`pkcs11-logger-x86.dll`) and 64-bit (`pkcs11-logger-x64.dll`) versions of logger library.
 
 ### Linux
 
-Execute the build script on a 64-bit Linux machine with GCC, GNU Make and GCC multilib support installed (available in [build-essential](https://packages.ubuntu.com/jammy/build-essential) and [gcc-multilib](https://packages.ubuntu.com/jammy/gcc-multilib) packages on Ubuntu 22.04 LTS):
+Execute the build script on a 64-bit Linux machine with GCC, GNU Make and GCC multilib support installed (available in [build-essential](https://packages.ubuntu.com/noble/build-essential) and [gcc-multilib](https://packages.ubuntu.com/noble/gcc-multilib) packages on Ubuntu 24.04 LTS):
 
 ```
 cd build/linux/
 sh build.sh
 ```
 
-The script should use GCC to build both 32-bit (pkcs11-logger-x86.so) and 64-bit (pkcs11-logger-x64.so) versions of logger library.
+The script should use GCC to build both 32-bit (`pkcs11-logger-x86.so`) and 64-bit (`pkcs11-logger-x64.so`) versions of logger library.
 
 ### macOS
 
@@ -151,12 +151,12 @@ cd build/macos/
 sh build.sh
 ```
 
-The script should use GCC to build 64-bit (pkcs11-logger-x64.dylib) version of logger library.
+The script should use Clang to build Mach-O universal binary (`pkcs11-logger.dylib`) usable on both Apple silicon and Intel-based Mac computers.
 
 ## License
 
 PKCS11-LOGGER is available under the terms of the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).  
-[Human friendly license summary](https://www.tldrlegal.com/l/apache2) is available at tldrlegal.com but the [full license text](LICENSE.md) always prevails.
+[Human friendly license summary](https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0) is available at tldrlegal.com but the [full license text](LICENSE.md) always prevails.
 
 ## About
 
