@@ -92,7 +92,7 @@ namespace Pkcs11Logger.Tests
             else if (Platform.IsMacOsX)
             {
                 Pkcs11LibraryPath = Path.Combine(testBasePath, "pkcs11-mock", "macos", $"pkcs11-mock-{platform}.dylib");
-                Pkcs11LoggerLibraryPath = Path.Combine(repoBasePath, "build", "macos", $"pkcs11-logger-{platform}.dylib");
+                Pkcs11LoggerLibraryPath = Path.Combine(repoBasePath, "build", "macos", $"pkcs11-logger.dylib");
                 Pkcs11LoggerLogPath1 = Path.Combine(testBasePath, $"pkcs11-logger-{platform}-1.txt");
                 Pkcs11LoggerLogPath2 = Path.Combine(testBasePath, $"pkcs11-logger-{platform}-2.txt");
             }
