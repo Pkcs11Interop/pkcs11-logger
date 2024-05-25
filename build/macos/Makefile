@@ -3,10 +3,10 @@
 
 SRC_DIR=../../src
 
-CC= gcc
-ARCH_FLAGS= -m64
+CC= clang
+ARCH_FLAGS= -target arm64-apple-macos11
 CFLAGS= $(ARCH_FLAGS) -Wall -Wextra -Werror -O2 -I$(SRC_DIR)
-LIBNAME=pkcs11-logger-x64.dylib
+LIBNAME=pkcs11-logger-arm64.dylib
 
 all: init.o lock.o log.o pkcs11-logger.o translate.o utils.o
 	$(CC) $(ARCH_FLAGS) -dynamiclib -o $(LIBNAME) \
