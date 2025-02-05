@@ -25,13 +25,19 @@ PKCS#11 is cryptography standard that defines ANSI C API to access smart cards a
 
 Library implementing PKCS#11 interface is usually used in the following scenario:
 
-	Application <--> PKCS#11 library <--> Device
+```mermaid
+flowchart LR
+    A[Application] --> B[PKCS#11 library] --> C[Device]
+```
 
 Due to the complexity of PKCS#11 API it is not rare that user needs to troubleshoot communication problems between application and PKCS#11 library. That is the moment when PKCS11-LOGGER (logger) may come handy.
 
 Logger sits between the application and the original PKCS#11 library:
 
-	Application <--> PKCS11-LOGGER library <--> PKCS#11 library <--> Device
+```mermaid
+flowchart LR
+    A[Application] --> B[PKCS11-LOGGER library] --> C[PKCS#11 library] --> D[Device]
+```
 
 Application calls PKCS#11 function provided by logger, logger calls the same function provided by the original PKCS#11 library and while logging everything it returns the result to the application.
 
@@ -99,21 +105,7 @@ Logger behavior can be controlled with the following [environment variables](htt
 
 ## Download
 
-Signed precompiled binaries as well as source code releases can be downloaded from [releases page](https://github.com/Pkcs11Interop/pkcs11-logger/releases):
-
- * **Windows**  
-   32-bit version: [pkcs11-logger-x86.dll](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x86.dll)  
-   64-bit version: [pkcs11-logger-x64.dll](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x64.dll)  
-   <sub>Requires [Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145) to be installed on the target system.</sub>
-   
- * **Ubuntu 14.04**  
-   32-bit version: [pkcs11-logger-x86.so](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x86.so)  
-   64-bit version: [pkcs11-logger-x64.so](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x64.so)
-   
- * **Mac OS X 10.11**  
-   32-bit version: [pkcs11-logger-x86.dylib](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x86.dylib)  
-   64-bit version: [pkcs11-logger-x64.dylib](https://github.com/Pkcs11Interop/pkcs11-logger/releases/download/v2.2.0/pkcs11-logger-x64.dylib)
-
+Signed precompiled binaries as well as source code releases can be downloaded from [releases page](https://github.com/Pkcs11Interop/pkcs11-logger/releases).  
 Archives with source code are signed with [GnuPG key of Jaroslav Imrich](https://www.jimrich.sk/crypto/).  
 Windows libraries are signed with [code-signing certificate of Jaroslav Imrich](https://www.jimrich.sk/crypto/).
 
@@ -121,7 +113,7 @@ Windows libraries are signed with [code-signing certificate of Jaroslav Imrich](
 
 ### Windows
 
-Execute the build script on a 64-bit Windows machine with [Visual Studio 2022 Community](https://visualstudio.microsoft.com/vs/community/) (or newer) installed:
+Execute the build script on a 64-bit Windows machine with [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) (or newer) installed:
 
 ```
 cd build/windows/
