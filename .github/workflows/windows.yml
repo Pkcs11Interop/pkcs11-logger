@@ -20,6 +20,12 @@ jobs:
         cd build/windows/
         build.bat
 
+    - name: Run tests
+      shell: cmd
+      run: |
+        dotnet build .\test\Pkcs11LoggerTests.sln
+        dotnet test .\test\Pkcs11LoggerTests.sln
+
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
