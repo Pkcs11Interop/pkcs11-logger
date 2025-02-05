@@ -26,7 +26,7 @@ PKCS#11 is cryptography standard that defines ANSI C API to access smart cards a
 Library implementing PKCS#11 interface is usually used in the following scenario:
 
 ```mermaid
-flowchart LR
+flowchart TB
     A[Application] --> B[PKCS#11 library] --> C[Device]
 ```
 
@@ -35,7 +35,7 @@ Due to the complexity of PKCS#11 API it is not rare that user needs to troublesh
 Logger sits between the application and the original PKCS#11 library:
 
 ```mermaid
-flowchart LR
+flowchart TB
     A[Application] --> B[PKCS11-LOGGER library] --> C[PKCS#11 library] --> D[Device]
 ```
 
