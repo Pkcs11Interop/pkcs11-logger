@@ -24,6 +24,11 @@ jobs:
         cd build/linux/
         sh build.sh
 
+    - name: Run tests
+      run: |
+        dotnet build .\test\Pkcs11LoggerTests.sln
+        dotnet test .\test\Pkcs11LoggerTests.sln
+
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
