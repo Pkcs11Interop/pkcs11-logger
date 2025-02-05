@@ -24,6 +24,7 @@ using System.IO;
 using Net.Pkcs11Interop.Common;
 using Net.Pkcs11Interop.HighLevelAPI;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Pkcs11Logger.Tests
 {
@@ -118,8 +119,8 @@ namespace Pkcs11Logger.Tests
             }
             catch (Exception ex)
             {
-                Assert.IsTrue(ex is Pkcs11Exception);
-                Assert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
+                ClassicAssert.IsTrue(ex is Pkcs11Exception);
+                ClassicAssert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
             }
 
             // PKCS11_LOGGER_LOG_FILE_PATH and PKCS11_LOGGER_FLAGS are optional
@@ -142,8 +143,8 @@ namespace Pkcs11Logger.Tests
             }
             catch (Exception ex)
             {
-                Assert.IsTrue(ex is Pkcs11Exception);
-                Assert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
+                ClassicAssert.IsTrue(ex is Pkcs11Exception);
+                ClassicAssert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
             }
 
             // PKCS11_LOGGER_LOG_FILE_PATH has to be provided without enclosing quotes
@@ -159,8 +160,8 @@ namespace Pkcs11Logger.Tests
             }
             catch (Exception ex)
             {
-                Assert.IsTrue(ex is Pkcs11Exception);
-                Assert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
+                ClassicAssert.IsTrue(ex is Pkcs11Exception);
+                ClassicAssert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
             }
 
             // PKCS11_LOGGER_FLAGS must contain a number
@@ -176,8 +177,8 @@ namespace Pkcs11Logger.Tests
             }
             catch (Exception ex)
             {
-                Assert.IsTrue(ex is Pkcs11Exception);
-                Assert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
+                ClassicAssert.IsTrue(ex is Pkcs11Exception);
+                ClassicAssert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
             }
         }
 
@@ -214,8 +215,8 @@ namespace Pkcs11Logger.Tests
             }
             catch (Exception ex)
             {
-                Assert.IsTrue(ex is Pkcs11Exception);
-                Assert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
+                ClassicAssert.IsTrue(ex is Pkcs11Exception);
+                ClassicAssert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
             }
 
             // Unspecified PKCS#11 library should not work
@@ -229,8 +230,8 @@ namespace Pkcs11Logger.Tests
             }
             catch (Exception ex)
             {
-                Assert.IsTrue(ex is Pkcs11Exception);
-                Assert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
+                ClassicAssert.IsTrue(ex is Pkcs11Exception);
+                ClassicAssert.IsTrue(((Pkcs11Exception)ex).RV == CKR.CKR_GENERAL_ERROR);
             }
         }
 
@@ -362,10 +363,10 @@ namespace Pkcs11Logger.Tests
 
             // Get ProcessID and ThreadID
             string[] parts = line.Split(new string[] { " : " }, StringSplitOptions.RemoveEmptyEntries);
-            Assert.IsTrue(parts != null && parts.Length == 3);
+            ClassicAssert.IsTrue(parts != null && parts.Length == 3);
             string processId = parts[0];
             string threadId = parts[1];
-            Assert.IsTrue(processId.StartsWith("0x") && threadId.StartsWith("0x"));
+            ClassicAssert.IsTrue(processId.StartsWith("0x") && threadId.StartsWith("0x"));
 
             // Delete log file
             File.Delete(Settings.Pkcs11LoggerLogPath1);
@@ -380,7 +381,7 @@ namespace Pkcs11Logger.Tests
             // Check if the first line starts with ThreadID
             using (StreamReader reader = new StreamReader(Settings.Pkcs11LoggerLogPath1))
                 line = reader.ReadLine();
-            Assert.IsTrue(line.StartsWith(threadId));
+            ClassicAssert.IsTrue(line.StartsWith(threadId));
 
             // Delete log file
             File.Delete(Settings.Pkcs11LoggerLogPath1);
@@ -395,7 +396,7 @@ namespace Pkcs11Logger.Tests
             // Check if both IDs are missing
             using (StreamReader reader = new StreamReader(Settings.Pkcs11LoggerLogPath1))
                 line = reader.ReadLine();
-            Assert.IsTrue(!line.StartsWith(processId) && !line.StartsWith(threadId));
+            ClassicAssert.IsTrue(!line.StartsWith(processId) && !line.StartsWith(threadId));
         }
 
         /// <summary>
@@ -421,7 +422,7 @@ namespace Pkcs11Logger.Tests
             using (ISession session = pkcs11Library.GetSlotList(SlotsType.WithTokenPresent)[0].OpenSession(SessionType.ReadOnly))
                 session.Login(CKU.CKU_USER, Settings.NormalUserPin);
 
-            Assert.IsTrue(File.ReadAllText(Settings.Pkcs11LoggerLogPath1).Contains(" *pPin: *** Intentionally hidden ***"));
+            ClassicAssert.IsTrue(File.ReadAllText(Settings.Pkcs11LoggerLogPath1).Contains(" *pPin: *** Intentionally hidden ***"));
 
             // Delete log file
             File.Delete(Settings.Pkcs11LoggerLogPath1);
@@ -433,7 +434,7 @@ namespace Pkcs11Logger.Tests
             using (ISession session = pkcs11Library.GetSlotList(SlotsType.WithTokenPresent)[0].OpenSession(SessionType.ReadOnly))
                 session.Login(CKU.CKU_USER, Settings.NormalUserPin);
 
-            Assert.IsTrue(File.ReadAllText(Settings.Pkcs11LoggerLogPath1).Contains(" *pPin: " + Settings.NormalUserPin));
+            ClassicAssert.IsTrue(File.ReadAllText(Settings.Pkcs11LoggerLogPath1).Contains(" *pPin: " + Settings.NormalUserPin));
         }
 
         /// <summary>
@@ -515,7 +516,7 @@ namespace Pkcs11Logger.Tests
                 }
                 catch (Exception ex)
                 {
-                    Assert.IsTrue(ex is IOException);
+                    ClassicAssert.IsTrue(ex is IOException);
                 }
 
                 // Check whether log file was not deleted
@@ -636,7 +637,7 @@ namespace Pkcs11Logger.Tests
                 File.Delete(Settings.Pkcs11LoggerLogPath1);
 
             // PKCS11_LOGGER_FLAG_ENABLE_FCLOSE decreases performance
-            Assert.IsTrue(fcloseEnabledTicks > fcloseDisabledTicks);
+            ClassicAssert.IsTrue(fcloseEnabledTicks > fcloseDisabledTicks);
         }
     }
 }

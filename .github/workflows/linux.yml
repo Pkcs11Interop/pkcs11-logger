@@ -1,0 +1,36 @@
+name: Linux
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup OS
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential gcc-multilib
+
+    - name: Checkout source
+      uses: actions/checkout@v4
+      
+    - name: Build source
+      run: |
+        cd build/linux/
+        sh build.sh
+
+    - name: Run tests
+      run: |
+        dotnet build ./test/Pkcs11LoggerTests.sln
+        dotnet test ./test/Pkcs11LoggerTests.sln
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: pkcs11-logger-linux
+        path: build/linux/pkcs11-logger-*.so

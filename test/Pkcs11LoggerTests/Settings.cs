@@ -69,7 +69,7 @@ namespace Pkcs11Logger.Tests
         static Settings()
         {
             string testBasePath = Path.GetDirectoryName(typeof(Settings).Assembly.Location);
-            string repoBasePath = testBasePath.Replace(Path.Combine("test", "Pkcs11LoggerTests", "bin", "Debug", "net60"), string.Empty);
+            string repoBasePath = testBasePath.Replace(Path.Combine("test", "Pkcs11LoggerTests", "bin", "Debug", "net80"), string.Empty);
             string platform = Platform.Uses32BitRuntime ? "x86" : "x64";
 
             if (Platform.IsWindows)
@@ -91,10 +91,10 @@ namespace Pkcs11Logger.Tests
             }
             else if (Platform.IsMacOsX)
             {
-                Pkcs11LibraryPath = Path.Combine(testBasePath, "pkcs11-mock", "macos", $"pkcs11-mock-{platform}.dylib");
+                Pkcs11LibraryPath = Path.Combine(testBasePath, "pkcs11-mock", "macos", $"pkcs11-mock.dylib");
                 Pkcs11LoggerLibraryPath = Path.Combine(repoBasePath, "build", "macos", $"pkcs11-logger.dylib");
-                Pkcs11LoggerLogPath1 = Path.Combine(testBasePath, $"pkcs11-logger-{platform}-1.txt");
-                Pkcs11LoggerLogPath2 = Path.Combine(testBasePath, $"pkcs11-logger-{platform}-2.txt");
+                Pkcs11LoggerLogPath1 = Path.Combine(testBasePath, $"pkcs11-logger-1.txt");
+                Pkcs11LoggerLogPath2 = Path.Combine(testBasePath, $"pkcs11-logger-2.txt");
             }
         }
 

@@ -2,10 +2,9 @@ PKCS11-LOGGER
 =============
 **PKCS#11 logging proxy module**
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/Pkcs11Interop/pkcs11-logger/blob/master/LICENSE.md)
-[![AppVeyor](https://ci.appveyor.com/api/projects/status/m4aidxggq1uo4fou/branch/master?svg=true)](https://ci.appveyor.com/project/pkcs11interop/pkcs11-logger/branch/master)
-[![Stack Overflow](https://img.shields.io/badge/stack-pkcs11interop-blue.svg)](https://stackoverflow.com/questions/tagged/pkcs11interop)
-[![Twitter](https://img.shields.io/badge/twitter-p11interop-blue.svg)](https://twitter.com/p11interop)
+[![Windows](https://github.com/Pkcs11Interop/pkcs11-logger/actions/workflows/windows.yml/badge.svg?branch=master)](https://github.com/Pkcs11Interop/pkcs11-logger/actions/workflows/windows.yml)
+[![Linux](https://github.com/Pkcs11Interop/pkcs11-logger/actions/workflows/linux.yml/badge.svg?branch=master)](https://github.com/Pkcs11Interop/pkcs11-logger/actions/workflows/linux.yml)
+[![macOS](https://github.com/Pkcs11Interop/pkcs11-logger/actions/workflows/macos.yml/badge.svg?branch=master)](https://github.com/Pkcs11Interop/pkcs11-logger/actions/workflows/macos.yml)
 
 ## Table of Contents
 
