@@ -1,0 +1,26 @@
+name: macOS
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+      
+    - name: Build source
+      run: |
+        cd build/macos/
+        sh build.sh
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: pkcs11-logger-macos
+        path: build/macos/pkcs11-logger.dylib
