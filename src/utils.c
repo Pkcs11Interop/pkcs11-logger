@@ -46,6 +46,9 @@ int pkcs11_logger_utils_str_to_long(const char *str, unsigned long *val)
 // Gets current system time as string
 void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
 {
+    if (buff_len < 27)
+        return;
+
 #ifdef _WIN32
 
     SYSTEMTIME systemtime;
@@ -57,6 +60,9 @@ void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
     GetDateFormatA(LOCALE_SYSTEM_DEFAULT, 0, &systemtime, "yyyy-MM-dd ", buff, buff_len);
     GetTimeFormatA(LOCALE_SYSTEM_DEFAULT, 0, &systemtime, "HH:mm:ss", buff + 11, buff_len - 11);
 
+    size_t len = strlen(buff);
+    snprintf(buff + len, buff_len - len, ".%03d000", systemtime.wMilliseconds);
+
 #else
 
     struct timeval tv;
@@ -65,8 +71,20 @@ void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
     memset(buff, 0, buff_len * sizeof(char));
 
     if (gettimeofday(&tv, NULL) == 0)
+    {
         if (localtime_r(&tv.tv_sec, &tm) != NULL)
+        {
             strftime(buff, buff_len, "%Y-%m-%d %H:%M:%S", &tm);
+
+#ifdef __APPLE__
+            size_t len = strlen(buff);
+            snprintf(buff + len, buff_len - len, ".%06d", tv.tv_usec);
+#else
+            size_t len = strlen(buff);
+            snprintf(buff + len, buff_len - len, ".%06ld", tv.tv_usec);
+#endif
+        }
+    }
 
 #endif
 }
