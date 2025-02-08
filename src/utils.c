@@ -46,7 +46,7 @@ int pkcs11_logger_utils_str_to_long(const char *str, unsigned long *val)
 // Gets current system time as string
 void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
 {
-    if (buff_len < 24)
+    if (buff_len < 27)
         return;
 
 #ifdef _WIN32
@@ -61,7 +61,7 @@ void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
     GetTimeFormatA(LOCALE_SYSTEM_DEFAULT, 0, &systemtime, "HH:mm:ss", buff + 11, buff_len - 11);
 
     size_t len = strlen(buff);
-    snprintf(buff + len, buff_len - len, ".%03d", systemtime.wMilliseconds);
+    snprintf(buff + len, buff_len - len, ".%03d000", systemtime.wMilliseconds);
 
 #else
 
@@ -78,10 +78,10 @@ void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
 
 #ifdef __APPLE__
             size_t len = strlen(buff);
-            snprintf(buff + len, buff_len - len, ".%03d", tv.tv_usec / 1000);
+            snprintf(buff + len, buff_len - len, ".%06d", tv.tv_usec);
 #else
             size_t len = strlen(buff);
-            snprintf(buff + len, buff_len - len, ".%03ld", tv.tv_usec / 1000);
+            snprintf(buff + len, buff_len - len, ".%06ld", tv.tv_usec);
 #endif
         }
     }
