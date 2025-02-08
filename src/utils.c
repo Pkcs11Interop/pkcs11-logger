@@ -76,8 +76,13 @@ void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len)
         {
             strftime(buff, buff_len, "%Y-%m-%d %H:%M:%S", &tm);
 
+#ifdef __APPLE__
+            size_t len = strlen(buff);
+            snprintf(buff + len, buff_len - len, ".%03d", tv.tv_usec / 1000);
+#else
             size_t len = strlen(buff);
             snprintf(buff + len, buff_len - len, ".%03ld", tv.tv_usec / 1000);
+#endif
         }
     }
 
