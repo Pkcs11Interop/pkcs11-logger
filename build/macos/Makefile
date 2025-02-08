@@ -8,12 +8,15 @@ ARCH_FLAGS= -target arm64-apple-macos11
 CFLAGS= $(ARCH_FLAGS) -Wall -Wextra -Werror -O2 -I$(SRC_DIR)
 LIBNAME=pkcs11-logger-arm64.dylib
 
-all: init.o lock.o log.o pkcs11-logger.o translate.o utils.o
+all: dl.o init.o lock.o log.o pkcs11-logger.o translate.o utils.o
 	$(CC) $(ARCH_FLAGS) -dynamiclib -o $(LIBNAME) \
 	-Wl,-exported_symbols_list,pkcs11-logger.symbols \
-	init.o lock.o log.o pkcs11-logger.o translate.o utils.o \
+	dl.o init.o lock.o log.o pkcs11-logger.o translate.o utils.o \
 	-lc -ldl -lpthread
 	strip -x $(LIBNAME)
+
+dl.o: $(SRC_DIR)/dl.c $(SRC_DIR)/*.h
+	$(CC) $(CFLAGS) -fPIC -c $(SRC_DIR)/dl.c
 
 init.o: $(SRC_DIR)/init.c $(SRC_DIR)/*.h
 	$(CC) $(CFLAGS) -fPIC -c $(SRC_DIR)/init.c

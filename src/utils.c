@@ -98,3 +98,36 @@ int pkcs11_logger_utils_get_process_id(void)
     return getpid();
 #endif
 }
+
+
+// Determines whether the path is absolute
+CK_BBOOL pkcs11_logger_utils_path_is_absolute(const char* path)
+{
+#ifdef _WIN32
+    if ((NULL == path) || (strlen(path) < 3))
+        return CK_FALSE;
+
+    char char1 = path[0];
+    char char2 = path[1];
+    char char3 = path[2];
+
+    // First character must be valid drive character
+    if ((char1 < 'A' || char1 > 'Z') && (char1 < 'a' || char1 > 'z'))
+        return CK_FALSE;
+
+    // Second character must be valid volume separator character
+    if (char2 != ':')
+        return CK_FALSE;
+
+    // Third character must be valid directory separator character
+    if (char3 != '\\' && char3 != '/')
+        return CK_FALSE;
+
+    return CK_TRUE;
+#else
+    if ((NULL == path) || (strlen(path) < 1))
+        return CK_FALSE;
+
+    return (path[0] == '/') ? CK_TRUE : CK_FALSE;
+#endif
+}

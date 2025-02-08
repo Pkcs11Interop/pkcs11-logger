@@ -61,13 +61,7 @@
 #pragma pack(pop, cryptoki)
 
 // Platform dependend type for dynamically loaded library handle
-typedef HINSTANCE DLHANDLE;
-// Platform dependend function that loads dynamic library
-#define DLOPEN(lib) LoadLibraryA((lib))
-// Platform dependend function that gets function pointer from dynamic library
-#define DLSYM(lib, func) GetProcAddress((lib), (func))
-// Platform dependend function that unloads dynamic library
-#define DLCLOSE FreeLibrary
+typedef HMODULE DLHANDLE;
 
 
 #else // #ifdef _WIN32
@@ -95,12 +89,6 @@ typedef HINSTANCE DLHANDLE;
 
 // Platform dependend type for dynamically loaded library handle
 typedef void* DLHANDLE;
-// Platform dependend function that loads dynamic library
-#define DLOPEN(lib) dlopen((lib), RTLD_NOW | RTLD_LOCAL);
-// Platform dependend function that gets function pointer from dynamic library
-#define DLSYM(lib, func) dlsym((lib), (func))
-// Platform dependend function that unloads dynamic library
-#define DLCLOSE dlclose
 
 
 #endif // #ifdef _WIN32
@@ -172,6 +160,11 @@ PKCS11_LOGGER_GLOBALS;
 // Macro that removes unused argument warning
 #define IGNORE_ARG(P) (void)(P)
 
+// dl.c - declaration of functions
+DLHANDLE pkcs11_logger_dl_open(const char* library);
+void* pkcs11_logger_dl_sym(DLHANDLE library, const char* function);
+int pkcs11_logger_dl_close(DLHANDLE library);
+
 // init.c - declaration of functions
 #ifdef _WIN32
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved);
@@ -215,3 +208,4 @@ int pkcs11_logger_utils_str_to_long(const char *str, unsigned long *val);
 void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len);
 unsigned long pkcs11_logger_utils_get_thread_id(void);
 int pkcs11_logger_utils_get_process_id(void);
+CK_BBOOL pkcs11_logger_utils_path_is_absolute(const char* path);

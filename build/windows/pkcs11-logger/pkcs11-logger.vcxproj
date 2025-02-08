@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\src\dl.c" />
     <ClCompile Include="..\..\..\src\init.c" />
     <ClCompile Include="..\..\..\src\lock.c" />
     <ClCompile Include="..\..\..\src\log.c" />
