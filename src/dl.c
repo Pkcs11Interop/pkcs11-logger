@@ -27,13 +27,14 @@
 DLHANDLE pkcs11_logger_dl_open(const char* library)
 {
 #ifdef _WIN32
-    return LoadLibraryA(library);
+    DWORD flags = 0;
+    
+    if (CK_TRUE == pkcs11_logger_utils_path_is_absolute(library))
+        flags = LOAD_WITH_ALTERED_SEARCH_PATH;
+
+    return LoadLibraryExA(library, NULL, flags);
 #else
-#ifdef __APPLE__
     return dlopen(library, RTLD_NOW | RTLD_LOCAL);
-#else 
-    return dlopen(library, RTLD_NOW | RTLD_LOCAL);
-#endif
 #endif
 }
 
@@ -42,13 +43,9 @@ DLHANDLE pkcs11_logger_dl_open(const char* library)
 void *pkcs11_logger_dl_sym(DLHANDLE library, const char *function)
 {
 #ifdef _WIN32
-    return GetProcAddress(library, function);
+    return (void*) GetProcAddress(library, function);
 #else
-#ifdef __APPLE__
     return dlsym(library, function);
-#else 
-    return dlsym(library, function);
-#endif
 #endif
 }
 
@@ -59,10 +56,6 @@ int pkcs11_logger_dl_close(DLHANDLE library)
 #ifdef _WIN32
     return FreeLibrary(library);
 #else
-#ifdef __APPLE__
     return dlclose(library);
-#else 
-    return dlclose(library);
-#endif
 #endif
 }

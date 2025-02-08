@@ -208,3 +208,4 @@ int pkcs11_logger_utils_str_to_long(const char *str, unsigned long *val);
 void pkcs11_logger_utils_get_current_time_str(char* buff, int buff_len);
 unsigned long pkcs11_logger_utils_get_thread_id(void);
 int pkcs11_logger_utils_get_process_id(void);
+CK_BBOOL pkcs11_logger_utils_path_is_absolute(const char* path);
