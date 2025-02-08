@@ -8,13 +8,16 @@ ARCH_FLAGS= -m32
 CFLAGS= $(ARCH_FLAGS) -Wall -Wextra -Werror -O2 -I$(SRC_DIR)
 LIBNAME=pkcs11-logger-x86.so
 
-all: init.o lock.o log.o pkcs11-logger.o translate.o utils.o
+all: dl.o init.o lock.o log.o pkcs11-logger.o translate.o utils.o
 	$(CC) $(ARCH_FLAGS) -shared -o $(LIBNAME) \
 	-Wl,-soname,$(LIBNAME) \
 	-Wl,--version-script,pkcs11-logger.version \
-	init.o lock.o log.o pkcs11-logger.o translate.o utils.o \
+	dl.o init.o lock.o log.o pkcs11-logger.o translate.o utils.o \
 	-lc -ldl -lpthread
 	strip --strip-all $(LIBNAME)
+
+dl.o: $(SRC_DIR)/dl.c $(SRC_DIR)/*.h
+	$(CC) $(CFLAGS) -fPIC -c $(SRC_DIR)/dl.c
 
 init.o: $(SRC_DIR)/init.c $(SRC_DIR)/*.h
 	$(CC) $(CFLAGS) -fPIC -c $(SRC_DIR)/init.c

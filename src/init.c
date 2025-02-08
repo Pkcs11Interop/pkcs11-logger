@@ -105,7 +105,7 @@ int pkcs11_logger_init_orig_lib(void)
     pkcs11_logger_log_separator();
 
     // Load PKCS#11 library
-    pkcs11_logger_globals.orig_lib_handle = DLOPEN((const char *)pkcs11_logger_globals.env_var_library_path);
+    pkcs11_logger_globals.orig_lib_handle = pkcs11_logger_dl_open((const char *)pkcs11_logger_globals.env_var_library_path);
     if (NULL == pkcs11_logger_globals.orig_lib_handle)
     {
         pkcs11_logger_log("Unable to load %s", pkcs11_logger_globals.env_var_library_path);
@@ -113,11 +113,11 @@ int pkcs11_logger_init_orig_lib(void)
     }
 
     // Get pointer to C_GetFunctionList()
-    GetFunctionListPointer = (CK_C_GetFunctionList) DLSYM(pkcs11_logger_globals.orig_lib_handle, "C_GetFunctionList");
+    GetFunctionListPointer = (CK_C_GetFunctionList) pkcs11_logger_dl_sym(pkcs11_logger_globals.orig_lib_handle, "C_GetFunctionList");
     if (NULL == GetFunctionListPointer)
     {
         pkcs11_logger_log("Unable to find C_GetFunctionList() in %s", pkcs11_logger_globals.env_var_library_path);
-        CALL_N_CLEAR(DLCLOSE, pkcs11_logger_globals.orig_lib_handle);
+        CALL_N_CLEAR(pkcs11_logger_dl_close, pkcs11_logger_globals.orig_lib_handle);
         return PKCS11_LOGGER_RV_ERROR;
     }
 
@@ -126,7 +126,7 @@ int pkcs11_logger_init_orig_lib(void)
     if (CKR_OK != rv)
     {
         pkcs11_logger_log("Unable to call C_GetFunctionList() from %s", pkcs11_logger_globals.env_var_library_path);
-        CALL_N_CLEAR(DLCLOSE, pkcs11_logger_globals.orig_lib_handle);
+        CALL_N_CLEAR(pkcs11_logger_dl_close, pkcs11_logger_globals.orig_lib_handle);
         return PKCS11_LOGGER_RV_ERROR;
     }
 
