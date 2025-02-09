@@ -189,6 +189,8 @@ void pkcs11_logger_log_separator(void);
 void pkcs11_logger_log_function_enter(const char *function);
 void pkcs11_logger_log_function_exit(CK_RV rv);
 void pkcs11_logger_log_input_params(void);
+void pkcs11_logger_log_orig_function_enter(void);
+void pkcs11_logger_log_orig_function_exit(void);
 void pkcs11_logger_log_output_params(void);
 void pkcs11_logger_log_flag(CK_ULONG flags, CK_ULONG flag_value, const char *flag_name);
 void pkcs11_logger_log_nonzero_string(const char *name, const CK_UTF8CHAR_PTR nonzero_string, CK_ULONG nonzero_string_len);

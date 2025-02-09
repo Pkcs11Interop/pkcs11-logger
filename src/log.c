@@ -120,24 +120,29 @@ void pkcs11_logger_log(const char* message, ...)
 // Logs separator line
 void pkcs11_logger_log_separator(void)
 {
-    char str_time[27];
-    pkcs11_logger_utils_get_current_time_str(str_time, sizeof(str_time));
-    pkcs11_logger_log("*************** %s ***", str_time);
+    pkcs11_logger_log("******************************************************************************************************************************");
 }
 
 
-// Logs function call
+// Logs entry into logger function
 void pkcs11_logger_log_function_enter(const char *function)
 {
     pkcs11_logger_log_separator();
-    pkcs11_logger_log("Calling %s", function);
+
+    char str_time[27];
+    pkcs11_logger_utils_get_current_time_str(str_time, sizeof(str_time));
+
+    pkcs11_logger_log("%s - Entered %s", str_time, function);
 }
 
 
-// Logs function exit
+// Logs exit from logger function
 void pkcs11_logger_log_function_exit(CK_RV rv)
 {
-    pkcs11_logger_log("Returning %lu (%s)", rv, pkcs11_logger_translate_ck_rv(rv));
+    char str_time[27];
+    pkcs11_logger_utils_get_current_time_str(str_time, sizeof(str_time));
+
+    pkcs11_logger_log("%s - Returning %lu (%s)", str_time, rv, pkcs11_logger_translate_ck_rv(rv));
 }
 
 
@@ -145,6 +150,26 @@ void pkcs11_logger_log_function_exit(CK_RV rv)
 void pkcs11_logger_log_input_params(void)
 {
     pkcs11_logger_log("Input");
+}
+
+
+// Logs entry into original function
+void pkcs11_logger_log_orig_function_enter(void)
+{
+    char str_time[27];
+    pkcs11_logger_utils_get_current_time_str(str_time, sizeof(str_time));
+
+    pkcs11_logger_log("%s - Going to call the original function", str_time);
+}
+
+
+// Logs exit from original function
+void pkcs11_logger_log_orig_function_exit(void)
+{
+    char str_time[27];
+    pkcs11_logger_utils_get_current_time_str(str_time, sizeof(str_time));
+
+    pkcs11_logger_log("%s - Received response from the original function", str_time);
 }
 
 
