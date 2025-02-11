@@ -185,6 +185,7 @@ void pkcs11_logger_lock_destroy(void);
 
 // log.c - declaration of functions
 void pkcs11_logger_log(const char* message, ...);
+void pkcs11_logger_log_with_timestamp(const char* message, ...);
 void pkcs11_logger_log_separator(void);
 void pkcs11_logger_log_function_enter(const char *function);
 void pkcs11_logger_log_function_exit(CK_RV rv);

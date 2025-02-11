@@ -26,16 +26,54 @@
  // Platform dependend function that loads dynamic library
 DLHANDLE pkcs11_logger_dl_open(const char* library)
 {
+    DLHANDLE handle = NULL;
+
+    pkcs11_logger_log_with_timestamp("Going to load PKCS#11 library \"%s\"", library);
+
 #ifdef _WIN32
+
     DWORD flags = 0;
-    
+    DWORD error = 0;
+
     if (CK_TRUE == pkcs11_logger_utils_path_is_absolute(library))
         flags = LOAD_WITH_ALTERED_SEARCH_PATH;
 
-    return LoadLibraryExA(library, NULL, flags);
+    handle = LoadLibraryExA(library, NULL, flags);
+    if (NULL == handle)
+    {
+        error = GetLastError();
+        pkcs11_logger_log_with_timestamp("Unable to load PKCS#11 library. Error: %0#10x", error);
+    }
+    else
+    {
+        pkcs11_logger_log_with_timestamp("Successfully loaded PKCS#11 library");
+    }
+
 #else
-    return dlopen(library, RTLD_NOW | RTLD_LOCAL);
+
+    char* error = NULL;
+
+    handle = dlopen(library, RTLD_NOW | RTLD_LOCAL);
+    if (NULL == handle)
+    {
+        error = dlerror();
+        if (NULL != error)
+        {
+            pkcs11_logger_log_with_timestamp("Unable to load PKCS#11 library. Error: %s", error);
+        }
+        else
+        {
+            pkcs11_logger_log_with_timestamp("Unable to load PKCS#11 library");
+        }
+    }
+    else
+    {
+        pkcs11_logger_log_with_timestamp("Successfully loaded PKCS#11 library");
+    }
+
 #endif
+
+    return handle;
 }
 
 
