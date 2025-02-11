@@ -120,7 +120,7 @@ int pkcs11_logger_init_orig_lib(void)
     }
 
     // Get pointers to all PKCS#11 functions
-    pkcs11_logger_log_with_timestamp("Going to call C_GetFunctionList function from the original library");
+    pkcs11_logger_log_with_timestamp("Calling C_GetFunctionList function");
     rv = GetFunctionListPointer(&(pkcs11_logger_globals.orig_lib_functions));
     pkcs11_logger_log_with_timestamp("Received response from C_GetFunctionList function");
     if (CKR_OK != rv)

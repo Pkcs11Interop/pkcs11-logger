@@ -179,7 +179,7 @@ void pkcs11_logger_log_input_params(void)
 // Logs entry into original function
 void pkcs11_logger_log_orig_function_enter(void)
 {
-    pkcs11_logger_log_with_timestamp("Going to call the original function");
+    pkcs11_logger_log_with_timestamp("Calling the original function");
 }
 
 

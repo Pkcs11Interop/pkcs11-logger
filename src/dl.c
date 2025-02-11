@@ -28,7 +28,7 @@ DLHANDLE pkcs11_logger_dl_open(const char* library)
 {
     DLHANDLE handle = NULL;
 
-    pkcs11_logger_log_with_timestamp("Going to load PKCS#11 library \"%s\"", library);
+    pkcs11_logger_log_with_timestamp("Loading PKCS#11 library \"%s\"", library);
 
 #ifdef _WIN32
 
@@ -82,7 +82,7 @@ void *pkcs11_logger_dl_sym(DLHANDLE library, const char *function)
 {
     void *address = NULL;
 
-    pkcs11_logger_log_with_timestamp("Going to obtain function pointer for %s", function);
+    pkcs11_logger_log_with_timestamp("Retrieving function pointer for %s", function);
 
 #ifdef _WIN32
 
@@ -92,11 +92,11 @@ void *pkcs11_logger_dl_sym(DLHANDLE library, const char *function)
     if (NULL == address)
     {
         error = GetLastError();
-        pkcs11_logger_log_with_timestamp("Unable to obtain function pointer. Error: %0#10x", error);
+        pkcs11_logger_log_with_timestamp("Unable to retrieve function pointer. Error: %0#10x", error);
     }
     else
     {
-        pkcs11_logger_log_with_timestamp("Successfully obtained function pointer");
+        pkcs11_logger_log_with_timestamp("Successfully retrieved function pointer");
     }
 
 #else
@@ -109,16 +109,16 @@ void *pkcs11_logger_dl_sym(DLHANDLE library, const char *function)
         error = dlerror();
         if (NULL != error)
         {
-            pkcs11_logger_log_with_timestamp("Unable to obtain function pointer. Error: %s", error);
+            pkcs11_logger_log_with_timestamp("Unable to retrieve function pointer. Error: %s", error);
         }
         else
         {
-            pkcs11_logger_log_with_timestamp("Unable to obtain function pointer");
+            pkcs11_logger_log_with_timestamp("Unable to retrieve function pointer");
         }
     }
     else
     {
-        pkcs11_logger_log_with_timestamp("Successfully obtained function pointer");
+        pkcs11_logger_log_with_timestamp("Successfully retrieved function pointer");
     }
 
 #endif

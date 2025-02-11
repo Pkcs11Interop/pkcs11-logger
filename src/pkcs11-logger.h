@@ -103,7 +103,7 @@ typedef struct
     CK_FUNCTION_LIST_PTR orig_lib_functions;
     // Pointers to all cryptoki functions in PKCS11-LOGGER library
     CK_FUNCTION_LIST logger_functions;
-    // Flag indicating whether environment variables has been successfuly read
+    // Flag indicating whether environment variables has been successfully read
     CK_BBOOL env_vars_read;
     // Value of PKCS11_LOGGER_LIBRARY_PATH environment variable
     CK_CHAR_PTR env_var_library_path;
