@@ -115,16 +115,17 @@ int pkcs11_logger_init_orig_lib(void)
     GetFunctionListPointer = (CK_C_GetFunctionList) pkcs11_logger_dl_sym(pkcs11_logger_globals.orig_lib_handle, "C_GetFunctionList");
     if (NULL == GetFunctionListPointer)
     {
-        pkcs11_logger_log("Unable to find C_GetFunctionList() in %s", pkcs11_logger_globals.env_var_library_path);
         CALL_N_CLEAR(pkcs11_logger_dl_close, pkcs11_logger_globals.orig_lib_handle);
         return PKCS11_LOGGER_RV_ERROR;
     }
 
     // Get pointers to all PKCS#11 functions
+    pkcs11_logger_log_with_timestamp("Going to call C_GetFunctionList function from the original library");
     rv = GetFunctionListPointer(&(pkcs11_logger_globals.orig_lib_functions));
+    pkcs11_logger_log_with_timestamp("Received response from C_GetFunctionList function");
     if (CKR_OK != rv)
     {
-        pkcs11_logger_log("Unable to call C_GetFunctionList() from %s", pkcs11_logger_globals.env_var_library_path);
+        pkcs11_logger_log("C_GetFunctionList returned %lu (%s)", rv, pkcs11_logger_translate_ck_rv(rv));
         CALL_N_CLEAR(pkcs11_logger_dl_close, pkcs11_logger_globals.orig_lib_handle);
         return PKCS11_LOGGER_RV_ERROR;
     }
@@ -134,7 +135,8 @@ int pkcs11_logger_init_orig_lib(void)
     pkcs11_logger_globals.logger_functions.version.minor = pkcs11_logger_globals.orig_lib_functions->version.minor;
     
     // Everything is set up
-    pkcs11_logger_log("Memory contents are dumped without endianness conversion");
+    pkcs11_logger_log_separator();
+    pkcs11_logger_log("NOTE: Memory contents will be logged without the endianness conversion");
 
     return PKCS11_LOGGER_RV_SUCCESS;
 }

@@ -80,11 +80,50 @@ DLHANDLE pkcs11_logger_dl_open(const char* library)
 // Platform dependend function that gets function pointer from dynamic library
 void *pkcs11_logger_dl_sym(DLHANDLE library, const char *function)
 {
+    void *address = NULL;
+
+    pkcs11_logger_log_with_timestamp("Going to obtain function pointer for %s", function);
+
 #ifdef _WIN32
-    return (void*) GetProcAddress(library, function);
+
+    DWORD error = 0;
+
+    address = (void*) GetProcAddress(library, function);
+    if (NULL == address)
+    {
+        error = GetLastError();
+        pkcs11_logger_log_with_timestamp("Unable to obtain function pointer. Error: %0#10x", error);
+    }
+    else
+    {
+        pkcs11_logger_log_with_timestamp("Successfully obtained function pointer");
+    }
+
 #else
-    return dlsym(library, function);
+
+    char* error = NULL;
+
+    address = dlsym(library, function);
+    if (NULL == address)
+    {
+        error = dlerror();
+        if (NULL != error)
+        {
+            pkcs11_logger_log_with_timestamp("Unable to obtain function pointer. Error: %s", error);
+        }
+        else
+        {
+            pkcs11_logger_log_with_timestamp("Unable to obtain function pointer");
+        }
+    }
+    else
+    {
+        pkcs11_logger_log_with_timestamp("Successfully obtained function pointer");
+    }
+
 #endif
+
+    return address;
 }
 
 
