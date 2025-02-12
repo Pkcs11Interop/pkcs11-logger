@@ -117,27 +117,55 @@ void pkcs11_logger_log(const char* message, ...)
 }
 
 
+// Logs message with prepended timestamp
+void pkcs11_logger_log_with_timestamp(const char* message, ...)
+{
+    char* message_string = NULL;
+    int message_string_len = 0;
+
+    va_list ap;
+    va_start(ap, message);
+    message_string_len = vsnprintf(NULL, 0, message, ap);
+    va_end(ap);
+    
+    message_string = (char*) malloc(message_string_len + 1);
+    if (NULL == message_string)
+        return;
+
+    memset(message_string, 0, message_string_len + 1);
+
+    va_start(ap, message);
+    vsnprintf(message_string, message_string_len + 1, message, ap);
+    va_end(ap);
+
+    char time_string[27];
+    pkcs11_logger_utils_get_current_time_str(time_string, sizeof(time_string));
+
+    pkcs11_logger_log("%s - %s", time_string, message_string);
+
+    CALL_N_CLEAR(free, message_string);
+}
+
+
 // Logs separator line
 void pkcs11_logger_log_separator(void)
 {
-    char str_time[27];
-    pkcs11_logger_utils_get_current_time_str(str_time, sizeof(str_time));
-    pkcs11_logger_log("*************** %s ***", str_time);
+    pkcs11_logger_log("******************************************************************************************************************************");
 }
 
 
-// Logs function call
+// Logs entry into logger function
 void pkcs11_logger_log_function_enter(const char *function)
 {
     pkcs11_logger_log_separator();
-    pkcs11_logger_log("Calling %s", function);
+    pkcs11_logger_log_with_timestamp("Entered %s", function);
 }
 
 
-// Logs function exit
+// Logs exit from logger function
 void pkcs11_logger_log_function_exit(CK_RV rv)
 {
-    pkcs11_logger_log("Returning %lu (%s)", rv, pkcs11_logger_translate_ck_rv(rv));
+    pkcs11_logger_log_with_timestamp("Returning %lu (%s)", rv, pkcs11_logger_translate_ck_rv(rv));
 }
 
 
@@ -145,6 +173,20 @@ void pkcs11_logger_log_function_exit(CK_RV rv)
 void pkcs11_logger_log_input_params(void)
 {
     pkcs11_logger_log("Input");
+}
+
+
+// Logs entry into original function
+void pkcs11_logger_log_orig_function_enter(const char* function)
+{
+    pkcs11_logger_log_with_timestamp("Calling %s", function);
+}
+
+
+// Logs exit from original function
+void pkcs11_logger_log_orig_function_exit(const char* function)
+{
+    pkcs11_logger_log_with_timestamp("Received response from %s", function);
 }
 
 

@@ -103,7 +103,7 @@ typedef struct
     CK_FUNCTION_LIST_PTR orig_lib_functions;
     // Pointers to all cryptoki functions in PKCS11-LOGGER library
     CK_FUNCTION_LIST logger_functions;
-    // Flag indicating whether environment variables has been successfuly read
+    // Flag indicating whether environment variables has been successfully read
     CK_BBOOL env_vars_read;
     // Value of PKCS11_LOGGER_LIBRARY_PATH environment variable
     CK_CHAR_PTR env_var_library_path;
@@ -185,10 +185,13 @@ void pkcs11_logger_lock_destroy(void);
 
 // log.c - declaration of functions
 void pkcs11_logger_log(const char* message, ...);
+void pkcs11_logger_log_with_timestamp(const char* message, ...);
 void pkcs11_logger_log_separator(void);
 void pkcs11_logger_log_function_enter(const char *function);
 void pkcs11_logger_log_function_exit(CK_RV rv);
 void pkcs11_logger_log_input_params(void);
+void pkcs11_logger_log_orig_function_enter(const char* function);
+void pkcs11_logger_log_orig_function_exit(const char* function);
 void pkcs11_logger_log_output_params(void);
 void pkcs11_logger_log_flag(CK_ULONG flags, CK_ULONG flag_value, const char *flag_name);
 void pkcs11_logger_log_nonzero_string(const char *name, const CK_UTF8CHAR_PTR nonzero_string, CK_ULONG nonzero_string_len);
