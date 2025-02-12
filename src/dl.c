@@ -28,7 +28,7 @@ DLHANDLE pkcs11_logger_dl_open(const char* library)
 {
     DLHANDLE handle = NULL;
 
-    pkcs11_logger_log_with_timestamp("Loading PKCS#11 library \"%s\"", library);
+    pkcs11_logger_log_with_timestamp("Loading library \"%s\"", library);
 
 #ifdef _WIN32
 
@@ -42,11 +42,11 @@ DLHANDLE pkcs11_logger_dl_open(const char* library)
     if (NULL == handle)
     {
         error = GetLastError();
-        pkcs11_logger_log_with_timestamp("Unable to load PKCS#11 library. Error: %0#10x", error);
+        pkcs11_logger_log_with_timestamp("Unable to load library. Error: %0#10x", error);
     }
     else
     {
-        pkcs11_logger_log_with_timestamp("Successfully loaded PKCS#11 library");
+        pkcs11_logger_log_with_timestamp("Successfully loaded library");
     }
 
 #else
@@ -59,16 +59,16 @@ DLHANDLE pkcs11_logger_dl_open(const char* library)
         error = dlerror();
         if (NULL != error)
         {
-            pkcs11_logger_log_with_timestamp("Unable to load PKCS#11 library. Error: %s", error);
+            pkcs11_logger_log_with_timestamp("Unable to load library. Error: %s", error);
         }
         else
         {
-            pkcs11_logger_log_with_timestamp("Unable to load PKCS#11 library");
+            pkcs11_logger_log_with_timestamp("Unable to load library");
         }
     }
     else
     {
-        pkcs11_logger_log_with_timestamp("Successfully loaded PKCS#11 library");
+        pkcs11_logger_log_with_timestamp("Successfully loaded library");
     }
 
 #endif
@@ -130,9 +130,48 @@ void *pkcs11_logger_dl_sym(DLHANDLE library, const char *function)
 // Platform dependend function that unloads dynamic library
 int pkcs11_logger_dl_close(DLHANDLE library)
 {
+    int rv = 0;
+
+    pkcs11_logger_log_with_timestamp("Unloading library");
+
 #ifdef _WIN32
-    return FreeLibrary(library);
+
+    DWORD error = 0;
+
+    rv = FreeLibrary(library);
+    if (0 == rv)
+    {
+        error = GetLastError();
+        pkcs11_logger_log_with_timestamp("Unable to unload library. Error: %0#10x", error);
+    }
+    else
+    {
+        pkcs11_logger_log_with_timestamp("Successfully unloaded library");
+    }
+
 #else
-    return dlclose(library);
+
+    char* error = NULL;
+
+    rv = dlclose(library);
+    if (0 == rv)
+    {
+        error = dlerror();
+        if (NULL != error)
+        {
+            pkcs11_logger_log_with_timestamp("Unable to unload library. Error: %s", error);
+        }
+        else
+        {
+            pkcs11_logger_log_with_timestamp("Unable to unload library");
+        }
+    }
+    else
+    {
+        pkcs11_logger_log_with_timestamp("Successfully unloaded library");
+    }
+
 #endif
+
+    return rv;
 }
