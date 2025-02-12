@@ -1,3 +1,21 @@
+PKCS11-LOGGER 2.3.0 (2025-02-12)
+ - #4 - Added break missing in the function translating CK_RV
+   Based on code provided by @viperomega
+ - #5 - Skip logging the value of PKCS#11 attributes that cannot be read
+ - #8 - Fixed multiple compilation warnings on macOS
+   Based on code provided by @LudovicRousseau
+ - #8 - Use pthread_threadid_np instead of pthread_self on macOS
+   Based on code provided by @LudovicRousseau
+ - #8 - Print thread_id with the correct 64-bit size
+   Based on code provided by @LudovicRousseau
+ - #16 - Uses PKCS#11 v3.1 headers but still supports only PKCS#11 v2.20
+ - #17 - Target current platforms
+ - #22 - Enabled GitHub Actions
+ - #24 - Use LoadLibraryEx instead of LoadLibrary
+ - #25 - Add microseconds to timestamps
+   Based on code provided by @lImbus
+ - #26 - Log performance related data
+
 PKCS11-LOGGER 2.2.0 (2016-04-03)
  - License changed to the Apache License, Version 2.0
 
