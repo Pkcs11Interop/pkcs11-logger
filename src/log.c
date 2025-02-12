@@ -177,16 +177,16 @@ void pkcs11_logger_log_input_params(void)
 
 
 // Logs entry into original function
-void pkcs11_logger_log_orig_function_enter(void)
+void pkcs11_logger_log_orig_function_enter(const char* function)
 {
-    pkcs11_logger_log_with_timestamp("Calling the original function");
+    pkcs11_logger_log_with_timestamp("Calling %s", function);
 }
 
 
 // Logs exit from original function
-void pkcs11_logger_log_orig_function_exit(void)
+void pkcs11_logger_log_orig_function_exit(const char* function)
 {
-    pkcs11_logger_log_with_timestamp("Received response from the original function");
+    pkcs11_logger_log_with_timestamp("Received response from %s", function);
 }
 
 

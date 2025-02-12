@@ -130,9 +130,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Initialize)(CK_VOID_PTR pInitArgs)
         pkcs11_logger_log("  pReserved: %p", args->pReserved);
     }
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_Initialize(pInitArgs);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
 
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -149,9 +149,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Finalize)(CK_VOID_PTR pReserved)
     
     pkcs11_logger_log(" pReserved: %p", pReserved);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_Finalize(pReserved);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -168,9 +168,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetInfo)(CK_INFO_PTR pInfo)
     
     pkcs11_logger_log(" pInfo: %p", pInfo);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetInfo(pInfo);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -233,9 +233,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetSlotList)(CK_BBOOL tokenPresent, CK_SLOT_ID_PTR p
     if (NULL != pulCount)
         pkcs11_logger_log(" *pulCount: %lu", *pulCount);
 
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetSlotList(tokenPresent, pSlotList, pulCount);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
 
     if (CKR_OK == rv)
     {
@@ -271,9 +271,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetSlotInfo)(CK_SLOT_ID slotID, CK_SLOT_INFO_PTR pIn
     pkcs11_logger_log(" slotID: %lu", slotID);
     pkcs11_logger_log(" pInfo: %p", pInfo);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetSlotInfo(slotID, pInfo);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -313,9 +313,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetTokenInfo)(CK_SLOT_ID slotID, CK_TOKEN_INFO_PTR p
     pkcs11_logger_log(" slotID: %lu", slotID);
     pkcs11_logger_log(" pInfo: %p", pInfo);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetTokenInfo(slotID, pInfo);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -387,9 +387,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetMechanismList)(CK_SLOT_ID slotID, CK_MECHANISM_TY
     if (NULL != pulCount)
         pkcs11_logger_log(" *pulCount: %lu", *pulCount);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetMechanismList(slotID, pMechanismList, pulCount);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
 
     if (CKR_OK == rv)
     {
@@ -426,9 +426,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetMechanismInfo)(CK_SLOT_ID slotID, CK_MECHANISM_TY
     pkcs11_logger_log(" type: %lu (%s)", type, pkcs11_logger_translate_ck_mechanism_type(type));
     pkcs11_logger_log(" pInfo: %p", pInfo);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetMechanismInfo(slotID, type, pInfo);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -487,9 +487,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_InitToken)(CK_SLOT_ID slotID, CK_UTF8CHAR_PTR pPin, 
     if (NULL != pLabel)
         pkcs11_logger_log(" *pLabel: %.32s", pLabel);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_InitToken(slotID, pPin, ulPinLen, pLabel);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -512,9 +512,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_InitPIN)(CK_SESSION_HANDLE hSession, CK_UTF8CHAR_PTR
         pkcs11_logger_log(" *pPin: *** Intentionally hidden ***");
     pkcs11_logger_log(" ulPinLen: %lu", ulPinLen);
 
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_InitPIN(hSession, pPin, ulPinLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -543,9 +543,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SetPIN)(CK_SESSION_HANDLE hSession, CK_UTF8CHAR_PTR 
         pkcs11_logger_log(" *pNewPin: *** Intentionally hidden ***");
     pkcs11_logger_log(" ulNewLen: %lu", ulNewLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_SetPIN(hSession, pOldPin, ulOldLen, pNewPin, ulNewLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -570,9 +570,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_OpenSession)(CK_SLOT_ID slotID, CK_FLAGS flags, CK_V
     if (NULL != phSession)
         pkcs11_logger_log(" *phSession: %lu", phSession);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_OpenSession(slotID, flags, pApplication, Notify, phSession);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -598,9 +598,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_CloseSession)(CK_SESSION_HANDLE hSession)
     
     pkcs11_logger_log(" hSession: %lu", hSession);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_CloseSession(hSession);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -617,9 +617,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_CloseAllSessions)(CK_SLOT_ID slotID)
     
     pkcs11_logger_log(" slotID: %lu", slotID);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_CloseAllSessions(slotID);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -637,9 +637,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetSessionInfo)(CK_SESSION_HANDLE hSession, CK_SESSI
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" pInfo: %p", pInfo);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetSessionInfo(hSession, pInfo);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -676,9 +676,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetOperationState)(CK_SESSION_HANDLE hSession, CK_BY
     if (NULL != pulOperationStateLen)
         pkcs11_logger_log(" *pulOperationStateLen: %lu", *pulOperationStateLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetOperationState(hSession, pOperationState, pulOperationStateLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -712,9 +712,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SetOperationState)(CK_SESSION_HANDLE hSession, CK_BY
     pkcs11_logger_log(" hEncryptionKey: %lu", hEncryptionKey);
     pkcs11_logger_log(" hAuthenticationKey: %lu", hAuthenticationKey);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_SetOperationState(hSession, pOperationState, ulOperationStateLen, hEncryptionKey, hAuthenticationKey);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -738,9 +738,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Login)(CK_SESSION_HANDLE hSession, CK_USER_TYPE user
         pkcs11_logger_log(" *pPin: *** Intentionally hidden ***");
     pkcs11_logger_log(" ulPinLen: %lu", ulPinLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_Login(hSession, userType, pPin, ulPinLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -757,9 +757,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Logout)(CK_SESSION_HANDLE hSession)
     
     pkcs11_logger_log(" hSession: %lu", hSession);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_Logout(hSession);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -782,9 +782,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_CreateObject)(CK_SESSION_HANDLE hSession, CK_ATTRIBU
     if (NULL != phObject)
         pkcs11_logger_log(" *phObject: %lu", *phObject);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_CreateObject(hSession, pTemplate, ulCount, phObject);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -817,9 +817,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_CopyObject)(CK_SESSION_HANDLE hSession, CK_OBJECT_HA
     if (NULL != phNewObject)
         pkcs11_logger_log(" *phNewObject: %lu", *phNewObject);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_CopyObject(hSession, hObject, pTemplate, ulCount, phNewObject);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -846,9 +846,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DestroyObject)(CK_SESSION_HANDLE hSession, CK_OBJECT
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" hObject: %lu", hObject);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_DestroyObject(hSession, hObject);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -869,9 +869,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetObjectSize)(CK_SESSION_HANDLE hSession, CK_OBJECT
     if (NULL != pulSize)
         pkcs11_logger_log(" *pulSize: %lu", *pulSize);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetObjectSize(hSession, hObject, pulSize);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -901,9 +901,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
     pkcs11_logger_log(" ulCount: %lu", ulCount);
     pkcs11_logger_log_attribute_template(pTemplate, ulCount);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetAttributeValue(hSession, hObject, pTemplate, ulCount);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if ((CKR_OK == rv) || (CKR_ATTRIBUTE_SENSITIVE == rv) || (CKR_ATTRIBUTE_TYPE_INVALID == rv) || (CKR_BUFFER_TOO_SMALL == rv))
     {
@@ -933,9 +933,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SetAttributeValue)(CK_SESSION_HANDLE hSession, CK_OB
     pkcs11_logger_log(" ulCount: %lu", ulCount);
     pkcs11_logger_log_attribute_template(pTemplate, ulCount);    
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_SetAttributeValue(hSession, hObject, pTemplate, ulCount);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -955,9 +955,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjectsInit)(CK_SESSION_HANDLE hSession, CK_ATTR
     pkcs11_logger_log(" ulCount: %lu", ulCount);
     pkcs11_logger_log_attribute_template(pTemplate, ulCount);        
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_FindObjectsInit(hSession, pTemplate, ulCount);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -988,9 +988,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjects)(CK_SESSION_HANDLE hSession, CK_OBJECT_H
         }
     }
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_FindObjects(hSession, phObject, ulMaxObjectCount, pulObjectCount);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1026,9 +1026,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_FindObjectsFinal)(CK_SESSION_HANDLE hSession)
     
     pkcs11_logger_log(" hSession: %lu", hSession);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_FindObjectsFinal(hSession);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1054,9 +1054,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANIS
     }
     pkcs11_logger_log(" hKey: %lu", hKey);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_EncryptInit(hSession, pMechanism, hKey);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1080,9 +1080,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Encrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDa
     if (NULL != pulEncryptedDataLen)
         pkcs11_logger_log(" *pulEncryptedDataLen: %lu", *pulEncryptedDataLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_Encrypt(hSession, pData, ulDataLen, pEncryptedData, pulEncryptedDataLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1118,9 +1118,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_P
     if (NULL != pulEncryptedPartLen)
         pkcs11_logger_log(" *pulEncryptedPartLen: %lu", *pulEncryptedPartLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_EncryptUpdate(hSession, pPart, ulPartLen, pEncryptedPart, pulEncryptedPartLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1153,9 +1153,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_EncryptFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
     if (NULL != pulLastEncryptedPartLen)
         pkcs11_logger_log(" *pulLastEncryptedPartLen: %lu", *pulLastEncryptedPartLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_EncryptFinal(hSession, pLastEncryptedPart, pulLastEncryptedPartLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1194,9 +1194,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit)(CK_SESSION_HANDLE hSession, CK_MECHANIS
     
     pkcs11_logger_log(" hKey: %lu", hKey);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_DecryptInit(hSession, pMechanism, hKey);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1220,9 +1220,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pEn
     if (NULL != pulDataLen)
         pkcs11_logger_log(" *pulDataLen: %lu", *pulDataLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_Decrypt(hSession, pEncryptedData, ulEncryptedDataLen, pData, pulDataLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1258,9 +1258,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_P
     if (NULL != pulPartLen)
         pkcs11_logger_log(" *pulPartLen: %lu", *pulPartLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_DecryptUpdate(hSession, pEncryptedPart, ulEncryptedPartLen, pPart, pulPartLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1293,9 +1293,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
     if (NULL != pulLastPartLen)
         pkcs11_logger_log(" *pulLastPartLen: %lu", *pulLastPartLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_DecryptFinal(hSession, pLastPart, pulLastPartLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1332,9 +1332,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM
         pkcs11_logger_log("  ulParameterLen: %p", pMechanism->ulParameterLen);        
     }
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_DigestInit(hSession, pMechanism);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1358,9 +1358,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Digest)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDat
     if (NULL != pulDigestLen)
         pkcs11_logger_log(" *pulDigestLen: %lu", *pulDigestLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_Digest(hSession, pData, ulDataLen, pDigest, pulDigestLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1392,9 +1392,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
     pkcs11_logger_log_byte_array(" *pPart", pPart, ulPartLen);
     pkcs11_logger_log(" ulPartLen: %lu", ulPartLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_DigestUpdate(hSession, pPart, ulPartLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1412,9 +1412,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestKey)(CK_SESSION_HANDLE hSession, CK_OBJECT_HAN
     pkcs11_logger_log(" hSession: %lu", hSession);
     pkcs11_logger_log(" hKey: %lu", hKey);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_DigestKey(hSession, hKey);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1435,9 +1435,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
     if (NULL != pulDigestLen)
         pkcs11_logger_log(" *pulDigestLen: %lu", *pulDigestLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_DigestFinal(hSession, pDigest, pulDigestLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1475,9 +1475,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM_P
     }
     pkcs11_logger_log(" hKey: %lu", hKey);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_SignInit(hSession, pMechanism, hKey);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1501,9 +1501,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Sign)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pData,
     if (NULL != pulSignatureLen)
         pkcs11_logger_log(" *pulSignatureLen: %lu", *pulSignatureLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_Sign(hSession, pData, ulDataLen, pSignature, pulSignatureLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1535,9 +1535,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR 
     pkcs11_logger_log_byte_array(" *pPart", pPart, ulPartLen);
     pkcs11_logger_log(" ulPartLen: %lu", ulPartLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_SignUpdate(hSession, pPart, ulPartLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1558,9 +1558,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR p
     if (NULL != pulSignatureLen)
         pkcs11_logger_log(" *pulSignatureLen: %lu", *pulSignatureLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_SignFinal(hSession, pSignature, pulSignatureLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1598,9 +1598,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignRecoverInit)(CK_SESSION_HANDLE hSession, CK_MECH
     }
     pkcs11_logger_log(" hKey: %lu", hKey);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_SignRecoverInit(hSession, pMechanism, hKey);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1624,9 +1624,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
     if (NULL != pulSignatureLen)
         pkcs11_logger_log(" *pulSignatureLen: %lu", *pulSignatureLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_SignRecover(hSession, pData, ulDataLen, pSignature, pulSignatureLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1664,9 +1664,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyInit)(CK_SESSION_HANDLE hSession, CK_MECHANISM
     }
     pkcs11_logger_log(" hKey: %lu", hKey);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_VerifyInit(hSession, pMechanism, hKey);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1689,9 +1689,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_Verify)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR pDat
     pkcs11_logger_log_byte_array(" *pSignature", pSignature, ulSignatureLen);
     pkcs11_logger_log(" ulSignatureLen: %lu", ulSignatureLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_Verify(hSession, pData, ulDataLen, pSignature, ulSignatureLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1711,9 +1711,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyUpdate)(CK_SESSION_HANDLE hSession, CK_BYTE_PT
     pkcs11_logger_log_byte_array(" *pPart", pPart, ulPartLen);
     pkcs11_logger_log(" ulPartLen: %lu", ulPartLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_VerifyUpdate(hSession, pPart, ulPartLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1733,9 +1733,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyFinal)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR
     pkcs11_logger_log_byte_array(" *pSignature", pSignature, ulSignatureLen);
     pkcs11_logger_log(" ulSignatureLen: %lu", ulSignatureLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_VerifyFinal(hSession, pSignature, ulSignatureLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1761,9 +1761,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyRecoverInit)(CK_SESSION_HANDLE hSession, CK_ME
     }
     pkcs11_logger_log(" hKey: %lu", hKey);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_VerifyRecoverInit(hSession, pMechanism, hKey);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -1787,9 +1787,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_VerifyRecover)(CK_SESSION_HANDLE hSession, CK_BYTE_P
     if (NULL != pulDataLen)
         pkcs11_logger_log(" *pulDataLen: %lu", *pulDataLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_VerifyRecover(hSession, pSignature, ulSignatureLen, pData, pulDataLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1825,9 +1825,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DigestEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_
     if (NULL != pulEncryptedPartLen)
         pkcs11_logger_log(" *pulEncryptedPartLen: %lu", *pulEncryptedPartLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_DigestEncryptUpdate(hSession, pPart, ulPartLen, pEncryptedPart, pulEncryptedPartLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1863,9 +1863,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptDigestUpdate)(CK_SESSION_HANDLE hSession, CK_
     if (NULL != pulPartLen)
         pkcs11_logger_log(" *pulPartLen: %lu", *pulPartLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_DecryptDigestUpdate(hSession, pEncryptedPart, ulEncryptedPartLen, pPart, pulPartLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1901,9 +1901,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SignEncryptUpdate)(CK_SESSION_HANDLE hSession, CK_BY
     if (NULL != pulEncryptedPartLen)
         pkcs11_logger_log(" *pulEncryptedPartLen: %lu", *pulEncryptedPartLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_SignEncryptUpdate(hSession, pPart, ulPartLen, pEncryptedPart, pulEncryptedPartLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1939,9 +1939,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptVerifyUpdate)(CK_SESSION_HANDLE hSession, CK_
     if (NULL != pulPartLen)
         pkcs11_logger_log(" *pulPartLen: %lu", *pulPartLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_DecryptVerifyUpdate(hSession, pEncryptedPart, ulEncryptedPartLen, pPart, pulPartLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -1984,9 +1984,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateKey)(CK_SESSION_HANDLE hSession, CK_MECHANIS
     if (NULL != phKey)
         pkcs11_logger_log(" *phKey: %lu", *phKey);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GenerateKey(hSession, pMechanism, pTemplate, ulCount, phKey);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -2032,9 +2032,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateKeyPair)(CK_SESSION_HANDLE hSession, CK_MECH
     if (NULL != phPrivateKey)
         pkcs11_logger_log(" *phPrivateKey: %lu", *phPrivateKey);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GenerateKeyPair(hSession, pMechanism, pPublicKeyTemplate, ulPublicKeyAttributeCount, pPrivateKeyTemplate, ulPrivateKeyAttributeCount, phPublicKey, phPrivateKey);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -2076,9 +2076,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_WrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_PT
     if (NULL != pulWrappedKeyLen)
         pkcs11_logger_log(" *pulWrappedKeyLen: %lu", *pulWrappedKeyLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_WrapKey(hSession, pMechanism, hWrappingKey, hKey, pWrappedKey, pulWrappedKeyLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -2125,9 +2125,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_UnwrapKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_
     if (NULL != phKey)
         pkcs11_logger_log(" *phKey: %lu", *phKey);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_UnwrapKey(hSession, pMechanism, hUnwrappingKey, pWrappedKey, ulWrappedKeyLen, pTemplate, ulAttributeCount, phKey);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -2168,9 +2168,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_DeriveKey)(CK_SESSION_HANDLE hSession, CK_MECHANISM_
     if (NULL != phKey)
         pkcs11_logger_log(" *phKey: %lu", *phKey);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_DeriveKey(hSession, pMechanism, hBaseKey, pTemplate, ulAttributeCount, phKey);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -2199,9 +2199,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_SeedRandom)(CK_SESSION_HANDLE hSession, CK_BYTE_PTR 
     pkcs11_logger_log_byte_array(" *pSeed", pSeed, ulSeedLen);
     pkcs11_logger_log(" ulSeedLen: %lu",  ulSeedLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_SeedRandom(hSession, pSeed, ulSeedLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -2221,9 +2221,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GenerateRandom)(CK_SESSION_HANDLE hSession, CK_BYTE_
     pkcs11_logger_log_byte_array(" *RandomData", RandomData, ulRandomLen);
     pkcs11_logger_log(" ulRandomLen: %lu", ulRandomLen);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GenerateRandom(hSession, RandomData, ulRandomLen);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
@@ -2249,9 +2249,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_GetFunctionStatus)(CK_SESSION_HANDLE hSession)
     
     pkcs11_logger_log(" hSession: %lu", hSession);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_GetFunctionStatus(hSession);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -2268,9 +2268,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_CancelFunction)(CK_SESSION_HANDLE hSession)
     
     pkcs11_logger_log(" hSession: %lu", hSession);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_CancelFunction(hSession);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     pkcs11_logger_log_function_exit(rv);
     return rv;
@@ -2290,9 +2290,9 @@ CK_DEFINE_FUNCTION(CK_RV, C_WaitForSlotEvent)(CK_FLAGS flags, CK_SLOT_ID_PTR pSl
     pkcs11_logger_log(" pSlot: %p", pSlot);
     pkcs11_logger_log(" pReserved: %p", pReserved);
     
-    pkcs11_logger_log_orig_function_enter();
+    pkcs11_logger_log_orig_function_enter(__FUNCTION__);
     rv = pkcs11_logger_globals.orig_lib_functions->C_WaitForSlotEvent(flags, pSlot, pReserved);
-    pkcs11_logger_log_orig_function_exit();
+    pkcs11_logger_log_orig_function_exit(__FUNCTION__);
     
     if (CKR_OK == rv)
     {
