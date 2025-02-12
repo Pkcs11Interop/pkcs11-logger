@@ -21,87 +21,76 @@ PKCS11-LOGGER
 
 ## Overview
 
-PKCS#11 is cryptography standard that defines ANSI C API to access smart cards and other types of cryptographic hardware.
+PKCS11-LOGGER (hereafter referred to as logger) is a minimalistic C library that implements the [PKCS#11 v2.20](https://github.com/Pkcs11Interop/PKCS11-SPECS/tree/master/v2.20) API.
 
-Library implementing PKCS#11 interface is usually used in the following scenario:
+PKCS#11 is a cryptographic standard that defines an ANSI C API for accessing smart cards and other types of cryptographic hardware.
+
+Library implementing the PKCS#11 interface is typically used in the following scenario:
 
 ```mermaid
 flowchart TB
     A[Application] --> B[PKCS#11 library] --> C[Device]
 ```
 
-Due to the complexity of PKCS#11 API it is not rare that user needs to troubleshoot communication problems between application and PKCS#11 library. That is the moment when PKCS11-LOGGER (logger) may come handy.
+Due to the complexity of the PKCS#11 API, users often need to troubleshoot communication issues between the application and the PKCS#11 library. This is where the logger becomes useful.
 
-Logger sits between the application and the original PKCS#11 library:
+The logger acts as an intermediary between the application and the original PKCS#11 library:
 
 ```mermaid
 flowchart TB
     A[Application] --> B[PKCS11-LOGGER library] --> C[PKCS#11 library] --> D[Device]
 ```
 
-Application calls PKCS#11 function provided by logger, logger calls the same function provided by the original PKCS#11 library and while logging everything it returns the result to the application.
+When an application calls PKCS#11 function provided by the logger, the logger forwards the call to the original PKCS#11 library while logging the interaction. It then returns the result to the application.
 
 ## Output example
 
-By default every logged line starts with the two hex numbers separated by a colon. The first hex number is process id and the second one is thread id.
+By default, each logged line starts with two hexadecimal numbers separated by a colon. The first number represents the process ID, and the second represents the thread ID. The following example shows a call to the `C_OpenSession` function:
 
 ```
-0x000016ac : 0x00000000000014dc : ****************************** 2022-06-19 09:52:48 ***
-0x000016ac : 0x00000000000014dc : Calling C_Initialize
-0x000016ac : 0x00000000000014dc : Input
-0x000016ac : 0x00000000000014dc :  pInitArgs: 000002290F5A7D10
-0x000016ac : 0x00000000000014dc :   CreateMutex: 0000000000000000
-0x000016ac : 0x00000000000014dc :   DestroyMutex: 0000000000000000
-0x000016ac : 0x00000000000014dc :   LockMutex: 0000000000000000
-0x000016ac : 0x00000000000014dc :   UnlockMutex: 0000000000000000
-0x000016ac : 0x00000000000014dc :   Flags: 2
-0x000016ac : 0x00000000000014dc :    CKF_LIBRARY_CANT_CREATE_OS_THREADS: FALSE
-0x000016ac : 0x00000000000014dc :    CKF_OS_LOCKING_OK: TRUE
-0x000016ac : 0x00000000000014dc :   pReserved: 0000000000000000
-0x000016ac : 0x00000000000014dc : Returning 0 (CKR_OK)
-0x000016ac : 0x00000000000014dc : ****************************** 2022-06-19 09:52:48 ***
-0x000016ac : 0x00000000000014dc : Calling C_GetInfo
-0x000016ac : 0x00000000000014dc : Input
-0x000016ac : 0x00000000000014dc :  pInfo: 000000671F6FE040
-0x000016ac : 0x00000000000014dc : Output
-0x000016ac : 0x00000000000014dc :  pInfo: 000000671F6FE040
-0x000016ac : 0x00000000000014dc :   cryptokiVersion:
-0x000016ac : 0x00000000000014dc :    major: 2
-0x000016ac : 0x00000000000014dc :    minor: 20
-0x000016ac : 0x00000000000014dc :   manufacturerID: Pkcs11Interop Project           
-0x000016ac : 0x00000000000014dc :   flags: 0
-0x000016ac : 0x00000000000014dc :   libraryDescription: Mock module                     
-0x000016ac : 0x00000000000014dc :   libraryVersion:
-0x000016ac : 0x00000000000014dc :    major: 1
-0x000016ac : 0x00000000000014dc :    minor: 0
-0x000016ac : 0x00000000000014dc : Returning 0 (CKR_OK)
+0x0000956c : 0x0000000000006838 : 2025-02-12 06:28:22.171000 - Entered C_OpenSession
+0x0000956c : 0x0000000000006838 : Input
+0x0000956c : 0x0000000000006838 :  slotID: 1
+0x0000956c : 0x0000000000006838 :  flags: 6
+0x0000956c : 0x0000000000006838 :   CKF_RW_SESSION: TRUE
+0x0000956c : 0x0000000000006838 :   CKF_SERIAL_SESSION: TRUE
+0x0000956c : 0x0000000000006838 :  pApplication: 0000000000000000
+0x0000956c : 0x0000000000006838 :  Notify: 0000000000000000
+0x0000956c : 0x0000000000006838 :  phSession: 000000782AFFF110
+0x0000956c : 0x0000000000006838 :  *phSession: 721416464
+0x0000956c : 0x0000000000006838 : 2025-02-12 06:28:22.171000 - Calling C_OpenSession
+0x0000956c : 0x0000000000006838 : 2025-02-12 06:28:22.171000 - Received response from C_OpenSession
+0x0000956c : 0x0000000000006838 : Output
+0x0000956c : 0x0000000000006838 :  phSession: 000000782AFFF110
+0x0000956c : 0x0000000000006838 :  *phSession: 1
+0x0000956c : 0x0000000000006838 : 2025-02-12 06:28:22.171000 - Returning 0 (CKR_OK)
 ```
 
 ## Configuration
 
-Logger behavior can be controlled with the following [environment variables](https://en.wikipedia.org/wiki/Environment_variable):
+The logger's behavior can be controlled using the following [environment variables](https://en.wikipedia.org/wiki/Environment_variable):
 
-* **PKCS11_LOGGER_LIBRARY_PATH**
+* **`PKCS11_LOGGER_LIBRARY_PATH`**
 
-  Specifies the path to the original PKCS#11 library. Value needs to be provided without the enclosing quotes. When this variable is not defined all logger functions return CKR_GENERAL_ERROR and print information about missing environment variable to the stderr.
+  Specifies the path to the original PKCS#11 library. The value must be provided without enclosing quotes. If this variable is not defined, all logger functions return `CKR_GENERAL_ERROR` and print an error message to `STDERR`.
 
-* **PKCS11_LOGGER_LOG_FILE_PATH**
+* **`PKCS11_LOGGER_LOG_FILE_PATH`**
 
-  Specifies the path to the log file. Value needs to be provided without the enclosing quotes.
+  Specifies the path to the log file. The value must be provided without enclosing quotes.
 
-* **PKCS11_LOGGER_FLAGS**
+* **`PKCS11_LOGGER_FLAGS`**
 
-  Specifies [bit mask](https://en.wikipedia.org/wiki/Mask_(computing)) that controls multiple logger features with the following meaning of individual bits:
-  
-  * 0x01 hex or 1 dec disables logging into the log file
-  * 0x02 hex or 2 dec disables logging of process id
-  * 0x04 hex or 4 dec disables logging of thread id
-  * 0x08 hex or 8 dec enables logging of PINs
-  * 0x10 hex or 16 dec enables logging to the stdout
-  * 0x20 hex or 32 dec enables logging to the stderr
-  * 0x40 hex or 64 dec enables reopening of log file (decreases performance but log file can be deleted when needed)
+  Specifies a [bitmask](https://en.wikipedia.org/wiki/Mask_(computing)) that controls multiple logger features. The meaning of individual bits is as follows:
 
-  Value needs to be provided as a decimal number that represents the sum of requested features. For example value 6 can be used to disable logging of process id and thread id. Default value is 0.
+  * `0x01` hex or `1` dec disables logging to the log file
+  * `0x02` hex or `2` dec disables logging of the process ID
+  * `0x04` hex or `4` dec disables logging of the thread ID
+  * `0x08` hex or `8` dec enables logging of PINs
+  * `0x10` hex or `16` dec enables logging to `STDOUT`
+  * `0x20` hex or `32` dec enables logging to `STDERR`
+  * `0x40` hex or `64` dec enables reopening of the log file (reduces performance but allows log file deletion)
+
+  The value must be provided as a decimal number representing the sum of the desired features. For example, a value of `6` disables logging of both the process ID and thread ID. The default value is `0`.
 
 ## Download
 
@@ -120,7 +109,7 @@ cd build/windows/
 build.bat
 ```
 	
-The script should use Visual Studio to build both 32-bit (`pkcs11-logger-x86.dll`) and 64-bit (`pkcs11-logger-x64.dll`) versions of logger library.
+The script should use Visual Studio to build both 32-bit (`pkcs11-logger-x86.dll`) and 64-bit (`pkcs11-logger-x64.dll`) versions of the library.
 
 ### Linux
 
@@ -131,7 +120,7 @@ cd build/linux/
 sh build.sh
 ```
 
-The script should use GCC to build both 32-bit (`pkcs11-logger-x86.so`) and 64-bit (`pkcs11-logger-x64.so`) versions of logger library.
+The script should use GCC to build both 32-bit (`pkcs11-logger-x86.so`) and 64-bit (`pkcs11-logger-x64.so`) versions of the library.
 
 ### macOS
 
